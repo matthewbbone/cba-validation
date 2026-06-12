@@ -1,0 +1,497 @@
+[
+  {
+    "conceptId": "C_WAGE_BASE_RATE",
+    "category": "Compensation",
+    "label": "Base wage or salary rate"
+  },
+  {
+    "conceptId": "C_GRIEVANCE_PROCEDURE",
+    "category": "Disputes",
+    "label": "Grievance steps, timelines, representation, and scope"
+  },
+  {
+    "conceptId": "C_ARBITRATION",
+    "category": "Disputes",
+    "label": "Arbitration access, selection, authority, costs, and finality"
+  },
+  {
+    "conceptId": "C_LEAVE_HOLIDAYS",
+    "category": "Leave",
+    "label": "Holidays and holiday pay"
+  },
+  {
+    "conceptId": "C_PREMIUM_OVERTIME",
+    "category": "Compensation",
+    "label": "Overtime eligibility thresholds and multipliers"
+  },
+  {
+    "conceptId": "C_UNION_ACCESS_BUSINESS",
+    "category": "Recognition",
+    "label": "Steward access, union business time, bulletin boards, and meeting rights"
+  },
+  {
+    "conceptId": "C_DISCIPLINE_JUST_CAUSE",
+    "category": "Disputes",
+    "label": "Just cause and substantive discipline/discharge standard"
+  },
+  {
+    "conceptId": "C_WAGE_INCREASES_COLA",
+    "category": "Compensation",
+    "label": "Annual wage increases: $0.25/hr for time workers (12/17/01, 12/16/02, 12/15/03); $0.25/hr equivalent for piece workers"
+  },
+  {
+    "conceptId": "C_HEALTH_MEDICAL_ACTIVE_CONTRIBUTION",
+    "category": "Healthcare",
+    "label": "H&W Fund contribution: 17.625% of payroll (12/17/01); declining to 13% (7/1/02); rising to 15.5% (7/1/03); allocated to Eastern States H&W F"
+  },
+  {
+    "conceptId": "C_LEAVE_VACATION",
+    "category": "Leave",
+    "label": "Vacation and annual leave"
+  },
+  {
+    "conceptId": "C_SAFETY_PPE_UNSAFE_WORK",
+    "category": "Safety",
+    "label": "PPE, unsafe-work rights, safety standards, and hazard response"
+  },
+  {
+    "conceptId": "C_PREMIUM_CALL_IN_REPORTING",
+    "category": "Compensation",
+    "label": "Call-in, call-back, reporting, and minimum-pay guarantees"
+  },
+  {
+    "conceptId": "C_RETIREMENT_PENSION",
+    "category": "Ancillary",
+    "label": "Pension and retirement plan eligibility/contributions"
+  },
+  {
+    "conceptId": "C_PREMIUM_SHIFT",
+    "category": "Compensation",
+    "label": "Shift differentials and night/weekend premiums"
+  },
+  {
+    "conceptId": "C_JOB_SECURITY_LAYOFF_ORDER",
+    "category": "Security",
+    "label": "Layoff notification and procedure"
+  },
+  {
+    "conceptId": "C_TIME_REGULAR_SCHEDULE",
+    "category": "Scheduling",
+    "label": "Regular hours and schedule structure"
+  },
+  {
+    "conceptId": "C_UNION_SECURITY_DUES_CHECKOFF",
+    "category": "Recognition",
+    "label": "Dues checkoff, agency shop, union security, and payroll remittance"
+  },
+  {
+    "conceptId": "C_WAGE_PROGRESSION",
+    "category": "Compensation",
+    "label": "Wage progression, steps, and classification movement"
+  },
+  {
+    "conceptId": "C_LEAVE_SICK",
+    "category": "Leave",
+    "label": "Sick/personal days: 3 days for 1–4 yr service; 5 days for 5+ yrs; unused days paid out at end of each period"
+  },
+  {
+    "conceptId": "C_LEAVE_PERSONAL_MISC",
+    "category": "Leave",
+    "label": "Bereavement/compassionate leave"
+  },
+  {
+    "conceptId": "C_JOB_SECURITY_RECALL",
+    "category": "Security",
+    "label": "Recall rights — equal to continuous service or 2 years maximum"
+  },
+  {
+    "conceptId": "C_TIME_REST_MEAL_PERIODS",
+    "category": "Scheduling",
+    "label": "Rest periods, meal periods, and relief breaks"
+  },
+  {
+    "conceptId": "C_PREMIUM_RESPONSIBILITY_SPECIALTY",
+    "category": "Compensation",
+    "label": "Responsibility, higher-classification, specialty, translation, flight, or role premiums"
+  },
+  {
+    "conceptId": "C_RETIREMENT_SAVINGS_ANNUITY",
+    "category": "Ancillary",
+    "label": "Annuity Fund (CT Carpenters) contributions"
+  },
+  {
+    "conceptId": "C_RECOGNITION_COVERAGE_SCOPE",
+    "category": "Recognition",
+    "label": "Bargaining unit scope"
+  },
+  {
+    "conceptId": "C_HEALTH_DENTAL",
+    "category": "Healthcare",
+    "label": "Dental plan — employer-paid after 6 months"
+  },
+  {
+    "conceptId": "C_LEAVE_PARENTAL_FAMILY",
+    "category": "Leave",
+    "label": "Family leave — CFRA and FMLA compliance"
+  },
+  {
+    "conceptId": "C_TRAINING_TUITION_CERTIFICATION",
+    "category": "Ancillary",
+    "label": "Training, tuition support, certification, and professional development"
+  },
+  {
+    "conceptId": "C_JOB_SECURITY_SEVERANCE",
+    "category": "Security",
+    "label": "Income Protection Supplement: 100% of base wage + COLA for 13-52 weeks by service tier after layoff pay exhausted"
+  },
+  {
+    "conceptId": "C_HEALTH_MEDICAL_ACTIVE",
+    "category": "Healthcare",
+    "label": "Active-worker medical umbrella record"
+  },
+  {
+    "conceptId": "C_HEALTH_LIFE_AD_D",
+    "category": "Healthcare",
+    "label": "Group life and AD&D insurance — employer-paid"
+  },
+  {
+    "conceptId": "C_DISCIPLINE_PROGRESSIVE",
+    "category": "Disputes",
+    "label": "Progressive discipline steps, warnings, and notice"
+  },
+  {
+    "conceptId": "C_HEALTH_MEDICAL_ACTIVE_PLAN_DESIGN",
+    "category": "Healthcare",
+    "label": "Active-worker medical plan design, covered services, deductibles, copays, OOP limits"
+  },
+  {
+    "conceptId": "C_PREMIUM_STANDBY_ON_CALL",
+    "category": "Compensation",
+    "label": "Standby pay"
+  },
+  {
+    "conceptId": "C_UNIFORM_CLOTHING_ALLOWANCE",
+    "category": "Compensation",
+    "label": "Safety shoe program: 100% cost for Wood Processing/Pulp Mill employees; up to $110 reimbursement for others"
+  },
+  {
+    "conceptId": "C_LABOR_MANAGEMENT_COMMITTEE",
+    "category": "Safety",
+    "label": "Labor-Management Cooperation Committee (LMCC)"
+  },
+  {
+    "conceptId": "C_HIRING_HALL_DISPATCH",
+    "category": "Recognition",
+    "label": "Hiring hall, dispatch hall, and referral system"
+  },
+  {
+    "conceptId": "C_DISCIPLINE_INVESTIGATION_APPEAL",
+    "category": "Disputes",
+    "label": "Disciplinary record removal — 1 year no recurrence"
+  },
+  {
+    "conceptId": "C_HEALTH_DISABILITY_INCOME",
+    "category": "Healthcare",
+    "label": "Income Protection and Extended Income Protection (disability income)"
+  },
+  {
+    "conceptId": "C_JOB_SECURITY_BENEFIT_CONTINUATION",
+    "category": "Security",
+    "label": "Benefits during leaves of absence — health, dental, life insurance continuation"
+  },
+  {
+    "conceptId": "C_HEALTH_RETIREE",
+    "category": "Healthcare",
+    "label": "Retiree health plan — Kaiser Foundation employer-paid"
+  },
+  {
+    "conceptId": "C_SUBCONTRACTING_WORK_PRESERVATION",
+    "category": "Security",
+    "label": "Subcontracting limits, non-unit work, and work preservation"
+  },
+  {
+    "conceptId": "C_WORKLOAD_CLASS_SIZE_STAFFING",
+    "category": "Scheduling",
+    "label": "School day defined; preparation periods required where practicable (45-minute duty-free lunch); extracurricular on voluntary basis"
+  },
+  {
+    "conceptId": "C_SENIORITY_SYSTEM",
+    "category": "Security",
+    "label": "Seniority system — length of service at premises by classification"
+  },
+  {
+    "conceptId": "C_TIME_SCHEDULE_NOTICE_CHANGE",
+    "category": "Scheduling",
+    "label": "Schedule changes — Thursday advance notice rule"
+  },
+  {
+    "conceptId": "C_PREMIUM_ZONE_SUBSISTENCE",
+    "category": "Compensation",
+    "label": "Zone pay, travel subsistence, and remote-site allowances"
+  },
+  {
+    "conceptId": "C_HEALTH_VISION",
+    "category": "Healthcare",
+    "label": "Group vision care plan"
+  },
+  {
+    "conceptId": "C_LEGAL_SERVICES_FUND",
+    "category": "Ancillary",
+    "label": "Group legal services fund"
+  },
+  {
+    "conceptId": "C_JOB_POSTING_BIDDING_TRANSFER",
+    "category": "Security",
+    "label": "Job posting and promotion rights"
+  },
+  {
+    "conceptId": "C_SAFETY_ASSAULT_VIOLENCE",
+    "category": "Safety",
+    "label": "Physical violence and verbal abuse policy; response team; paid release on shift of assault"
+  },
+  {
+    "conceptId": "C_RETIREMENT_INCENTIVE",
+    "category": "Ancillary",
+    "label": "Retirement bonus — $10,000 at June 30 2005, $7,500 at June 30 2006, $5,000 at June 30 2007 — for teachers with 30+ years ACS service"
+  },
+  {
+    "conceptId": "C_JOB_SECURITY_LAYOFF_RECALL",
+    "category": "Security",
+    "label": "Force adjustments and recall — Art. 10"
+  },
+  {
+    "conceptId": "C_JOB_SECURITY_SUB_INCOME_BRIDGE",
+    "category": "Security",
+    "label": "Supplemental Unemployment Benefit (SUB) fund"
+  },
+  {
+    "conceptId": "C_CHILD_DEPENDENT_CARE",
+    "category": "Ancillary",
+    "label": "Fellowships for Day Care"
+  },
+  {
+    "conceptId": "C_HEALTH_EMPLOYER_CONTRIBUTION",
+    "category": "Healthcare",
+    "label": "IAFF VEBA health benefit fund"
+  },
+  {
+    "conceptId": "C_HEALTH_ACTIVE",
+    "category": "Healthcare",
+    "label": "Health benefits — VEBA Trust; state-funded monthly allocation per FTE; plan design in Trust"
+  },
+  {
+    "conceptId": "C_JOB_SECURITY_LAYOFF",
+    "category": "Security",
+    "label": "Dismissal pay — 2 weeks if musician not re-engaged within 90 days"
+  },
+  {
+    "conceptId": "C_WAGE_GENERAL_INCREASE",
+    "category": "Compensation",
+    "label": "Scale increase: 2.5% in year 2 (2/16/2003), 3.5% in year 3 (2/15/2004)"
+  },
+  {
+    "conceptId": "C_TIME_NO_CANCELLATION_SECURITY",
+    "category": "Scheduling",
+    "label": "Involuntary leave status caps"
+  },
+  {
+    "conceptId": "C_JOB_SECURITY_SENIORITY",
+    "category": "Security",
+    "label": "Seniority — 3 groups: Meatcutters, Wrappers, Service Counter"
+  },
+  {
+    "conceptId": "C_TRANSIT_COMMUTER_BENEFIT",
+    "category": "Ancillary",
+    "label": "Transit subsidy per SMC 4.20.370"
+  },
+  {
+    "conceptId": "C_WAGE_APPRENTICE",
+    "category": "Compensation",
+    "label": "Apprentice wage schedule 40-82% of JW over 7 periods"
+  },
+  {
+    "conceptId": "C_WAGE_SCHEDULED_INCREASE",
+    "category": "Compensation",
+    "label": "Longevity pay — $0.10/hr at 10yr through $0.25/hr at 25yr"
+  },
+  {
+    "conceptId": "C_PREMIUM_SUNDAY_HOLIDAY",
+    "category": "Compensation",
+    "label": "6th and 7th day in workweek — 1.5x (150%); 6 legal holidays — 2.0x"
+  },
+  {
+    "conceptId": "C_LIGHT_DUTY_ACCOMMODATION",
+    "category": "Security",
+    "label": "Partially disabled employees — modified duty with pay protection"
+  },
+  {
+    "conceptId": "C_HEALTH_LIFE_INSURANCE",
+    "category": "Healthcare",
+    "label": "Life insurance Board-provided"
+  },
+  {
+    "conceptId": "C_PREMIUM_FOREMAN",
+    "category": "Compensation",
+    "label": "Foreman and General Foreman premium"
+  },
+  {
+    "conceptId": "C_HEALTH_ACTIVE_CONTRIBUTION",
+    "category": "Healthcare",
+    "label": "Active health — plan terms not recovered in CBA text"
+  },
+  {
+    "conceptId": "C_LEAVE_BEREAVEMENT",
+    "category": "Leave",
+    "label": "Bereavement leave — 5 days"
+  },
+  {
+    "conceptId": "C_JOB_SECURITY_SUBCONTRACTING",
+    "category": "Security",
+    "label": "Subcontracting at company discretion; union matching opportunity discussion"
+  },
+  {
+    "conceptId": "C_JOB_SECURITY_RIF_LAYOFF",
+    "category": "Security",
+    "label": "Layoff — inverse seniority within classification; recall from employment pool for 1 year"
+  },
+  {
+    "conceptId": "C_HEALTH_EXTERNAL_FUND",
+    "category": "Healthcare",
+    "label": "Health/Welfare — GLDC-ILA Health and Welfare Fund (external trust)"
+  },
+  {
+    "conceptId": "C_PREMIUM_HAZARD",
+    "category": "Compensation",
+    "label": "Hazardous work differential — 15% above classification rate"
+  },
+  {
+    "conceptId": "C_HEALTH_ACTIVE_PLAN_DESIGN",
+    "category": "Healthcare",
+    "label": "Active health plan design — POS in-network 100%, out-of-network 70% after $295/$885 deductible; OOP $1,750/$5,250; dental 100% premium compa"
+  },
+  {
+    "conceptId": "C_UNION_SECURITY",
+    "category": "Recognition",
+    "label": "Union membership required as condition of employment"
+  },
+  {
+    "conceptId": "C_WAGE_INCREASE",
+    "category": "Compensation",
+    "label": "Annual wage increases: $0.50 3/1/2001, $0.50 9/2/2002, $1.00 3/1/2004"
+  },
+  {
+    "conceptId": "C_WAGE_LONGEVITY",
+    "category": "Compensation",
+    "label": "Longevity pay"
+  },
+  {
+    "conceptId": "C_UNION_DUES_CHECKOFF",
+    "category": "Recognition",
+    "label": "Monthly dues checkoff; remit by 15th of following month"
+  },
+  {
+    "conceptId": "C_HEALTH_PLAN_DESIGN",
+    "category": "Healthcare",
+    "label": "Health plan design options"
+  },
+  {
+    "conceptId": "C_WAGE_MERIT_STEP",
+    "category": "Compensation",
+    "label": "Step advancement on salary schedule"
+  },
+  {
+    "conceptId": "C_DISCIPLINE_PROBATION",
+    "category": "Disputes",
+    "label": "Probation 90 working days; 60 days for classification transfer"
+  },
+  {
+    "conceptId": "C_SAFETY_DRUG_TESTING",
+    "category": "Safety",
+    "label": "Work accident investigation protocol"
+  },
+  {
+    "conceptId": "C_JOB_SECURITY_BUMPING",
+    "category": "Security",
+    "label": "Bumping rights to former classification"
+  },
+  {
+    "conceptId": "C_HEALTH_INSURANCE_BUYOUT",
+    "category": "Healthcare",
+    "label": "Health insurance opt-out payment $1,200/year"
+  },
+  {
+    "conceptId": "C_JOB_SECURITY_NO_CONTRACTING_OUT",
+    "category": "Security",
+    "label": "Subcontracting limitation"
+  },
+  {
+    "conceptId": "C_WAGE_SAVINGS",
+    "category": "Compensation",
+    "label": "Savings/deferred compensation contribution"
+  },
+  {
+    "conceptId": "C_WAGE_VACATION_SUPP",
+    "category": "Compensation",
+    "label": "Vacation/Supplemental dues contribution $2.95/hr"
+  },
+  {
+    "conceptId": "C_WAGE_ACCRUAL_VACATION",
+    "category": "Compensation",
+    "label": "Vacation/holiday pay accrual ($0.50/hr)"
+  },
+  {
+    "conceptId": "C_PREMIUM_LEADMAN",
+    "category": "Compensation",
+    "label": "Leadman premium — $2.00/hr"
+  },
+  {
+    "conceptId": "C_LEAVE_PERSONAL",
+    "category": "Leave",
+    "label": "Perfect Attendance Days (paid personal time)"
+  },
+  {
+    "conceptId": "C_HEALTH_WELFARE_FUND",
+    "category": "Healthcare",
+    "label": "Welfare fund employer contributions"
+  },
+  {
+    "conceptId": "C_LEAVE_SUBSISTENCE",
+    "category": "Leave",
+    "label": "Subsistence: $75/night (Torrent) or $50-$70/day by distance (AGC main)"
+  },
+  {
+    "conceptId": "C_HEALTH_DISABILITY",
+    "category": "Healthcare",
+    "label": "Short-term disability $400/week max 26 weeks"
+  },
+  {
+    "conceptId": "C_PREMIUM_GROUP_LEADER",
+    "category": "Compensation",
+    "label": "Group leader premium $1.20/$0.80/$0.40 per hour by tier"
+  },
+  {
+    "conceptId": "C_LEAVE_JURY_DUTY",
+    "category": "Leave",
+    "label": "Jury duty — 8x regular rate per day"
+  },
+  {
+    "conceptId": "C_WAGE_INCENTIVE",
+    "category": "Compensation",
+    "label": "Incentive pay: up to 5% company performance + 5% cell bonus + 5% stretch targets = max 15% of annual base salary"
+  },
+  {
+    "conceptId": "C_PREMIUM_STANDBY",
+    "category": "Compensation",
+    "label": "Standby provision — reachable by signal device; 1-hour response time"
+  },
+  {
+    "conceptId": "C_HEALTH_PRESCRIPTION_DRUG",
+    "category": "Healthcare",
+    "label": "3-tier HMO prescription co-pay"
+  },
+  {
+    "conceptId": "C_HEALTH_BENEFITS",
+    "category": "Healthcare",
+    "label": "Health and welfare benefits"
+  }
+]

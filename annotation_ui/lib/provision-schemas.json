@@ -1,0 +1,781 @@
+{
+  "C_WAGE_BASE_RATE": {
+    "format": "complex",
+    "flags": [
+      "has_base_rate",
+      "has_rate_table",
+      "has_classification_rates",
+      "has_step_rates",
+      "has_salary_rates",
+      "has_hourly_rates"
+    ]
+  },
+  "C_GRIEVANCE_PROCEDURE": {
+    "format": "complex",
+    "flags": [
+      "has_grievance_steps",
+      "has_deadlines",
+      "has_union_representation",
+      "has_written_grievance",
+      "has_management_response"
+    ]
+  },
+  "C_ARBITRATION": {
+    "format": "complex",
+    "flags": [
+      "has_arbitration",
+      "final_and_binding",
+      "has_neutral_arbitrator",
+      "has_shared_costs",
+      "limits_arbitrator_authority"
+    ]
+  },
+  "C_LEAVE_HOLIDAYS": {
+    "format": "complex",
+    "flags": [
+      "has_paid_holidays",
+      "has_holiday_premium_pay",
+      "has_floating_holidays",
+      "has_observed_holidays"
+    ]
+  },
+  "C_PREMIUM_OVERTIME": {
+    "format": "complex",
+    "flags": [
+      "has_overtime_threshold",
+      "has_daily_overtime",
+      "has_weekly_overtime",
+      "has_premium_multiplier",
+      "has_double_time"
+    ]
+  },
+  "C_UNION_ACCESS_BUSINESS": {
+    "format": "complex",
+    "flags": [
+      "has_steward_access",
+      "has_union_business_time",
+      "has_bulletin_board_rights",
+      "has_meeting_rights",
+      "has_paid_union_time"
+    ]
+  },
+  "C_DISCIPLINE_JUST_CAUSE": {
+    "format": "binary",
+    "flags": []
+  },
+  "C_WAGE_INCREASES_COLA": {
+    "format": "complex",
+    "flags": [
+      "has_scheduled_increases",
+      "has_cola",
+      "has_lump_sum_adjustment",
+      "has_across_the_board_increase"
+    ]
+  },
+  "C_HEALTH_MEDICAL_ACTIVE_CONTRIBUTION": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_LEAVE_VACATION": {
+    "format": "complex",
+    "flags": [
+      "has_paid_vacation",
+      "accrues_with_service",
+      "has_cashout",
+      "has_scheduling_rules",
+      "has_vacation_fund"
+    ]
+  },
+  "C_SAFETY_PPE_UNSAFE_WORK": {
+    "format": "complex",
+    "flags": [
+      "has_ppe_requirement",
+      "has_unsafe_work_right",
+      "has_safety_standards",
+      "has_hazard_response",
+      "has_safety_committee"
+    ]
+  },
+  "C_PREMIUM_CALL_IN_REPORTING": {
+    "format": "complex",
+    "flags": [
+      "has_call_in_pay",
+      "has_call_back_pay",
+      "has_reporting_pay",
+      "has_minimum_pay_guarantee"
+    ]
+  },
+  "C_RETIREMENT_PENSION": {
+    "format": "complex",
+    "flags": [
+      "has_defined_benefit_pension",
+      "has_employer_contribution",
+      "has_employee_contribution",
+      "has_vesting_requirement",
+      "has_external_fund"
+    ]
+  },
+  "C_PREMIUM_SHIFT": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_JOB_SECURITY_LAYOFF_ORDER": {
+    "format": "complex",
+    "flags": [
+      "has_layoff_notice",
+      "seniority_based",
+      "has_bumping_rights",
+      "has_inverse_seniority_order",
+      "has_union_notice"
+    ]
+  },
+  "C_TIME_REGULAR_SCHEDULE": {
+    "format": "complex",
+    "flags": [
+      "has_regular_hours",
+      "has_workweek_definition",
+      "has_shift_schedule",
+      "has_flexible_schedule",
+      "has_guaranteed_hours"
+    ]
+  },
+  "C_UNION_SECURITY_DUES_CHECKOFF": {
+    "format": "complex",
+    "flags": [
+      "has_dues_checkoff",
+      "has_union_security",
+      "has_agency_shop",
+      "has_remittance_deadline",
+      "has_authorization_requirement"
+    ]
+  },
+  "C_WAGE_PROGRESSION": {
+    "format": "complex",
+    "flags": [
+      "has_step_progression",
+      "has_classification_movement",
+      "has_seniority_progression",
+      "has_training_progression",
+      "has_automatic_progression"
+    ]
+  },
+  "C_LEAVE_SICK": {
+    "format": "complex",
+    "flags": [
+      "has_paid_sick_leave",
+      "accrues_with_service",
+      "has_carryover",
+      "has_cashout",
+      "has_medical_certification_requirement"
+    ]
+  },
+  "C_LEAVE_PERSONAL_MISC": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_JOB_SECURITY_RECALL": {
+    "format": "complex",
+    "flags": [
+      "has_recall_rights",
+      "seniority_based",
+      "has_recall_period_limit",
+      "has_recall_notice",
+      "has_preference_over_new_hires"
+    ]
+  },
+  "C_TIME_REST_MEAL_PERIODS": {
+    "format": "complex",
+    "flags": [
+      "has_rest_periods",
+      "has_meal_periods",
+      "has_paid_breaks",
+      "has_relief_breaks",
+      "has_missed_break_premium"
+    ]
+  },
+  "C_PREMIUM_RESPONSIBILITY_SPECIALTY": {
+    "format": "complex",
+    "flags": [
+      "has_responsibility_premium",
+      "has_higher_classification_premium",
+      "has_specialty_premium",
+      "has_translation_premium",
+      "has_role_premium"
+    ]
+  },
+  "C_RETIREMENT_SAVINGS_ANNUITY": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_RECOGNITION_COVERAGE_SCOPE": {
+    "format": "complex",
+    "flags": [
+      "has_bargaining_unit_scope",
+      "excludes_supervisors",
+      "excludes_confidential_employees",
+      "has_accretion_language"
+    ]
+  },
+  "C_HEALTH_DENTAL": {
+    "format": "complex",
+    "flags": [
+      "includes_dental",
+      "employer_paid",
+      "employee_paid",
+      "includes_dependent_coverage",
+      "has_waiting_period"
+    ]
+  },
+  "C_LEAVE_PARENTAL_FAMILY": {
+    "format": "complex",
+    "flags": [
+      "has_parental_leave",
+      "has_family_leave",
+      "paid",
+      "has_fmla_reference",
+      "has_job_protection"
+    ]
+  },
+  "C_TRAINING_TUITION_CERTIFICATION": {
+    "format": "complex",
+    "flags": [
+      "has_training_benefit",
+      "has_tuition_reimbursement",
+      "has_certification_support",
+      "employer_paid",
+      "has_professional_development"
+    ]
+  },
+  "C_JOB_SECURITY_SEVERANCE": {
+    "format": "complex",
+    "flags": [
+      "has_severance_pay",
+      "service_based",
+      "wage_based",
+      "has_layoff_trigger",
+      "has_maximum_duration"
+    ]
+  },
+  "C_HEALTH_MEDICAL_ACTIVE": {
+    "format": "complex",
+    "flags": [
+      "includes_medical",
+      "includes_dependent_coverage",
+      "employer_paid",
+      "employee_paid",
+      "has_external_plan"
+    ]
+  },
+  "C_HEALTH_LIFE_AD_D": {
+    "format": "complex",
+    "flags": [
+      "includes_life_insurance",
+      "includes_add",
+      "employer_paid",
+      "employee_paid",
+      "includes_dependent_coverage"
+    ]
+  },
+  "C_DISCIPLINE_PROGRESSIVE": {
+    "format": "complex",
+    "flags": [
+      "has_progressive_discipline",
+      "has_warnings",
+      "has_notice_requirement",
+      "has_suspension_step",
+      "has_discharge_step"
+    ]
+  },
+  "C_HEALTH_MEDICAL_ACTIVE_PLAN_DESIGN": {
+    "format": "complex",
+    "flags": [
+      "includes_medical",
+      "has_deductible",
+      "has_copay",
+      "has_out_of_pocket_maximum",
+      "has_coverage_tiers",
+      "has_network_rules"
+    ]
+  },
+  "C_PREMIUM_STANDBY_ON_CALL": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_UNIFORM_CLOTHING_ALLOWANCE": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_LABOR_MANAGEMENT_COMMITTEE": {
+    "format": "binary",
+    "flags": []
+  },
+  "C_HIRING_HALL_DISPATCH": {
+    "format": "complex",
+    "flags": [
+      "has_hiring_hall",
+      "has_dispatch_rules",
+      "has_referral_priority",
+      "union_operated",
+      "has_registration_list"
+    ]
+  },
+  "C_DISCIPLINE_INVESTIGATION_APPEAL": {
+    "format": "complex",
+    "flags": [
+      "has_appeal_right",
+      "has_investigation_procedure",
+      "has_record_removal",
+      "has_union_representation",
+      "has_deadline"
+    ]
+  },
+  "C_HEALTH_DISABILITY_INCOME": {
+    "format": "complex",
+    "flags": [
+      "includes_disability",
+      "has_short_term_disability",
+      "has_long_term_disability",
+      "employer_paid",
+      "wage_replacement_based",
+      "has_waiting_period"
+    ]
+  },
+  "C_JOB_SECURITY_BENEFIT_CONTINUATION": {
+    "format": "complex",
+    "flags": [
+      "has_benefit_continuation",
+      "includes_health_continuation",
+      "includes_life_insurance_continuation",
+      "applies_during_leave",
+      "employer_paid"
+    ]
+  },
+  "C_HEALTH_RETIREE": {
+    "format": "complex",
+    "flags": [
+      "includes_retiree_coverage",
+      "employer_paid",
+      "employee_paid",
+      "includes_dependent_coverage",
+      "has_eligibility_requirement"
+    ]
+  },
+  "C_SUBCONTRACTING_WORK_PRESERVATION": {
+    "format": "complex",
+    "flags": [
+      "limits_subcontracting",
+      "has_work_preservation",
+      "requires_union_notice",
+      "allows_union_matching",
+      "protects_bargaining_unit_work"
+    ]
+  },
+  "C_WORKLOAD_CLASS_SIZE_STAFFING": {
+    "format": "complex",
+    "flags": [
+      "has_class_size_limit",
+      "has_staffing_ratio",
+      "has_preparation_period",
+      "has_duty_free_lunch",
+      "has_voluntary_extracurricular"
+    ]
+  },
+  "C_SENIORITY_SYSTEM": {
+    "format": "complex",
+    "flags": [
+      "has_seniority_system",
+      "classification_based",
+      "plantwide_seniority",
+      "has_tie_breaker",
+      "affects_layoff"
+    ]
+  },
+  "C_TIME_SCHEDULE_NOTICE_CHANGE": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_PREMIUM_ZONE_SUBSISTENCE": {
+    "format": "complex",
+    "flags": [
+      "has_zone_pay",
+      "has_travel_subsistence",
+      "has_remote_site_allowance",
+      "distance_based",
+      "overnight_based"
+    ]
+  },
+  "C_HEALTH_VISION": {
+    "format": "complex",
+    "flags": [
+      "includes_vision",
+      "employer_paid",
+      "employee_paid",
+      "includes_dependent_coverage",
+      "has_waiting_period"
+    ]
+  },
+  "C_LEGAL_SERVICES_FUND": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_JOB_POSTING_BIDDING_TRANSFER": {
+    "format": "complex",
+    "flags": [
+      "has_job_posting",
+      "has_bidding_rights",
+      "has_transfer_rights",
+      "seniority_based",
+      "has_trial_period"
+    ]
+  },
+  "C_SAFETY_ASSAULT_VIOLENCE": {
+    "format": "complex",
+    "flags": [
+      "has_assault_policy",
+      "has_violence_response",
+      "has_paid_release",
+      "has_response_team",
+      "has_reporting_requirement"
+    ]
+  },
+  "C_RETIREMENT_INCENTIVE": {
+    "format": "complex",
+    "flags": [
+      "has_retirement_bonus",
+      "service_based",
+      "date_based",
+      "has_age_requirement",
+      "has_notice_requirement"
+    ]
+  },
+  "C_JOB_SECURITY_LAYOFF_RECALL": {
+    "format": "complex",
+    "flags": [
+      "has_layoff_procedure",
+      "has_recall_rights",
+      "seniority_based",
+      "has_bumping_rights",
+      "has_notice_requirement"
+    ]
+  },
+  "C_JOB_SECURITY_SUB_INCOME_BRIDGE": {
+    "format": "complex",
+    "flags": [
+      "has_sub_income_benefit",
+      "wage_replacement_based",
+      "service_based",
+      "has_external_fund",
+      "has_duration_limit"
+    ]
+  },
+  "C_CHILD_DEPENDENT_CARE": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_HEALTH_EMPLOYER_CONTRIBUTION": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_HEALTH_ACTIVE": {
+    "format": "complex",
+    "flags": [
+      "includes_medical",
+      "includes_dental",
+      "includes_vision",
+      "employer_paid",
+      "employee_paid",
+      "has_external_trust"
+    ]
+  },
+  "C_JOB_SECURITY_LAYOFF": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_WAGE_GENERAL_INCREASE": {
+    "format": "complex",
+    "flags": [
+      "has_general_increase",
+      "percentage_based",
+      "flat_amount_based",
+      "has_effective_dates",
+      "across_the_board"
+    ]
+  },
+  "C_TIME_NO_CANCELLATION_SECURITY": {
+    "format": "complex",
+    "flags": [
+      "has_no_cancellation_rule",
+      "has_involuntary_leave_limit",
+      "has_pay_protection",
+      "has_schedule_security"
+    ]
+  },
+  "C_JOB_SECURITY_SENIORITY": {
+    "format": "complex",
+    "flags": [
+      "has_seniority_groups",
+      "classification_based",
+      "affects_layoff",
+      "affects_recall",
+      "affects_bidding"
+    ]
+  },
+  "C_TRANSIT_COMMUTER_BENEFIT": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_WAGE_APPRENTICE": {
+    "format": "complex",
+    "flags": [
+      "has_apprentice_scale",
+      "percentage_of_journeyman",
+      "has_periods",
+      "has_step_progression",
+      "hours_based"
+    ]
+  },
+  "C_WAGE_SCHEDULED_INCREASE": {
+    "format": "complex",
+    "flags": [
+      "has_scheduled_increases",
+      "service_based",
+      "longevity_based",
+      "has_effective_dates",
+      "flat_amount_based"
+    ]
+  },
+  "C_PREMIUM_SUNDAY_HOLIDAY": {
+    "format": "complex",
+    "flags": [
+      "has_sunday_premium",
+      "has_holiday_premium",
+      "has_double_time",
+      "has_sixth_day_premium",
+      "has_seventh_day_premium"
+    ]
+  },
+  "C_LIGHT_DUTY_ACCOMMODATION": {
+    "format": "complex",
+    "flags": [
+      "has_light_duty",
+      "has_accommodation_process",
+      "has_pay_protection",
+      "disability_related",
+      "has_medical_clearance"
+    ]
+  },
+  "C_HEALTH_LIFE_INSURANCE": {
+    "format": "binary",
+    "flags": []
+  },
+  "C_PREMIUM_FOREMAN": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_HEALTH_ACTIVE_CONTRIBUTION": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_LEAVE_BEREAVEMENT": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_JOB_SECURITY_SUBCONTRACTING": {
+    "format": "binary",
+    "flags": []
+  },
+  "C_JOB_SECURITY_RIF_LAYOFF": {
+    "format": "complex",
+    "flags": [
+      "has_rif_procedure",
+      "has_layoff_order",
+      "seniority_based",
+      "classification_based",
+      "has_recall_pool"
+    ]
+  },
+  "C_HEALTH_EXTERNAL_FUND": {
+    "format": "complex",
+    "flags": [
+      "has_external_fund",
+      "employer_contribution",
+      "employee_contribution",
+      "trustee_administered",
+      "includes_health_welfare"
+    ]
+  },
+  "C_PREMIUM_HAZARD": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_HEALTH_ACTIVE_PLAN_DESIGN": {
+    "format": "complex",
+    "flags": [
+      "includes_medical",
+      "has_deductible",
+      "has_copay",
+      "has_out_of_pocket_maximum",
+      "has_network_rules",
+      "includes_dental"
+    ]
+  },
+  "C_UNION_SECURITY": {
+    "format": "binary",
+    "flags": []
+  },
+  "C_WAGE_INCREASE": {
+    "format": "complex",
+    "flags": [
+      "has_wage_increase",
+      "percentage_based",
+      "flat_amount_based",
+      "has_effective_dates",
+      "across_the_board"
+    ]
+  },
+  "C_WAGE_LONGEVITY": {
+    "format": "complex",
+    "flags": [
+      "has_longevity_pay",
+      "service_based",
+      "has_steps",
+      "flat_amount_based",
+      "percentage_based"
+    ]
+  },
+  "C_UNION_DUES_CHECKOFF": {
+    "format": "complex",
+    "flags": [
+      "has_dues_checkoff",
+      "has_remittance_deadline",
+      "has_authorization_requirement",
+      "percentage_based",
+      "flat_amount_based"
+    ]
+  },
+  "C_HEALTH_PLAN_DESIGN": {
+    "format": "complex",
+    "flags": [
+      "includes_medical",
+      "has_plan_options",
+      "has_deductible",
+      "has_copay",
+      "has_out_of_pocket_maximum",
+      "has_premium_share"
+    ]
+  },
+  "C_WAGE_MERIT_STEP": {
+    "format": "complex",
+    "flags": [
+      "has_merit_step",
+      "performance_based",
+      "has_step_schedule",
+      "discretionary",
+      "has_review_process"
+    ]
+  },
+  "C_DISCIPLINE_PROBATION": {
+    "format": "complex",
+    "flags": [
+      "has_probation_period",
+      "has_transfer_probation",
+      "has_shortened_discipline_rights",
+      "has_completion_rule"
+    ]
+  },
+  "C_SAFETY_DRUG_TESTING": {
+    "format": "complex",
+    "flags": [
+      "has_drug_testing",
+      "accident_triggered",
+      "reasonable_suspicion_based",
+      "random_testing",
+      "has_discipline_consequence"
+    ]
+  },
+  "C_JOB_SECURITY_BUMPING": {
+    "format": "binary",
+    "flags": []
+  },
+  "C_HEALTH_INSURANCE_BUYOUT": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_JOB_SECURITY_NO_CONTRACTING_OUT": {
+    "format": "binary",
+    "flags": []
+  },
+  "C_WAGE_SAVINGS": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_WAGE_VACATION_SUPP": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_WAGE_ACCRUAL_VACATION": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_PREMIUM_LEADMAN": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_LEAVE_PERSONAL": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_HEALTH_WELFARE_FUND": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_LEAVE_SUBSISTENCE": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_HEALTH_DISABILITY": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_PREMIUM_GROUP_LEADER": {
+    "format": "complex",
+    "flags": [
+      "has_group_leader_premium",
+      "tiered_premium",
+      "flat_amount_based",
+      "has_role_premium"
+    ]
+  },
+  "C_LEAVE_JURY_DUTY": {
+    "format": "quantitative",
+    "flags": []
+  },
+  "C_WAGE_INCENTIVE": {
+    "format": "complex",
+    "flags": [
+      "has_incentive_pay",
+      "performance_based",
+      "percentage_based",
+      "has_cap",
+      "has_bonus_components"
+    ]
+  },
+  "C_PREMIUM_STANDBY": {
+    "format": "binary",
+    "flags": []
+  },
+  "C_HEALTH_PRESCRIPTION_DRUG": {
+    "format": "complex",
+    "flags": [
+      "includes_prescription_drug",
+      "has_copay",
+      "has_tiers",
+      "mail_order_included",
+      "generic_required"
+    ]
+  },
+  "C_HEALTH_BENEFITS": {
+    "format": "binary",
+    "flags": []
+  }
+}
