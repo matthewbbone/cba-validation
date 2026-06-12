@@ -1,0 +1,18 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - cd annotation_ui
+        - npm ci
+        - npx tsx scripts/prepare-data.ts
+    build:
+      commands:
+        - npm run build  # run from annotation_ui/ (cd persists in preBuild)
+  artifacts:
+    baseDirectory: annotation_ui/.next
+    files:
+      - "**/*"
+  cache:
+    paths:
+      - annotation_ui/node_modules/**/*

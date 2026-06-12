@@ -1,0 +1,100 @@
+concept_id,category,concept_label_example,n_docs_present,pct_docs
+C_WAGE_BASE_RATE,Compensation,Base wage or salary rate,983,98.7
+C_GRIEVANCE_PROCEDURE,Disputes,"Grievance steps, timelines, representation, and scope",959,96.3
+C_ARBITRATION,Disputes,"Arbitration access, selection, authority, costs, and finality",924,92.8
+C_LEAVE_HOLIDAYS,Leave,Holidays and holiday pay,866,86.9
+C_PREMIUM_OVERTIME,Compensation,Overtime eligibility thresholds and multipliers,864,86.7
+C_UNION_ACCESS_BUSINESS,Recognition,"Steward access, union business time, bulletin boards, and meeting rights",847,85.0
+C_DISCIPLINE_JUST_CAUSE,Disputes,Just cause and substantive discipline/discharge standard,791,79.4
+C_WAGE_INCREASES_COLA,Compensation,"Annual wage increases: $0.25/hr for time workers (12/17/01, 12/16/02, 12/15/03); $0.25/hr equivalent for piece workers",782,78.5
+C_HEALTH_MEDICAL_ACTIVE_CONTRIBUTION,Healthcare,H&W Fund contribution: 17.625% of payroll (12/17/01); declining to 13% (7/1/02); rising to 15.5% (7/1/03); allocated to Eastern States H&W F,757,76.0
+C_LEAVE_VACATION,Leave,Vacation and annual leave,749,75.2
+C_SAFETY_PPE_UNSAFE_WORK,Safety,"PPE, unsafe-work rights, safety standards, and hazard response",709,71.2
+C_PREMIUM_CALL_IN_REPORTING,Compensation,"Call-in, call-back, reporting, and minimum-pay guarantees",696,69.9
+C_RETIREMENT_PENSION,Ancillary,Pension and retirement plan eligibility/contributions,693,69.6
+C_PREMIUM_SHIFT,Compensation,Shift differentials and night/weekend premiums,673,67.6
+C_JOB_SECURITY_LAYOFF_ORDER,Security,Layoff notification and procedure,667,67.0
+C_TIME_REGULAR_SCHEDULE,Scheduling,Regular hours and schedule structure,657,66.0
+C_UNION_SECURITY_DUES_CHECKOFF,Recognition,"Dues checkoff, agency shop, union security, and payroll remittance",601,60.3
+C_WAGE_PROGRESSION,Compensation,"Wage progression, steps, and classification movement",536,53.8
+C_LEAVE_SICK,Leave,Sick/personal days: 3 days for 1–4 yr service; 5 days for 5+ yrs; unused days paid out at end of each period,531,53.3
+C_LEAVE_PERSONAL_MISC,Leave,Bereavement/compassionate leave,464,46.6
+C_JOB_SECURITY_RECALL,Security,Recall rights — equal to continuous service or 2 years maximum,434,43.6
+C_TIME_REST_MEAL_PERIODS,Scheduling,"Rest periods, meal periods, and relief breaks",315,31.6
+C_PREMIUM_RESPONSIBILITY_SPECIALTY,Compensation,"Responsibility, higher-classification, specialty, translation, flight, or role premiums",277,27.8
+C_RETIREMENT_SAVINGS_ANNUITY,Ancillary,Annuity Fund (CT Carpenters) contributions,255,25.6
+C_RECOGNITION_COVERAGE_SCOPE,Recognition,Bargaining unit scope,247,24.8
+C_HEALTH_DENTAL,Healthcare,Dental plan — employer-paid after 6 months,213,21.4
+C_LEAVE_PARENTAL_FAMILY,Leave,Family leave — CFRA and FMLA compliance,207,20.8
+C_TRAINING_TUITION_CERTIFICATION,Ancillary,"Training, tuition support, certification, and professional development",201,20.2
+C_JOB_SECURITY_SEVERANCE,Security,Income Protection Supplement: 100% of base wage + COLA for 13-52 weeks by service tier after layoff pay exhausted,185,18.6
+C_HEALTH_MEDICAL_ACTIVE,Healthcare,Active-worker medical umbrella record,184,18.5
+C_HEALTH_LIFE_AD_D,Healthcare,Group life and AD&D insurance — employer-paid,177,17.8
+C_DISCIPLINE_PROGRESSIVE,Disputes,"Progressive discipline steps, warnings, and notice",163,16.4
+C_HEALTH_MEDICAL_ACTIVE_PLAN_DESIGN,Healthcare,"Active-worker medical plan design, covered services, deductibles, copays, OOP limits",157,15.8
+C_PREMIUM_STANDBY_ON_CALL,Compensation,Standby pay,146,14.7
+C_UNIFORM_CLOTHING_ALLOWANCE,Compensation,Safety shoe program: 100% cost for Wood Processing/Pulp Mill employees; up to $110 reimbursement for others,146,14.7
+C_LABOR_MANAGEMENT_COMMITTEE,Safety,Labor-Management Cooperation Committee (LMCC),142,14.3
+C_HIRING_HALL_DISPATCH,Recognition,"Hiring hall, dispatch hall, and referral system",119,11.9
+C_DISCIPLINE_INVESTIGATION_APPEAL,Disputes,Disciplinary record removal — 1 year no recurrence,116,11.6
+C_HEALTH_DISABILITY_INCOME,Healthcare,Income Protection and Extended Income Protection (disability income),115,11.5
+C_JOB_SECURITY_BENEFIT_CONTINUATION,Security,"Benefits during leaves of absence — health, dental, life insurance continuation",93,9.3
+C_HEALTH_RETIREE,Healthcare,Retiree health plan — Kaiser Foundation employer-paid,92,9.2
+C_SUBCONTRACTING_WORK_PRESERVATION,Security,"Subcontracting limits, non-unit work, and work preservation",67,6.7
+C_WORKLOAD_CLASS_SIZE_STAFFING,Scheduling,School day defined; preparation periods required where practicable (45-minute duty-free lunch); extracurricular on voluntary basis,67,6.7
+C_SENIORITY_SYSTEM,Security,Seniority system — length of service at premises by classification,60,6.0
+C_TIME_SCHEDULE_NOTICE_CHANGE,Scheduling,Schedule changes — Thursday advance notice rule,58,5.8
+C_PREMIUM_ZONE_SUBSISTENCE,Compensation,"Zone pay, travel subsistence, and remote-site allowances",57,5.7
+C_HEALTH_VISION,Healthcare,Group vision care plan,44,4.4
+C_LEGAL_SERVICES_FUND,Ancillary,Group legal services fund,32,3.2
+C_JOB_POSTING_BIDDING_TRANSFER,Security,Job posting and promotion rights,31,3.1
+C_SAFETY_ASSAULT_VIOLENCE,Safety,Physical violence and verbal abuse policy; response team; paid release on shift of assault,27,2.7
+C_RETIREMENT_INCENTIVE,Ancillary,"Retirement bonus — $10,000 at June 30 2005, $7,500 at June 30 2006, $5,000 at June 30 2007 — for teachers with 30+ years ACS service",24,2.4
+C_JOB_SECURITY_LAYOFF_RECALL,Security,Force adjustments and recall — Art. 10,18,1.8
+C_JOB_SECURITY_SUB_INCOME_BRIDGE,Security,Supplemental Unemployment Benefit (SUB) fund,18,1.8
+C_CHILD_DEPENDENT_CARE,Ancillary,Fellowships for Day Care,16,1.6
+C_HEALTH_EMPLOYER_CONTRIBUTION,Healthcare,IAFF VEBA health benefit fund,15,1.5
+C_HEALTH_ACTIVE,Healthcare,Health benefits — VEBA Trust; state-funded monthly allocation per FTE; plan design in Trust,15,1.5
+C_JOB_SECURITY_LAYOFF,Security,Dismissal pay — 2 weeks if musician not re-engaged within 90 days,14,1.4
+C_WAGE_GENERAL_INCREASE,Compensation,"Scale increase: 2.5% in year 2 (2/16/2003), 3.5% in year 3 (2/15/2004)",13,1.3
+C_TIME_NO_CANCELLATION_SECURITY,Scheduling,Involuntary leave status caps,12,1.2
+C_JOB_SECURITY_SENIORITY,Security,"Seniority — 3 groups: Meatcutters, Wrappers, Service Counter",12,1.2
+C_TRANSIT_COMMUTER_BENEFIT,Ancillary,Transit subsidy per SMC 4.20.370,10,1.0
+C_WAGE_APPRENTICE,Compensation,Apprentice wage schedule 40-82% of JW over 7 periods,8,0.8
+C_WAGE_SCHEDULED_INCREASE,Compensation,Longevity pay — $0.10/hr at 10yr through $0.25/hr at 25yr,7,0.7
+C_PREMIUM_SUNDAY_HOLIDAY,Compensation,6th and 7th day in workweek — 1.5x (150%); 6 legal holidays — 2.0x,7,0.7
+C_LIGHT_DUTY_ACCOMMODATION,Security,Partially disabled employees — modified duty with pay protection,6,0.6
+C_HEALTH_LIFE_INSURANCE,Healthcare,Life insurance Board-provided,6,0.6
+C_PREMIUM_FOREMAN,Compensation,Foreman and General Foreman premium,5,0.5
+C_HEALTH_ACTIVE_CONTRIBUTION,Healthcare,Active health — plan terms not recovered in CBA text,4,0.4
+C_LEAVE_BEREAVEMENT,Leave,Bereavement leave — 5 days,4,0.4
+C_JOB_SECURITY_SUBCONTRACTING,Security,Subcontracting at company discretion; union matching opportunity discussion,4,0.4
+C_JOB_SECURITY_RIF_LAYOFF,Security,Layoff — inverse seniority within classification; recall from employment pool for 1 year,4,0.4
+C_HEALTH_EXTERNAL_FUND,Healthcare,Health/Welfare — GLDC-ILA Health and Welfare Fund (external trust),3,0.3
+C_PREMIUM_HAZARD,Compensation,Hazardous work differential — 15% above classification rate,3,0.3
+C_HEALTH_ACTIVE_PLAN_DESIGN,Healthcare,"Active health plan design — POS in-network 100%, out-of-network 70% after $295/$885 deductible; OOP $1,750/$5,250; dental 100% premium compa",3,0.3
+C_UNION_SECURITY,Recognition,Union membership required as condition of employment,3,0.3
+C_WAGE_INCREASE,Compensation,"Annual wage increases: $0.50 3/1/2001, $0.50 9/2/2002, $1.00 3/1/2004",3,0.3
+C_WAGE_LONGEVITY,Compensation,Longevity pay,3,0.3
+C_UNION_DUES_CHECKOFF,Recognition,Monthly dues checkoff; remit by 15th of following month,3,0.3
+C_HEALTH_PLAN_DESIGN,Healthcare,Health plan design options,3,0.3
+C_WAGE_MERIT_STEP,Compensation,Step advancement on salary schedule,3,0.3
+C_DISCIPLINE_PROBATION,Disputes,Probation 90 working days; 60 days for classification transfer,2,0.2
+C_SAFETY_DRUG_TESTING,Safety,Work accident investigation protocol,2,0.2
+C_JOB_SECURITY_BUMPING,Security,Bumping rights to former classification,2,0.2
+C_HEALTH_INSURANCE_BUYOUT,Healthcare,"Health insurance opt-out payment $1,200/year",2,0.2
+C_JOB_SECURITY_NO_CONTRACTING_OUT,Security,Subcontracting limitation,2,0.2
+C_WAGE_SAVINGS,Compensation,Savings/deferred compensation contribution,1,0.1
+C_WAGE_VACATION_SUPP,Compensation,Vacation/Supplemental dues contribution $2.95/hr,1,0.1
+C_WAGE_ACCRUAL_VACATION,Compensation,Vacation/holiday pay accrual ($0.50/hr),1,0.1
+C_PREMIUM_LEADMAN,Compensation,Leadman premium — $2.00/hr,1,0.1
+C_LEAVE_PERSONAL,Leave,Perfect Attendance Days (paid personal time),1,0.1
+C_HEALTH_WELFARE_FUND,Healthcare,Welfare fund employer contributions,1,0.1
+C_LEAVE_SUBSISTENCE,Leave,Subsistence: $75/night (Torrent) or $50-$70/day by distance (AGC main),1,0.1
+C_HEALTH_DISABILITY,Healthcare,Short-term disability $400/week max 26 weeks,1,0.1
+C_PREMIUM_GROUP_LEADER,Compensation,Group leader premium $1.20/$0.80/$0.40 per hour by tier,1,0.1
+C_LEAVE_JURY_DUTY,Leave,Jury duty — 8x regular rate per day,1,0.1
+C_WAGE_INCENTIVE,Compensation,Incentive pay: up to 5% company performance + 5% cell bonus + 5% stretch targets = max 15% of annual base salary,1,0.1
+C_PREMIUM_STANDBY,Compensation,Standby provision — reachable by signal device; 1-hour response time,1,0.1
+C_HEALTH_PRESCRIPTION_DRUG,Healthcare,3-tier HMO prescription co-pay,1,0.1
+C_HEALTH_BENEFITS,Healthcare,Health and welfare benefits,1,0.1

@@ -1,0 +1,12 @@
+{
+  "summarize": "The agreement allows discipline and discharge only for just cause, requires written notice of dismissal, suspension, or other disciplinary action, and provides that disciplinary action must be taken within 10 working days after the Board becomes aware of the conduct. It also states that probationary employees are not subject to the grievance procedure for discipline or termination and that dismissals and suspensions are without pay.",
+  "exists": true,
+  "values": [],
+  "flags": {
+    "has_progressive_discipline": false,
+    "has_warnings": false,
+    "has_notice_requirement": true,
+    "has_suspension_step": true,
+    "has_discharge_step": true
+  }
+}
