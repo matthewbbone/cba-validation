@@ -23,19 +23,18 @@ applications:
             # Launch script
             - printf "#!/bin/bash\nexport HOSTNAME=0.0.0.0\nexport PORT=3000\nnode server.js\n" > .amplify-hosting/compute/default/run.sh
             - chmod +x .amplify-hosting/compute/default/run.sh
-            # Deploy manifest
+            # Deploy manifest (no fallback:null, no framework — schema rejects those)
             - >-
               node -e "require('fs').writeFileSync(
                 '.amplify-hosting/deploy-manifest.json',
                 JSON.stringify({
                   version: 1,
                   routes: [
-                    { path: '/_next/static/*', target: { kind: 'Static' }, fallback: null },
-                    { path: '/_next/image', target: { kind: 'ImageOptimization' }, fallback: null },
-                    { path: '/*', target: { kind: 'Compute', src: 'default' }, fallback: null }
+                    { path: '/_next/static/*', target: { kind: 'Static' } },
+                    { path: '/_next/image', target: { kind: 'ImageOptimization' } },
+                    { path: '/*', target: { kind: 'Compute', src: 'default' } }
                   ],
-                  computeResources: [{ name: 'default', runtime: 'nodejs18.x', entrypoint: 'run.sh' }],
-                  framework: { name: 'Next.js', version: '14.2.35' }
+                  computeResources: [{ name: 'default', runtime: 'nodejs20.x', entrypoint: 'run.sh' }]
                 }, null, 2)
               );"
       artifacts:
