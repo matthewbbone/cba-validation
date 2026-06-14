@@ -20,21 +20,22 @@ applications:
             - cp -r .next/static .amplify-hosting/static/_next/static
             # public/ folder (favicons, etc.) if it exists
             - '[ -d public ] && cp -r public/. .amplify-hosting/compute/default/public/ || true'
-            # Launch script
-            - printf "#!/bin/bash\nexport HOSTNAME=0.0.0.0\nexport PORT=3000\nnode server.js\n" > .amplify-hosting/compute/default/run.sh
-            - chmod +x .amplify-hosting/compute/default/run.sh
-            # Deploy manifest (no fallback:null, no framework — schema rejects those)
+            # Node entrypoint wrapper: force host/port, then start the standalone server.
+            # Amplify requires the entrypoint to be runnable with `node <entrypoint>`.
+            - printf "process.env.HOSTNAME='0.0.0.0';\nprocess.env.PORT=process.env.PORT||'3000';\nrequire('./server.js');\n" > .amplify-hosting/compute/default/index.js
+            # Deploy manifest — framework is REQUIRED; entrypoint must be node-runnable.
             - >-
               node -e "require('fs').writeFileSync(
                 '.amplify-hosting/deploy-manifest.json',
                 JSON.stringify({
                   version: 1,
                   routes: [
-                    { path: '/_next/static/*', target: { kind: 'Static' } },
-                    { path: '/_next/image', target: { kind: 'ImageOptimization' } },
+                    { path: '/_next/static/*', target: { kind: 'Static', cacheControl: 'public, max-age=31536000, immutable' } },
+                    { path: '/*.*', target: { kind: 'Static' }, fallback: { kind: 'Compute', src: 'default' } },
                     { path: '/*', target: { kind: 'Compute', src: 'default' } }
                   ],
-                  computeResources: [{ name: 'default', runtime: 'nodejs20.x', entrypoint: 'run.sh' }]
+                  computeResources: [{ name: 'default', runtime: 'nodejs20.x', entrypoint: 'index.js' }],
+                  framework: { name: 'next', version: '14.2.35' }
                 }, null, 2)
               );"
       artifacts:
