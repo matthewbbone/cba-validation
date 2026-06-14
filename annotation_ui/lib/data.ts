@@ -1,6 +1,11 @@
 import fs from "fs";
 import path from "path";
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  GetObjectCommand,
+  PutObjectCommand,
+  ListObjectsV2Command,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import type { CBA, Provision, AnnotationRecord } from "./types";
 
@@ -25,6 +30,15 @@ export function getAllCBAs(): CBA[] {
 export function getRandomCBA(): CBA {
   const all = getAllCBAs();
   return all[Math.floor(Math.random() * all.length)];
+}
+
+export function getRandomCBAExcluding(excludeKeys: string[]): CBA | null {
+  const excluded = new Set(excludeKeys);
+  const available = getAllCBAs().filter(
+    (c) => !excluded.has(`${c.source}/${c.filename}`)
+  );
+  if (available.length === 0) return null;
+  return available[Math.floor(Math.random() * available.length)];
 }
 
 // ── Provision dictionary ─────────────────────────────────────────────────────
@@ -64,7 +78,50 @@ export function isS3Configured(): boolean {
   return !!BUCKET;
 }
 
-// ── Annotation output (JSONL) ─────────────────────────────────────────────────
+// ── Annotation output — S3 (production) ──────────────────────────────────────
+
+export async function writeAnnotationToS3(
+  prolificPid: string,
+  record: AnnotationRecord
+): Promise<void> {
+  const key = `annotations/${prolificPid}/${record.cba_source}/${record.cba_filename}.json`;
+  await getS3().send(
+    new PutObjectCommand({
+      Bucket: BUCKET!,
+      Key: key,
+      Body: JSON.stringify(record),
+      ContentType: "application/json",
+    })
+  );
+}
+
+export async function getCompletedCBAsForPID(prolificPid: string): Promise<string[]> {
+  const prefix = `annotations/${prolificPid}/`;
+  const keys: string[] = [];
+  let continuationToken: string | undefined;
+
+  do {
+    const response = await getS3().send(
+      new ListObjectsV2Command({
+        Bucket: BUCKET!,
+        Prefix: prefix,
+        ContinuationToken: continuationToken,
+      })
+    );
+    for (const obj of response.Contents ?? []) {
+      if (!obj.Key) continue;
+      // Strip "annotations/{pid}/" prefix and ".json" suffix → "source/filename"
+      const rel = obj.Key.slice(prefix.length);
+      const cbaKey = rel.endsWith(".json") ? rel.slice(0, -5) : rel;
+      if (cbaKey) keys.push(cbaKey);
+    }
+    continuationToken = response.IsTruncated ? response.NextContinuationToken : undefined;
+  } while (continuationToken);
+
+  return keys;
+}
+
+// ── Annotation output — local disk (dev fallback) ─────────────────────────────
 const REPO_ROOT = path.resolve(process.cwd(), "..");
 const ANNOTATIONS_PATH = path.join(REPO_ROOT, "data", "annotations", "human_annotations.jsonl");
 

@@ -23,6 +23,15 @@ export interface CBA {
 export interface SessionData {
   cba: CBA;
   provisions: Provision[];
+  exhausted?: boolean;
+}
+
+// ── Prolific identifiers ──────────────────────────────────────────────────────
+
+export interface ProlificContext {
+  prolific_pid: string;
+  study_id: string;
+  prolific_session_id: string;
 }
 
 // ── Annotation value types (mirror Python QuantitativeValue) ──────────────────
@@ -68,14 +77,28 @@ export interface SubmitPayload {
   sessionId: string;
   cba: CBA;
   provisions: ProvisionAnnotation[];
+  prolific: ProlificContext;
 }
 
-// ── Storage (JSONL row) ───────────────────────────────────────────────────────
+// ── Storage (JSONL row / S3 object) ───────────────────────────────────────────
 
 export interface AnnotationRecord {
   session_id: string;
   timestamp: string;
   cba_source: string;
   cba_filename: string;
+  prolific_pid: string;
+  study_id: string;
+  prolific_session_id: string;
   provisions: ProvisionAnnotation[];
+}
+
+// ── Draft (localStorage) ──────────────────────────────────────────────────────
+
+export interface DraftState {
+  sessionId: string;
+  cba: CBA;
+  provisions: Provision[];
+  annotations: ProvisionAnnotation[];
+  savedAt: string;
 }
