@@ -8,6 +8,40 @@ applications:
         build:
           commands:
             - npm run build
+        postBuild:
+          commands:
+            # Build .amplify-hosting package for Amplify WEB_COMPUTE (SSR)
+            - mkdir -p .amplify-hosting/compute/default .amplify-hosting/static/_next
+            # Standalone server + its bundled node_modules
+            - cp -r .next/standalone/. .amplify-hosting/compute/default/
+            # Static assets alongside the server (needed for SSR fallback)
+            - cp -r .next/static .amplify-hosting/compute/default/.next/static
+            # Static assets served directly from CloudFront
+            - cp -r .next/static .amplify-hosting/static/_next/static
+            # public/ folder (favicons, etc.) if it exists
+            - '[ -d public ] && cp -r public/. .amplify-hosting/compute/default/public/ || true'
+            # Launch script
+            - printf "#!/bin/bash\nexport HOSTNAME=0.0.0.0\nexport PORT=3000\nnode server.js\n" > .amplify-hosting/compute/default/run.sh
+            - chmod +x .amplify-hosting/compute/default/run.sh
+            # Deploy manifest
+            - >-
+              node -e "require('fs').writeFileSync(
+                '.amplify-hosting/deploy-manifest.json',
+                JSON.stringify({
+                  version: 1,
+                  routes: [
+                    { path: '/_next/static/*', target: { kind: 'Static' }, fallback: null },
+                    { path: '/_next/image', target: { kind: 'ImageOptimization' }, fallback: null },
+                    { path: '/*', target: { kind: 'Compute', src: 'default' }, fallback: null }
+                  ],
+                  computeResources: [{ name: 'default', runtime: 'nodejs18.x', entrypoint: 'run.sh' }],
+                  framework: { name: 'Next.js', version: '14.2.35' }
+                }, null, 2)
+              );"
+      artifacts:
+        baseDirectory: .amplify-hosting
+        files:
+          - "**/*"
       cache:
         paths:
           - node_modules/**/*
