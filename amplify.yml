@@ -20,9 +20,19 @@ applications:
             - cp -r .next/static .amplify-hosting/static/_next/static
             # public/ folder (favicons, etc.) if it exists
             - '[ -d public ] && cp -r public/. .amplify-hosting/compute/default/public/ || true'
-            # Node entrypoint wrapper: force host/port, then start the standalone server.
-            # Amplify requires the entrypoint to be runnable with `node <entrypoint>`.
-            - printf "process.env.HOSTNAME='0.0.0.0';\nprocess.env.PORT=process.env.PORT||'3000';\nrequire('./server.js');\n" > .amplify-hosting/compute/default/index.js
+            # Node entrypoint wrapper: force host/port and bake in S3_BUCKET_NAME
+            # from the build environment (Amplify does not forward console env vars
+            # to the SSR compute runtime for manual standalone builds). Entrypoint
+            # must be runnable with `node <entrypoint>`.
+            - >-
+              node -e "const b=process.env.S3_BUCKET_NAME||'';
+              require('fs').writeFileSync(
+                '.amplify-hosting/compute/default/index.js',
+                \"process.env.S3_BUCKET_NAME=process.env.S3_BUCKET_NAME||'\"+b+\"';\n\"+
+                \"process.env.HOSTNAME='0.0.0.0';\n\"+
+                \"process.env.PORT=process.env.PORT||'3000';\n\"+
+                \"require('./server.js');\n\"
+              );"
             # Deploy manifest — framework is REQUIRED; entrypoint must be node-runnable.
             - >-
               node -e "require('fs').writeFileSync(
