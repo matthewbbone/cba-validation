@@ -161,15 +161,33 @@ def test_representative_string_fields_are_exposed() -> None:
         "classification_names",
         "effective_dates",
     }.issubset(PROVISION_STRING_FIELD_REGISTRY["C_WAGE_BASE_RATE"])
-    assert "plan_names" in PROVISION_STRING_FIELD_REGISTRY[
-        "C_HEALTH_MEDICAL_ACTIVE_CONTRIBUTION"
-    ]
     assert {
-        "union_names",
+        "coverage_tiers",
+        "eligible_employee_groups",
+    }.issubset(
+        PROVISION_STRING_FIELD_REGISTRY[
+        "C_HEALTH_MEDICAL_ACTIVE_CONTRIBUTION"
+        ]
+    )
+    assert {
         "bargaining_unit_descriptions",
         "included_employee_groups",
         "excluded_employee_groups",
     }.issubset(PROVISION_STRING_FIELD_REGISTRY["C_RECOGNITION_COVERAGE_SCOPE"])
+
+
+def test_label_and_broad_eligibility_string_fields_are_not_exposed() -> None:
+    removed_fields = {
+        "certification_names",
+        "covered_service_names",
+        "eligibility_terms",
+        "fund_names",
+        "plan_names",
+        "step_names",
+        "union_names",
+    }
+    for concept_id, fields in PROVISION_STRING_FIELD_REGISTRY.items():
+        assert not (set(fields) & removed_fields), concept_id
 
 
 def test_complex_existing_extraction_accepts_string_detail_only() -> None:
@@ -195,9 +213,9 @@ def test_absent_extraction_rejects_string_detail() -> None:
 def test_quantitative_existing_extraction_accepts_string_detail_without_value() -> None:
     model_cls = PROVISION_EXTRACTION_REGISTRY["C_PREMIUM_SHIFT"]
     extraction = model_cls(
-        summarize="The agreement names the second shift premium but no amount.",
+        summarize="The agreement limits shift premium eligibility to covered mechanics.",
         exists=True,
-        shift_names=["second shift"],
+        covered_employee_groups=["mechanics"],
     )
     assert extraction.value is None
     assert extraction.has_string_detail()
