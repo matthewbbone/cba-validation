@@ -1,12 +1,25 @@
 from __future__ import annotations
 
-from typing import ClassVar, Self
+from typing import ClassVar, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class StrictBaseModel(BaseModel):
     model_config = ConfigDict(extra="forbid", validate_assignment=True)
+
+
+class ProvisionMeta(StrictBaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    priority_tier: Literal["core", "conditional_core", "advanced", "standard"] = (
+        "standard"
+    )
+    rank: int | None = None
+    priority_score: int | None = None
+    difficulty: Literal["low", "medium", "high"] | None = None
+    core_family: str | None = None
+    notes: tuple[str, ...] = ()
 
 
 class Duration(StrictBaseModel):
@@ -70,10 +83,12 @@ class QuantitativeValue(StrictBaseModel):
 
 class BaseProvisionExtraction(StrictBaseModel):
     detail_fields: ClassVar[tuple[str, ...]] = ()
+    string_detail_fields: ClassVar[tuple[str, ...]] = ()
     requires_detail_when_exists: ClassVar[bool] = True
 
     concept_id: ClassVar[str] = ""
     category: ClassVar[str] = ""
+    meta: ClassVar[ProvisionMeta] = ProvisionMeta()
 
     summarize: str = Field(
         description=(
@@ -93,6 +108,13 @@ class BaseProvisionExtraction(StrictBaseModel):
             if isinstance(value, list | dict | tuple | set) and len(value) == 0:
                 continue
             return True
+        return self.has_string_detail()
+
+    def has_string_detail(self) -> bool:
+        for field_name in self.string_detail_fields:
+            value = getattr(self, field_name)
+            if isinstance(value, list) and any(item.strip() for item in value):
+                return True
         return False
 
     @model_validator(mode="after")
@@ -102,7 +124,7 @@ class BaseProvisionExtraction(StrictBaseModel):
         if not self.exists:
             populated = [
                 field_name
-                for field_name in self.detail_fields
+                for field_name in (*self.detail_fields, *self.string_detail_fields)
                 if getattr(self, field_name) not in (None, [], {}, (), set())
             ]
             if populated:

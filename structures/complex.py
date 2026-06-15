@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import ClassVar, Literal
 
+from pydantic import Field
+
 from .templates import (
     BooleanFlagModel,
     AncillaryBenefitExtraction,
@@ -35,6 +37,13 @@ class WageBaseRateExtraction(WageScaleExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_WAGE_BASE_RATE']] = 'C_WAGE_BASE_RATE'
     category: ClassVar[Literal['Compensation']] = 'Compensation'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('occupation_names', 'classification_names', 'step_names', 'wage_schedule_names', 'geographic_areas', 'effective_dates')
+    occupation_names: list[str] = Field(default_factory=list)
+    classification_names: list[str] = Field(default_factory=list)
+    step_names: list[str] = Field(default_factory=list)
+    wage_schedule_names: list[str] = Field(default_factory=list)
+    geographic_areas: list[str] = Field(default_factory=list)
+    effective_dates: list[str] = Field(default_factory=list)
     flags: WageBaseRateFlags | None = None
 
 
@@ -51,6 +60,11 @@ class GrievanceProcedureExtraction(ProcedureOrStandardExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_GRIEVANCE_PROCEDURE']] = 'C_GRIEVANCE_PROCEDURE'
     category: ClassVar[Literal['Disputes']] = 'Disputes'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('grievance_step_names', 'eligible_filers', 'excluded_claim_types', 'deadline_terms')
+    grievance_step_names: list[str] = Field(default_factory=list)
+    eligible_filers: list[str] = Field(default_factory=list)
+    excluded_claim_types: list[str] = Field(default_factory=list)
+    deadline_terms: list[str] = Field(default_factory=list)
     flags: GrievanceProcedureFlags | None = None
 
 
@@ -67,6 +81,11 @@ class ArbitrationExtraction(ProcedureOrStandardExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_ARBITRATION']] = 'C_ARBITRATION'
     category: ClassVar[Literal['Disputes']] = 'Disputes'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('arbitrator_selection_terms', 'excluded_claim_types', 'forum_names', 'remedy_limit_terms')
+    arbitrator_selection_terms: list[str] = Field(default_factory=list)
+    excluded_claim_types: list[str] = Field(default_factory=list)
+    forum_names: list[str] = Field(default_factory=list)
+    remedy_limit_terms: list[str] = Field(default_factory=list)
     flags: ArbitrationFlags | None = None
 
 
@@ -82,6 +101,10 @@ class LeaveHolidaysExtraction(LeaveEntitlementExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_LEAVE_HOLIDAYS']] = 'C_LEAVE_HOLIDAYS'
     category: ClassVar[Literal['Leave']] = 'Leave'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('holiday_names', 'observed_rule_terms', 'eligibility_terms')
+    holiday_names: list[str] = Field(default_factory=list)
+    observed_rule_terms: list[str] = Field(default_factory=list)
+    eligibility_terms: list[str] = Field(default_factory=list)
     flags: LeaveHolidaysFlags | None = None
 
 
@@ -98,6 +121,11 @@ class PremiumOvertimeExtraction(PremiumPayExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_PREMIUM_OVERTIME']] = 'C_PREMIUM_OVERTIME'
     category: ClassVar[Literal['Compensation']] = 'Compensation'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('trigger_terms', 'covered_employee_groups', 'excluded_employee_groups', 'premium_names')
+    trigger_terms: list[str] = Field(default_factory=list)
+    covered_employee_groups: list[str] = Field(default_factory=list)
+    excluded_employee_groups: list[str] = Field(default_factory=list)
+    premium_names: list[str] = Field(default_factory=list)
     flags: PremiumOvertimeFlags | None = None
 
 
@@ -114,7 +142,34 @@ class UnionAccessBusinessExtraction(RecognitionExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_UNION_ACCESS_BUSINESS']] = 'C_UNION_ACCESS_BUSINESS'
     category: ClassVar[Literal['Recognition']] = 'Recognition'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('union_role_names', 'access_location_names', 'communication_channel_names')
+    union_role_names: list[str] = Field(default_factory=list)
+    access_location_names: list[str] = Field(default_factory=list)
+    communication_channel_names: list[str] = Field(default_factory=list)
     flags: UnionAccessBusinessFlags | None = None
+
+
+class DisciplineJustCauseFlags(BooleanFlagModel):
+    has_just_cause_standard: bool | None = None
+    covers_discipline: bool | None = None
+    covers_discharge: bool | None = None
+    has_hearing_right: bool | None = None
+    has_investigatory_right: bool | None = None
+    has_probation_exception: bool | None = None
+    has_progressive_discipline: bool | None = None
+
+
+class DisciplineJustCauseExtraction(ProcedureOrStandardExtraction):
+    """Just cause and substantive discipline/discharge standard."""
+    detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
+    concept_id: ClassVar[Literal['C_DISCIPLINE_JUST_CAUSE']] = 'C_DISCIPLINE_JUST_CAUSE'
+    category: ClassVar[Literal['Disputes']] = 'Disputes'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('discipline_terms', 'covered_employee_groups', 'excluded_employee_groups', 'offense_terms')
+    discipline_terms: list[str] = Field(default_factory=list)
+    covered_employee_groups: list[str] = Field(default_factory=list)
+    excluded_employee_groups: list[str] = Field(default_factory=list)
+    offense_terms: list[str] = Field(default_factory=list)
+    flags: DisciplineJustCauseFlags | None = None
 
 
 class WageIncreasesColaFlags(BooleanFlagModel):
@@ -129,6 +184,11 @@ class WageIncreasesColaExtraction(WageAdjustmentExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_WAGE_INCREASES_COLA']] = 'C_WAGE_INCREASES_COLA'
     category: ClassVar[Literal['Compensation']] = 'Compensation'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('effective_dates', 'covered_employee_groups', 'adjustment_names', 'cola_index_names')
+    effective_dates: list[str] = Field(default_factory=list)
+    covered_employee_groups: list[str] = Field(default_factory=list)
+    adjustment_names: list[str] = Field(default_factory=list)
+    cola_index_names: list[str] = Field(default_factory=list)
     flags: WageIncreasesColaFlags | None = None
 
 
@@ -145,6 +205,10 @@ class LeaveVacationExtraction(LeaveEntitlementExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_LEAVE_VACATION']] = 'C_LEAVE_VACATION'
     category: ClassVar[Literal['Leave']] = 'Leave'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('service_band_names', 'vacation_schedule_terms', 'eligible_employee_groups')
+    service_band_names: list[str] = Field(default_factory=list)
+    vacation_schedule_terms: list[str] = Field(default_factory=list)
+    eligible_employee_groups: list[str] = Field(default_factory=list)
     flags: LeaveVacationFlags | None = None
 
 
@@ -161,6 +225,11 @@ class SafetyPpeUnsafeWorkExtraction(SafetyExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_SAFETY_PPE_UNSAFE_WORK']] = 'C_SAFETY_PPE_UNSAFE_WORK'
     category: ClassVar[Literal['Safety']] = 'Safety'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('ppe_item_names', 'hazard_names', 'safety_standard_names', 'committee_names')
+    ppe_item_names: list[str] = Field(default_factory=list)
+    hazard_names: list[str] = Field(default_factory=list)
+    safety_standard_names: list[str] = Field(default_factory=list)
+    committee_names: list[str] = Field(default_factory=list)
     flags: SafetyPpeUnsafeWorkFlags | None = None
 
 
@@ -176,6 +245,10 @@ class PremiumCallInReportingExtraction(PremiumPayExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_PREMIUM_CALL_IN_REPORTING']] = 'C_PREMIUM_CALL_IN_REPORTING'
     category: ClassVar[Literal['Compensation']] = 'Compensation'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('trigger_terms', 'covered_employee_groups', 'guarantee_names')
+    trigger_terms: list[str] = Field(default_factory=list)
+    covered_employee_groups: list[str] = Field(default_factory=list)
+    guarantee_names: list[str] = Field(default_factory=list)
     flags: PremiumCallInReportingFlags | None = None
 
 
@@ -192,6 +265,11 @@ class RetirementPensionExtraction(AncillaryBenefitExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_RETIREMENT_PENSION']] = 'C_RETIREMENT_PENSION'
     category: ClassVar[Literal['Ancillary']] = 'Ancillary'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('plan_names', 'fund_names', 'eligible_employee_groups', 'vesting_terms')
+    plan_names: list[str] = Field(default_factory=list)
+    fund_names: list[str] = Field(default_factory=list)
+    eligible_employee_groups: list[str] = Field(default_factory=list)
+    vesting_terms: list[str] = Field(default_factory=list)
     flags: RetirementPensionFlags | None = None
 
 
@@ -208,6 +286,11 @@ class JobSecurityLayoffOrderExtraction(JobSecurityExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_JOB_SECURITY_LAYOFF_ORDER']] = 'C_JOB_SECURITY_LAYOFF_ORDER'
     category: ClassVar[Literal['Security']] = 'Security'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('layoff_unit_names', 'affected_employee_groups', 'notice_method_terms', 'exception_terms')
+    layoff_unit_names: list[str] = Field(default_factory=list)
+    affected_employee_groups: list[str] = Field(default_factory=list)
+    notice_method_terms: list[str] = Field(default_factory=list)
+    exception_terms: list[str] = Field(default_factory=list)
     flags: JobSecurityLayoffOrderFlags | None = None
 
 
@@ -224,6 +307,10 @@ class TimeRegularScheduleExtraction(SchedulingExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_TIME_REGULAR_SCHEDULE']] = 'C_TIME_REGULAR_SCHEDULE'
     category: ClassVar[Literal['Scheduling']] = 'Scheduling'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('shift_names', 'workweek_definition_terms', 'covered_employee_groups')
+    shift_names: list[str] = Field(default_factory=list)
+    workweek_definition_terms: list[str] = Field(default_factory=list)
+    covered_employee_groups: list[str] = Field(default_factory=list)
     flags: TimeRegularScheduleFlags | None = None
 
 
@@ -240,6 +327,11 @@ class UnionSecurityDuesCheckoffExtraction(RecognitionExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_UNION_SECURITY_DUES_CHECKOFF']] = 'C_UNION_SECURITY_DUES_CHECKOFF'
     category: ClassVar[Literal['Recognition']] = 'Recognition'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('union_names', 'authorization_terms', 'revocation_terms', 'fee_type_names')
+    union_names: list[str] = Field(default_factory=list)
+    authorization_terms: list[str] = Field(default_factory=list)
+    revocation_terms: list[str] = Field(default_factory=list)
+    fee_type_names: list[str] = Field(default_factory=list)
     flags: UnionSecurityDuesCheckoffFlags | None = None
 
 
@@ -256,6 +348,11 @@ class WageProgressionExtraction(WageAdjustmentExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_WAGE_PROGRESSION']] = 'C_WAGE_PROGRESSION'
     category: ClassVar[Literal['Compensation']] = 'Compensation'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('progression_step_names', 'classification_names', 'occupation_names', 'effective_dates')
+    progression_step_names: list[str] = Field(default_factory=list)
+    classification_names: list[str] = Field(default_factory=list)
+    occupation_names: list[str] = Field(default_factory=list)
+    effective_dates: list[str] = Field(default_factory=list)
     flags: WageProgressionFlags | None = None
 
 
@@ -272,6 +369,10 @@ class LeaveSickExtraction(LeaveEntitlementExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_LEAVE_SICK']] = 'C_LEAVE_SICK'
     category: ClassVar[Literal['Leave']] = 'Leave'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('sick_leave_bank_names', 'eligible_employee_groups', 'permitted_use_terms')
+    sick_leave_bank_names: list[str] = Field(default_factory=list)
+    eligible_employee_groups: list[str] = Field(default_factory=list)
+    permitted_use_terms: list[str] = Field(default_factory=list)
     flags: LeaveSickFlags | None = None
 
 
@@ -288,6 +389,11 @@ class JobSecurityRecallExtraction(JobSecurityExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_JOB_SECURITY_RECALL']] = 'C_JOB_SECURITY_RECALL'
     category: ClassVar[Literal['Security']] = 'Security'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('recall_list_names', 'affected_employee_groups', 'notice_method_terms', 'exception_terms')
+    recall_list_names: list[str] = Field(default_factory=list)
+    affected_employee_groups: list[str] = Field(default_factory=list)
+    notice_method_terms: list[str] = Field(default_factory=list)
+    exception_terms: list[str] = Field(default_factory=list)
     flags: JobSecurityRecallFlags | None = None
 
 
@@ -304,6 +410,10 @@ class TimeRestMealPeriodsExtraction(SchedulingExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_TIME_REST_MEAL_PERIODS']] = 'C_TIME_REST_MEAL_PERIODS'
     category: ClassVar[Literal['Scheduling']] = 'Scheduling'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('break_type_names', 'shift_names', 'exception_terms')
+    break_type_names: list[str] = Field(default_factory=list)
+    shift_names: list[str] = Field(default_factory=list)
+    exception_terms: list[str] = Field(default_factory=list)
     flags: TimeRestMealPeriodsFlags | None = None
 
 
@@ -320,6 +430,10 @@ class PremiumResponsibilitySpecialtyExtraction(PremiumPayExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_PREMIUM_RESPONSIBILITY_SPECIALTY']] = 'C_PREMIUM_RESPONSIBILITY_SPECIALTY'
     category: ClassVar[Literal['Compensation']] = 'Compensation'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('premium_role_names', 'classification_names', 'specialty_names')
+    premium_role_names: list[str] = Field(default_factory=list)
+    classification_names: list[str] = Field(default_factory=list)
+    specialty_names: list[str] = Field(default_factory=list)
     flags: PremiumResponsibilitySpecialtyFlags | None = None
 
 
@@ -335,6 +449,11 @@ class RecognitionCoverageScopeExtraction(RecognitionExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_RECOGNITION_COVERAGE_SCOPE']] = 'C_RECOGNITION_COVERAGE_SCOPE'
     category: ClassVar[Literal['Recognition']] = 'Recognition'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('union_names', 'bargaining_unit_descriptions', 'included_employee_groups', 'excluded_employee_groups')
+    union_names: list[str] = Field(default_factory=list)
+    bargaining_unit_descriptions: list[str] = Field(default_factory=list)
+    included_employee_groups: list[str] = Field(default_factory=list)
+    excluded_employee_groups: list[str] = Field(default_factory=list)
     flags: RecognitionCoverageScopeFlags | None = None
 
 
@@ -351,6 +470,11 @@ class HealthDentalExtraction(HealthBenefitExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_HEALTH_DENTAL']] = 'C_HEALTH_DENTAL'
     category: ClassVar[Literal['Healthcare']] = 'Healthcare'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('plan_names', 'coverage_tiers', 'eligible_employee_groups', 'covered_service_names')
+    plan_names: list[str] = Field(default_factory=list)
+    coverage_tiers: list[str] = Field(default_factory=list)
+    eligible_employee_groups: list[str] = Field(default_factory=list)
+    covered_service_names: list[str] = Field(default_factory=list)
     flags: HealthDentalFlags | None = None
 
 
@@ -367,6 +491,10 @@ class LeaveParentalFamilyExtraction(LeaveEntitlementExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_LEAVE_PARENTAL_FAMILY']] = 'C_LEAVE_PARENTAL_FAMILY'
     category: ClassVar[Literal['Leave']] = 'Leave'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('leave_type_names', 'relationship_terms', 'statute_names')
+    leave_type_names: list[str] = Field(default_factory=list)
+    relationship_terms: list[str] = Field(default_factory=list)
+    statute_names: list[str] = Field(default_factory=list)
     flags: LeaveParentalFamilyFlags | None = None
 
 
@@ -383,6 +511,10 @@ class TrainingTuitionCertificationExtraction(AncillaryBenefitExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_TRAINING_TUITION_CERTIFICATION']] = 'C_TRAINING_TUITION_CERTIFICATION'
     category: ClassVar[Literal['Ancillary']] = 'Ancillary'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('training_program_names', 'certification_names', 'eligible_employee_groups')
+    training_program_names: list[str] = Field(default_factory=list)
+    certification_names: list[str] = Field(default_factory=list)
+    eligible_employee_groups: list[str] = Field(default_factory=list)
     flags: TrainingTuitionCertificationFlags | None = None
 
 
@@ -399,6 +531,10 @@ class JobSecuritySeveranceExtraction(JobSecurityExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_JOB_SECURITY_SEVERANCE']] = 'C_JOB_SECURITY_SEVERANCE'
     category: ClassVar[Literal['Security']] = 'Security'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('severance_plan_names', 'eligible_employee_groups', 'benefit_type_names')
+    severance_plan_names: list[str] = Field(default_factory=list)
+    eligible_employee_groups: list[str] = Field(default_factory=list)
+    benefit_type_names: list[str] = Field(default_factory=list)
     flags: JobSecuritySeveranceFlags | None = None
 
 
@@ -415,6 +551,11 @@ class HealthMedicalActiveExtraction(HealthBenefitExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_HEALTH_MEDICAL_ACTIVE']] = 'C_HEALTH_MEDICAL_ACTIVE'
     category: ClassVar[Literal['Healthcare']] = 'Healthcare'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('plan_names', 'coverage_tiers', 'eligible_employee_groups', 'covered_service_names')
+    plan_names: list[str] = Field(default_factory=list)
+    coverage_tiers: list[str] = Field(default_factory=list)
+    eligible_employee_groups: list[str] = Field(default_factory=list)
+    covered_service_names: list[str] = Field(default_factory=list)
     flags: HealthMedicalActiveFlags | None = None
 
 
@@ -431,6 +572,11 @@ class HealthLifeAdDExtraction(HealthBenefitExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_HEALTH_LIFE_AD_D']] = 'C_HEALTH_LIFE_AD_D'
     category: ClassVar[Literal['Healthcare']] = 'Healthcare'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('plan_names', 'coverage_tiers', 'eligible_employee_groups', 'covered_service_names')
+    plan_names: list[str] = Field(default_factory=list)
+    coverage_tiers: list[str] = Field(default_factory=list)
+    eligible_employee_groups: list[str] = Field(default_factory=list)
+    covered_service_names: list[str] = Field(default_factory=list)
     flags: HealthLifeAdDFlags | None = None
 
 
@@ -447,6 +593,10 @@ class DisciplineProgressiveExtraction(ProcedureOrStandardExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_DISCIPLINE_PROGRESSIVE']] = 'C_DISCIPLINE_PROGRESSIVE'
     category: ClassVar[Literal['Disputes']] = 'Disputes'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('discipline_step_names', 'offense_terms', 'notice_terms')
+    discipline_step_names: list[str] = Field(default_factory=list)
+    offense_terms: list[str] = Field(default_factory=list)
+    notice_terms: list[str] = Field(default_factory=list)
     flags: DisciplineProgressiveFlags | None = None
 
 
@@ -464,6 +614,11 @@ class HealthMedicalActivePlanDesignExtraction(HealthBenefitExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_HEALTH_MEDICAL_ACTIVE_PLAN_DESIGN']] = 'C_HEALTH_MEDICAL_ACTIVE_PLAN_DESIGN'
     category: ClassVar[Literal['Healthcare']] = 'Healthcare'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('plan_names', 'network_names', 'coverage_tiers', 'covered_service_names')
+    plan_names: list[str] = Field(default_factory=list)
+    network_names: list[str] = Field(default_factory=list)
+    coverage_tiers: list[str] = Field(default_factory=list)
+    covered_service_names: list[str] = Field(default_factory=list)
     flags: HealthMedicalActivePlanDesignFlags | None = None
 
 
@@ -480,6 +635,10 @@ class HiringHallDispatchExtraction(RecognitionExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_HIRING_HALL_DISPATCH']] = 'C_HIRING_HALL_DISPATCH'
     category: ClassVar[Literal['Recognition']] = 'Recognition'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('hiring_hall_names', 'referral_priority_terms', 'registration_list_names')
+    hiring_hall_names: list[str] = Field(default_factory=list)
+    referral_priority_terms: list[str] = Field(default_factory=list)
+    registration_list_names: list[str] = Field(default_factory=list)
     flags: HiringHallDispatchFlags | None = None
 
 
@@ -496,6 +655,10 @@ class DisciplineInvestigationAppealExtraction(ProcedureOrStandardExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_DISCIPLINE_INVESTIGATION_APPEAL']] = 'C_DISCIPLINE_INVESTIGATION_APPEAL'
     category: ClassVar[Literal['Disputes']] = 'Disputes'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('appeal_step_names', 'record_removal_terms', 'representation_terms')
+    appeal_step_names: list[str] = Field(default_factory=list)
+    record_removal_terms: list[str] = Field(default_factory=list)
+    representation_terms: list[str] = Field(default_factory=list)
     flags: DisciplineInvestigationAppealFlags | None = None
 
 
@@ -513,6 +676,10 @@ class HealthDisabilityIncomeExtraction(HealthBenefitExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_HEALTH_DISABILITY_INCOME']] = 'C_HEALTH_DISABILITY_INCOME'
     category: ClassVar[Literal['Healthcare']] = 'Healthcare'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('plan_names', 'disability_type_names', 'waiting_period_terms')
+    plan_names: list[str] = Field(default_factory=list)
+    disability_type_names: list[str] = Field(default_factory=list)
+    waiting_period_terms: list[str] = Field(default_factory=list)
     flags: HealthDisabilityIncomeFlags | None = None
 
 
@@ -529,6 +696,11 @@ class JobSecurityBenefitContinuationExtraction(JobSecurityExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_JOB_SECURITY_BENEFIT_CONTINUATION']] = 'C_JOB_SECURITY_BENEFIT_CONTINUATION'
     category: ClassVar[Literal['Security']] = 'Security'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('benefit_program_names', 'benefit_type_names', 'leave_type_names', 'eligible_employee_groups')
+    benefit_program_names: list[str] = Field(default_factory=list)
+    benefit_type_names: list[str] = Field(default_factory=list)
+    leave_type_names: list[str] = Field(default_factory=list)
+    eligible_employee_groups: list[str] = Field(default_factory=list)
     flags: JobSecurityBenefitContinuationFlags | None = None
 
 
@@ -545,6 +717,10 @@ class HealthRetireeExtraction(HealthBenefitExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_HEALTH_RETIREE']] = 'C_HEALTH_RETIREE'
     category: ClassVar[Literal['Healthcare']] = 'Healthcare'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('plan_names', 'eligible_retiree_groups', 'eligibility_terms')
+    plan_names: list[str] = Field(default_factory=list)
+    eligible_retiree_groups: list[str] = Field(default_factory=list)
+    eligibility_terms: list[str] = Field(default_factory=list)
     flags: HealthRetireeFlags | None = None
 
 
@@ -561,6 +737,11 @@ class SubcontractingWorkPreservationExtraction(JobSecurityExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_SUBCONTRACTING_WORK_PRESERVATION']] = 'C_SUBCONTRACTING_WORK_PRESERVATION'
     category: ClassVar[Literal['Security']] = 'Security'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('protected_work_terms', 'subcontracting_terms', 'subcontracting_exception_terms', 'notice_recipient_names')
+    protected_work_terms: list[str] = Field(default_factory=list)
+    subcontracting_terms: list[str] = Field(default_factory=list)
+    subcontracting_exception_terms: list[str] = Field(default_factory=list)
+    notice_recipient_names: list[str] = Field(default_factory=list)
     flags: SubcontractingWorkPreservationFlags | None = None
 
 
@@ -577,6 +758,10 @@ class WorkloadClassSizeStaffingExtraction(SchedulingExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_WORKLOAD_CLASS_SIZE_STAFFING']] = 'C_WORKLOAD_CLASS_SIZE_STAFFING'
     category: ClassVar[Literal['Scheduling']] = 'Scheduling'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('class_size_unit_names', 'staffing_ratio_terms', 'duty_terms')
+    class_size_unit_names: list[str] = Field(default_factory=list)
+    staffing_ratio_terms: list[str] = Field(default_factory=list)
+    duty_terms: list[str] = Field(default_factory=list)
     flags: WorkloadClassSizeStaffingFlags | None = None
 
 
@@ -593,6 +778,13 @@ class SenioritySystemExtraction(JobSecurityExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_SENIORITY_SYSTEM']] = 'C_SENIORITY_SYSTEM'
     category: ClassVar[Literal['Security']] = 'Security'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('seniority_unit_names', 'seniority_type_names', 'seniority_group_names', 'classification_names', 'break_in_service_terms', 'tie_breaker_terms')
+    seniority_unit_names: list[str] = Field(default_factory=list)
+    seniority_type_names: list[str] = Field(default_factory=list)
+    seniority_group_names: list[str] = Field(default_factory=list)
+    classification_names: list[str] = Field(default_factory=list)
+    break_in_service_terms: list[str] = Field(default_factory=list)
+    tie_breaker_terms: list[str] = Field(default_factory=list)
     flags: SenioritySystemFlags | None = None
 
 
@@ -609,6 +801,10 @@ class PremiumZoneSubsistenceExtraction(PremiumPayExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_PREMIUM_ZONE_SUBSISTENCE']] = 'C_PREMIUM_ZONE_SUBSISTENCE'
     category: ClassVar[Literal['Compensation']] = 'Compensation'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('zone_names', 'geographic_areas', 'travel_terms')
+    zone_names: list[str] = Field(default_factory=list)
+    geographic_areas: list[str] = Field(default_factory=list)
+    travel_terms: list[str] = Field(default_factory=list)
     flags: PremiumZoneSubsistenceFlags | None = None
 
 
@@ -625,6 +821,11 @@ class HealthVisionExtraction(HealthBenefitExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_HEALTH_VISION']] = 'C_HEALTH_VISION'
     category: ClassVar[Literal['Healthcare']] = 'Healthcare'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('plan_names', 'coverage_tiers', 'eligible_employee_groups', 'covered_service_names')
+    plan_names: list[str] = Field(default_factory=list)
+    coverage_tiers: list[str] = Field(default_factory=list)
+    eligible_employee_groups: list[str] = Field(default_factory=list)
+    covered_service_names: list[str] = Field(default_factory=list)
     flags: HealthVisionFlags | None = None
 
 
@@ -641,6 +842,11 @@ class JobPostingBiddingTransferExtraction(JobSecurityExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_JOB_POSTING_BIDDING_TRANSFER']] = 'C_JOB_POSTING_BIDDING_TRANSFER'
     category: ClassVar[Literal['Security']] = 'Security'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('job_posting_terms', 'bidding_unit_names', 'eligible_employee_groups', 'trial_period_terms')
+    job_posting_terms: list[str] = Field(default_factory=list)
+    bidding_unit_names: list[str] = Field(default_factory=list)
+    eligible_employee_groups: list[str] = Field(default_factory=list)
+    trial_period_terms: list[str] = Field(default_factory=list)
     flags: JobPostingBiddingTransferFlags | None = None
 
 
@@ -657,6 +863,10 @@ class SafetyAssaultViolenceExtraction(SafetyExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_SAFETY_ASSAULT_VIOLENCE']] = 'C_SAFETY_ASSAULT_VIOLENCE'
     category: ClassVar[Literal['Safety']] = 'Safety'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('violence_event_terms', 'response_team_names', 'reporting_terms')
+    violence_event_terms: list[str] = Field(default_factory=list)
+    response_team_names: list[str] = Field(default_factory=list)
+    reporting_terms: list[str] = Field(default_factory=list)
     flags: SafetyAssaultViolenceFlags | None = None
 
 
@@ -673,6 +883,10 @@ class RetirementIncentiveExtraction(AncillaryBenefitExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_RETIREMENT_INCENTIVE']] = 'C_RETIREMENT_INCENTIVE'
     category: ClassVar[Literal['Ancillary']] = 'Ancillary'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('incentive_names', 'eligible_employee_groups', 'effective_dates')
+    incentive_names: list[str] = Field(default_factory=list)
+    eligible_employee_groups: list[str] = Field(default_factory=list)
+    effective_dates: list[str] = Field(default_factory=list)
     flags: RetirementIncentiveFlags | None = None
 
 
@@ -689,6 +903,12 @@ class JobSecurityLayoffRecallExtraction(JobSecurityExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_JOB_SECURITY_LAYOFF_RECALL']] = 'C_JOB_SECURITY_LAYOFF_RECALL'
     category: ClassVar[Literal['Security']] = 'Security'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('layoff_unit_names', 'recall_list_names', 'affected_employee_groups', 'notice_method_terms', 'exception_terms')
+    layoff_unit_names: list[str] = Field(default_factory=list)
+    recall_list_names: list[str] = Field(default_factory=list)
+    affected_employee_groups: list[str] = Field(default_factory=list)
+    notice_method_terms: list[str] = Field(default_factory=list)
+    exception_terms: list[str] = Field(default_factory=list)
     flags: JobSecurityLayoffRecallFlags | None = None
 
 
@@ -705,6 +925,11 @@ class JobSecuritySubIncomeBridgeExtraction(JobSecurityExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_JOB_SECURITY_SUB_INCOME_BRIDGE']] = 'C_JOB_SECURITY_SUB_INCOME_BRIDGE'
     category: ClassVar[Literal['Security']] = 'Security'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('severance_plan_names', 'benefit_program_names', 'benefit_type_names', 'eligible_employee_groups')
+    severance_plan_names: list[str] = Field(default_factory=list)
+    benefit_program_names: list[str] = Field(default_factory=list)
+    benefit_type_names: list[str] = Field(default_factory=list)
+    eligible_employee_groups: list[str] = Field(default_factory=list)
     flags: JobSecuritySubIncomeBridgeFlags | None = None
 
 
@@ -722,6 +947,12 @@ class HealthActiveExtraction(HealthBenefitExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_HEALTH_ACTIVE']] = 'C_HEALTH_ACTIVE'
     category: ClassVar[Literal['Healthcare']] = 'Healthcare'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('plan_names', 'trust_names', 'coverage_tiers', 'eligible_employee_groups', 'covered_service_names')
+    plan_names: list[str] = Field(default_factory=list)
+    trust_names: list[str] = Field(default_factory=list)
+    coverage_tiers: list[str] = Field(default_factory=list)
+    eligible_employee_groups: list[str] = Field(default_factory=list)
+    covered_service_names: list[str] = Field(default_factory=list)
     flags: HealthActiveFlags | None = None
 
 
@@ -738,6 +969,10 @@ class WageGeneralIncreaseExtraction(WageAdjustmentExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_WAGE_GENERAL_INCREASE']] = 'C_WAGE_GENERAL_INCREASE'
     category: ClassVar[Literal['Compensation']] = 'Compensation'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('effective_dates', 'covered_employee_groups', 'adjustment_names')
+    effective_dates: list[str] = Field(default_factory=list)
+    covered_employee_groups: list[str] = Field(default_factory=list)
+    adjustment_names: list[str] = Field(default_factory=list)
     flags: WageGeneralIncreaseFlags | None = None
 
 
@@ -753,6 +988,10 @@ class TimeNoCancellationSecurityExtraction(SchedulingExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_TIME_NO_CANCELLATION_SECURITY']] = 'C_TIME_NO_CANCELLATION_SECURITY'
     category: ClassVar[Literal['Scheduling']] = 'Scheduling'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('cancellation_terms', 'affected_employee_groups', 'pay_protection_terms')
+    cancellation_terms: list[str] = Field(default_factory=list)
+    affected_employee_groups: list[str] = Field(default_factory=list)
+    pay_protection_terms: list[str] = Field(default_factory=list)
     flags: TimeNoCancellationSecurityFlags | None = None
 
 
@@ -769,6 +1008,13 @@ class JobSecuritySeniorityExtraction(JobSecurityExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_JOB_SECURITY_SENIORITY']] = 'C_JOB_SECURITY_SENIORITY'
     category: ClassVar[Literal['Security']] = 'Security'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('seniority_unit_names', 'seniority_type_names', 'seniority_group_names', 'classification_names', 'break_in_service_terms', 'tie_breaker_terms')
+    seniority_unit_names: list[str] = Field(default_factory=list)
+    seniority_type_names: list[str] = Field(default_factory=list)
+    seniority_group_names: list[str] = Field(default_factory=list)
+    classification_names: list[str] = Field(default_factory=list)
+    break_in_service_terms: list[str] = Field(default_factory=list)
+    tie_breaker_terms: list[str] = Field(default_factory=list)
     flags: JobSecuritySeniorityFlags | None = None
 
 
@@ -785,6 +1031,9 @@ class WageApprenticeExtraction(WageAdjustmentExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_WAGE_APPRENTICE']] = 'C_WAGE_APPRENTICE'
     category: ClassVar[Literal['Compensation']] = 'Compensation'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('apprenticeship_period_names', 'classification_names')
+    apprenticeship_period_names: list[str] = Field(default_factory=list)
+    classification_names: list[str] = Field(default_factory=list)
     flags: WageApprenticeFlags | None = None
 
 
@@ -801,6 +1050,10 @@ class WageScheduledIncreaseExtraction(WageAdjustmentExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_WAGE_SCHEDULED_INCREASE']] = 'C_WAGE_SCHEDULED_INCREASE'
     category: ClassVar[Literal['Compensation']] = 'Compensation'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('effective_dates', 'service_band_names', 'adjustment_names')
+    effective_dates: list[str] = Field(default_factory=list)
+    service_band_names: list[str] = Field(default_factory=list)
+    adjustment_names: list[str] = Field(default_factory=list)
     flags: WageScheduledIncreaseFlags | None = None
 
 
@@ -817,6 +1070,9 @@ class PremiumSundayHolidayExtraction(PremiumPayExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_PREMIUM_SUNDAY_HOLIDAY']] = 'C_PREMIUM_SUNDAY_HOLIDAY'
     category: ClassVar[Literal['Compensation']] = 'Compensation'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('day_names', 'holiday_names')
+    day_names: list[str] = Field(default_factory=list)
+    holiday_names: list[str] = Field(default_factory=list)
     flags: PremiumSundayHolidayFlags | None = None
 
 
@@ -833,6 +1089,10 @@ class LightDutyAccommodationExtraction(JobSecurityExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_LIGHT_DUTY_ACCOMMODATION']] = 'C_LIGHT_DUTY_ACCOMMODATION'
     category: ClassVar[Literal['Security']] = 'Security'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('accommodation_terms', 'eligible_employee_groups', 'medical_clearance_terms')
+    accommodation_terms: list[str] = Field(default_factory=list)
+    eligible_employee_groups: list[str] = Field(default_factory=list)
+    medical_clearance_terms: list[str] = Field(default_factory=list)
     flags: LightDutyAccommodationFlags | None = None
 
 
@@ -849,6 +1109,12 @@ class JobSecurityRifLayoffExtraction(JobSecurityExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_JOB_SECURITY_RIF_LAYOFF']] = 'C_JOB_SECURITY_RIF_LAYOFF'
     category: ClassVar[Literal['Security']] = 'Security'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('layoff_unit_names', 'recall_list_names', 'affected_employee_groups', 'notice_method_terms', 'exception_terms')
+    layoff_unit_names: list[str] = Field(default_factory=list)
+    recall_list_names: list[str] = Field(default_factory=list)
+    affected_employee_groups: list[str] = Field(default_factory=list)
+    notice_method_terms: list[str] = Field(default_factory=list)
+    exception_terms: list[str] = Field(default_factory=list)
     flags: JobSecurityRifLayoffFlags | None = None
 
 
@@ -865,6 +1131,11 @@ class HealthExternalFundExtraction(HealthBenefitExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_HEALTH_EXTERNAL_FUND']] = 'C_HEALTH_EXTERNAL_FUND'
     category: ClassVar[Literal['Healthcare']] = 'Healthcare'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('fund_names', 'trustee_names', 'plan_names', 'contribution_terms')
+    fund_names: list[str] = Field(default_factory=list)
+    trustee_names: list[str] = Field(default_factory=list)
+    plan_names: list[str] = Field(default_factory=list)
+    contribution_terms: list[str] = Field(default_factory=list)
     flags: HealthExternalFundFlags | None = None
 
 
@@ -882,6 +1153,11 @@ class HealthActivePlanDesignExtraction(HealthBenefitExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_HEALTH_ACTIVE_PLAN_DESIGN']] = 'C_HEALTH_ACTIVE_PLAN_DESIGN'
     category: ClassVar[Literal['Healthcare']] = 'Healthcare'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('plan_names', 'network_names', 'coverage_tiers', 'covered_service_names')
+    plan_names: list[str] = Field(default_factory=list)
+    network_names: list[str] = Field(default_factory=list)
+    coverage_tiers: list[str] = Field(default_factory=list)
+    covered_service_names: list[str] = Field(default_factory=list)
     flags: HealthActivePlanDesignFlags | None = None
 
 
@@ -898,6 +1174,10 @@ class WageIncreaseExtraction(WageAdjustmentExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_WAGE_INCREASE']] = 'C_WAGE_INCREASE'
     category: ClassVar[Literal['Compensation']] = 'Compensation'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('effective_dates', 'covered_employee_groups', 'adjustment_names')
+    effective_dates: list[str] = Field(default_factory=list)
+    covered_employee_groups: list[str] = Field(default_factory=list)
+    adjustment_names: list[str] = Field(default_factory=list)
     flags: WageIncreaseFlags | None = None
 
 
@@ -914,6 +1194,9 @@ class WageLongevityExtraction(WageAdjustmentExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_WAGE_LONGEVITY']] = 'C_WAGE_LONGEVITY'
     category: ClassVar[Literal['Compensation']] = 'Compensation'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('service_band_names', 'covered_employee_groups')
+    service_band_names: list[str] = Field(default_factory=list)
+    covered_employee_groups: list[str] = Field(default_factory=list)
     flags: WageLongevityFlags | None = None
 
 
@@ -930,6 +1213,11 @@ class UnionDuesCheckoffExtraction(RecognitionExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_UNION_DUES_CHECKOFF']] = 'C_UNION_DUES_CHECKOFF'
     category: ClassVar[Literal['Recognition']] = 'Recognition'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('union_names', 'authorization_terms', 'revocation_terms', 'fee_type_names')
+    union_names: list[str] = Field(default_factory=list)
+    authorization_terms: list[str] = Field(default_factory=list)
+    revocation_terms: list[str] = Field(default_factory=list)
+    fee_type_names: list[str] = Field(default_factory=list)
     flags: UnionDuesCheckoffFlags | None = None
 
 
@@ -947,6 +1235,11 @@ class HealthPlanDesignExtraction(HealthBenefitExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_HEALTH_PLAN_DESIGN']] = 'C_HEALTH_PLAN_DESIGN'
     category: ClassVar[Literal['Healthcare']] = 'Healthcare'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('plan_names', 'network_names', 'coverage_tiers', 'covered_service_names')
+    plan_names: list[str] = Field(default_factory=list)
+    network_names: list[str] = Field(default_factory=list)
+    coverage_tiers: list[str] = Field(default_factory=list)
+    covered_service_names: list[str] = Field(default_factory=list)
     flags: HealthPlanDesignFlags | None = None
 
 
@@ -963,6 +1256,10 @@ class WageMeritStepExtraction(WageAdjustmentExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_WAGE_MERIT_STEP']] = 'C_WAGE_MERIT_STEP'
     category: ClassVar[Literal['Compensation']] = 'Compensation'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('step_names', 'eligibility_terms', 'review_terms')
+    step_names: list[str] = Field(default_factory=list)
+    eligibility_terms: list[str] = Field(default_factory=list)
+    review_terms: list[str] = Field(default_factory=list)
     flags: WageMeritStepFlags | None = None
 
 
@@ -978,6 +1275,9 @@ class DisciplineProbationExtraction(ProcedureOrStandardExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_DISCIPLINE_PROBATION']] = 'C_DISCIPLINE_PROBATION'
     category: ClassVar[Literal['Disputes']] = 'Disputes'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('probationary_group_names', 'probation_completion_terms')
+    probationary_group_names: list[str] = Field(default_factory=list)
+    probation_completion_terms: list[str] = Field(default_factory=list)
     flags: DisciplineProbationFlags | None = None
 
 
@@ -994,6 +1294,10 @@ class SafetyDrugTestingExtraction(SafetyExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_SAFETY_DRUG_TESTING']] = 'C_SAFETY_DRUG_TESTING'
     category: ClassVar[Literal['Safety']] = 'Safety'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('testing_trigger_terms', 'substance_test_names', 'consequence_terms')
+    testing_trigger_terms: list[str] = Field(default_factory=list)
+    substance_test_names: list[str] = Field(default_factory=list)
+    consequence_terms: list[str] = Field(default_factory=list)
     flags: SafetyDrugTestingFlags | None = None
 
 
@@ -1009,6 +1313,9 @@ class PremiumGroupLeaderExtraction(PremiumPayExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_PREMIUM_GROUP_LEADER']] = 'C_PREMIUM_GROUP_LEADER'
     category: ClassVar[Literal['Compensation']] = 'Compensation'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('role_names', 'tier_names')
+    role_names: list[str] = Field(default_factory=list)
+    tier_names: list[str] = Field(default_factory=list)
     flags: PremiumGroupLeaderFlags | None = None
 
 
@@ -1025,6 +1332,9 @@ class WageIncentiveExtraction(WageAdjustmentExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_WAGE_INCENTIVE']] = 'C_WAGE_INCENTIVE'
     category: ClassVar[Literal['Compensation']] = 'Compensation'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('incentive_names', 'performance_metric_names')
+    incentive_names: list[str] = Field(default_factory=list)
+    performance_metric_names: list[str] = Field(default_factory=list)
     flags: WageIncentiveFlags | None = None
 
 
@@ -1041,4 +1351,8 @@ class HealthPrescriptionDrugExtraction(HealthBenefitExtraction):
     detail_fields: ClassVar[tuple[str, ...]] = ("values", "flags")
     concept_id: ClassVar[Literal['C_HEALTH_PRESCRIPTION_DRUG']] = 'C_HEALTH_PRESCRIPTION_DRUG'
     category: ClassVar[Literal['Healthcare']] = 'Healthcare'
+    string_detail_fields: ClassVar[tuple[str, ...]] = ('plan_names', 'drug_tier_names', 'covered_service_names')
+    plan_names: list[str] = Field(default_factory=list)
+    drug_tier_names: list[str] = Field(default_factory=list)
+    covered_service_names: list[str] = Field(default_factory=list)
     flags: HealthPrescriptionDrugFlags | None = None

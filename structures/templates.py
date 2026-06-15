@@ -41,8 +41,10 @@ class QuantitativeProvisionExtraction(BaseProvisionExtraction):
 
     @model_validator(mode="after")
     def validate_quantitative_value(self) -> Self:
-        if self.exists and self.value is None:
-            raise ValueError("existing quantitative provisions require value")
+        if self.exists and self.value is None and not self.has_string_detail():
+            raise ValueError(
+                "existing quantitative provisions require value or string detail"
+            )
         if not self.exists and self.value is not None:
             raise ValueError("nonexistent quantitative provisions must have value=None")
         return self

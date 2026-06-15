@@ -1,7 +1,21 @@
 #!/usr/bin/env python3
 """
 Generate provision UI schema for the annotation tool.
-Outputs JSON to stdout mapping concept_id -> { format, flags[] }.
+
+Outputs JSON to stdout mapping each concept_id to:
+    {
+        "format": "binary" | "quantitative" | "complex",
+        "flags": [str, ...],          # boolean flag field names (complex only)
+        "string_fields": [str, ...],  # typed string-list attribute names (all formats)
+        "meta": {                     # ProvisionMeta, identifies tier/rank
+            "priority_tier": "core" | "conditional_core" | "advanced" | "standard",
+            "rank": int | null,
+            "priority_score": int | null,
+            "difficulty": "low" | "medium" | "high" | null,
+            "core_family": str | null,
+            "notes": [str, ...]
+        }
+    }
 
 Usage:
     python structures/generate_ui_schema.py > annotation_ui/lib/provision-schemas.json
@@ -18,9 +32,14 @@ from structures import PROVISION_FORMAT_REGISTRY, PROVISION_EXTRACTION_REGISTRY
 
 schema = {}
 for concept_id, fmt in PROVISION_FORMAT_REGISTRY.items():
-    entry: dict = {"format": fmt, "flags": []}
+    cls = PROVISION_EXTRACTION_REGISTRY[concept_id]
+    entry: dict = {
+        "format": fmt,
+        "flags": [],
+        "string_fields": list(cls.string_detail_fields),
+        "meta": cls.meta.model_dump(mode="json"),
+    }
     if fmt == "complex":
-        cls = PROVISION_EXTRACTION_REGISTRY[concept_id]
         hints = typing.get_type_hints(cls)
         if "flags" in hints:
             flags_type = hints["flags"]

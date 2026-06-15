@@ -11,8 +11,21 @@ function emptyValue(): AnnotationValue {
   };
 }
 
+function emptyStringFields(schema: ProvisionSchema): Record<string, string[]> {
+  const fields: Record<string, string[]> = {};
+  for (const f of schema.string_fields ?? []) fields[f] = [];
+  return fields;
+}
+
 function emptyAnnotation(conceptId: string, category: string, schema: ProvisionSchema): ProvisionAnnotation {
-  const base = { concept_id: conceptId, category, format: schema.format, exists: null, summarize: "" };
+  const base = {
+    concept_id: conceptId,
+    category,
+    format: schema.format,
+    exists: null,
+    summarize: "",
+    string_fields: emptyStringFields(schema),
+  };
   if (schema.format === "quantitative") return { ...base, value: emptyValue() };
   if (schema.format === "complex") {
     const flags: Record<string, boolean | null> = {};
@@ -48,6 +61,54 @@ function FlagRow({ name, groupName, value, onChange }: {
             </label>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+// ── Typed string-list attribute (named source terms) ─────────────────────────
+
+function StringListInput({ name, values, onChange }: {
+  name: string;
+  values: string[];
+  onChange: (v: string[]) => void;
+}) {
+  function addFromInput(el: HTMLInputElement) {
+    const term = el.value.trim();
+    if (!term) return;
+    onChange([...values, term]);
+    el.value = "";
+  }
+
+  return (
+    <div className="string-list">
+      <label className="string-list-label">{flagLabel(name)}</label>
+      <div className="string-list-chips">
+        {values.map((v, i) => (
+          <span key={i} className="string-chip">
+            {v}
+            <button
+              type="button"
+              className="string-chip-remove"
+              title="Remove"
+              onClick={() => onChange(values.filter((_, j) => j !== i))}
+            >
+              ×
+            </button>
+          </span>
+        ))}
+        <input
+          type="text"
+          className="string-list-input"
+          placeholder="Add term, press Enter…"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              addFromInput(e.currentTarget);
+            }
+          }}
+          onBlur={(e) => addFromInput(e.currentTarget)}
+        />
       </div>
     </div>
   );
@@ -198,8 +259,10 @@ export function ProvisionForm({ index, conceptId, category, label, schema, annot
 
   function handleExistsChange(exists: boolean) {
     if (!exists) {
-      // Clear detail fields when marking absent
+      // Clear all detail fields when marking absent — absent provisions must
+      // carry no normalized detail (mirrors validate_presence_consistency).
       const cleared: ProvisionAnnotation = { ...annotation, exists: false, summarize: annotation.summarize };
+      cleared.string_fields = emptyStringFields(schema);
       if (schema.format === "quantitative") cleared.value = null;
       if (schema.format === "complex") {
         cleared.values = [];
@@ -223,6 +286,12 @@ export function ProvisionForm({ index, conceptId, category, label, schema, annot
         <span className="provision-id">{conceptId}</span>
         <span className={categoryClass}>{category}</span>
         <span className="format-badge">{schema.format}</span>
+        {schema.meta?.priority_tier && (
+          <span className="tier-badge" data-tier={schema.meta.priority_tier}>
+            {schema.meta.priority_tier.replace(/_/g, " ")}
+            {schema.meta.rank != null ? ` · #${schema.meta.rank}` : ""}
+          </span>
+        )}
       </div>
       <p className="provision-label">{label}</p>
 
@@ -319,6 +388,26 @@ export function ProvisionForm({ index, conceptId, category, label, schema, annot
               </div>
             </>
           )}
+        </div>
+      )}
+
+      {/* Typed string-list attributes — named source terms, all formats */}
+      {annotation.exists && (schema.string_fields?.length ?? 0) > 0 && (
+        <div className="detail-section">
+          <p className="detail-heading">Named terms</p>
+          <p className="detail-hint">
+            Short terms copied from the CBA (occupations, plan names, dates, etc.). Optional.
+          </p>
+          {schema.string_fields!.map((fieldName) => (
+            <StringListInput
+              key={fieldName}
+              name={fieldName}
+              values={(annotation.string_fields ?? {})[fieldName] ?? []}
+              onChange={(v) =>
+                set({ string_fields: { ...(annotation.string_fields ?? {}), [fieldName]: v } })
+              }
+            />
+          ))}
         </div>
       )}
     </div>

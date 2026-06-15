@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import type {
   SessionData,
   ProvisionAnnotation,
+  ProvisionSchema,
   SubmitPayload,
   ProlificContext,
   DraftState,
@@ -12,10 +13,7 @@ import type {
 import provisionSchemas from "@/lib/provision-schemas.json";
 import { ProvisionForm, emptyAnnotation } from "./components/ProvisionForm";
 
-const SCHEMAS = provisionSchemas as Record<
-  string,
-  { format: "binary" | "quantitative" | "complex"; flags: string[] }
->;
+const SCHEMAS = provisionSchemas as Record<string, ProvisionSchema>;
 
 const LS_PID = "cba-annotation:prolific_pid";
 const LS_STUDY = "cba-annotation:study_id";

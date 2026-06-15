@@ -8,9 +8,22 @@ export interface Provision {
 
 export type ProvisionFormat = "binary" | "quantitative" | "complex";
 
+export type PriorityTier = "core" | "conditional_core" | "advanced" | "standard";
+
+export interface ProvisionMeta {
+  priority_tier?: PriorityTier;
+  rank?: number | null;
+  priority_score?: number | null;
+  difficulty?: "low" | "medium" | "high" | null;
+  core_family?: string | null;
+  notes?: string[];
+}
+
 export interface ProvisionSchema {
   format: ProvisionFormat;
-  flags: string[]; // flag field names for complex provisions
+  flags: string[]; // boolean flag field names (complex only)
+  string_fields?: string[]; // typed string-list attribute names (all formats)
+  meta?: ProvisionMeta; // tier/rank metadata
 }
 
 // ── CBA ───────────────────────────────────────────────────────────────────────
@@ -69,6 +82,8 @@ export interface ProvisionAnnotation {
   // complex: list of values + flag map
   values?: AnnotationValue[];
   flags?: Record<string, boolean | null>;
+  // typed string-list attributes (named source terms), keyed by attribute name
+  string_fields?: Record<string, string[]>;
 }
 
 // ── Submit payload ────────────────────────────────────────────────────────────

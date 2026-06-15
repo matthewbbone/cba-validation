@@ -3,13 +3,14 @@ from __future__ import annotations
 from typing import Literal, TypeAlias
 
 from .common import BaseProvisionExtraction
+from .common import ProvisionMeta
 from .complex import WageBaseRateExtraction
 from .complex import GrievanceProcedureExtraction
 from .complex import ArbitrationExtraction
 from .complex import LeaveHolidaysExtraction
 from .complex import PremiumOvertimeExtraction
 from .complex import UnionAccessBusinessExtraction
-from .binary import DisciplineJustCauseExtraction
+from .complex import DisciplineJustCauseExtraction
 from .complex import WageIncreasesColaExtraction
 from .quantitative import HealthMedicalActiveContributionExtraction
 from .complex import LeaveVacationExtraction
@@ -216,7 +217,7 @@ PROVISION_FORMAT_REGISTRY: dict[str, ProvisionFormat] = {
     'C_LEAVE_HOLIDAYS': 'complex',
     'C_PREMIUM_OVERTIME': 'complex',
     'C_UNION_ACCESS_BUSINESS': 'complex',
-    'C_DISCIPLINE_JUST_CAUSE': 'binary',
+    'C_DISCIPLINE_JUST_CAUSE': 'complex',
     'C_WAGE_INCREASES_COLA': 'complex',
     'C_HEALTH_MEDICAL_ACTIVE_CONTRIBUTION': 'quantitative',
     'C_LEAVE_VACATION': 'complex',
@@ -311,10 +312,208 @@ PROVISION_FORMAT_REGISTRY: dict[str, ProvisionFormat] = {
     'C_HEALTH_BENEFITS': 'binary',
 }
 
+PROVISION_EXTRACTION_REGISTRY["C_WAGE_BASE_RATE"].meta = ProvisionMeta(
+    priority_tier="core",
+    rank=1,
+    priority_score=98,
+    difficulty="medium",
+    core_family="base_wage_schedule",
+    notes=("Core pay tables, classifications, steps, and rates.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_PREMIUM_OVERTIME"].meta = ProvisionMeta(
+    priority_tier="core",
+    rank=2,
+    priority_score=96,
+    difficulty="medium",
+    core_family="overtime_and_premium_pay",
+    notes=("Overtime triggers, thresholds, multipliers, and stacking rules.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_GRIEVANCE_PROCEDURE"].meta = ProvisionMeta(
+    priority_tier="core",
+    rank=3,
+    priority_score=95,
+    difficulty="high",
+    core_family="grievance_arbitration",
+    notes=("Procedural backbone for contract enforcement.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_ARBITRATION"].meta = ProvisionMeta(
+    priority_tier="core",
+    rank=3,
+    priority_score=95,
+    difficulty="high",
+    core_family="grievance_arbitration",
+    notes=("Procedural backbone for contract enforcement.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_RECOGNITION_COVERAGE_SCOPE"].meta = ProvisionMeta(
+    priority_tier="core",
+    rank=4,
+    priority_score=94,
+    difficulty="low",
+    core_family="recognition_bargaining_unit",
+    notes=("Defines covered employees and exclusions for downstream provisions.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_JOB_SECURITY_LAYOFF_ORDER"].meta = ProvisionMeta(
+    priority_tier="core",
+    rank=5,
+    priority_score=92,
+    difficulty="high",
+    core_family="layoff_recall_bumping",
+    notes=("Workforce reduction order, notice, and displacement rules.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_JOB_SECURITY_RECALL"].meta = ProvisionMeta(
+    priority_tier="core",
+    rank=5,
+    priority_score=92,
+    difficulty="high",
+    core_family="layoff_recall_bumping",
+    notes=("Recall rights for laid-off workers.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_JOB_SECURITY_BUMPING"].meta = ProvisionMeta(
+    priority_tier="advanced",
+    rank=5,
+    priority_score=92,
+    difficulty="high",
+    core_family="layoff_recall_bumping",
+    notes=("Advanced subcomponent of the layoff/recall family.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_HEALTH_MEDICAL_ACTIVE_CONTRIBUTION"].meta = (
+    ProvisionMeta(
+        priority_tier="core",
+        rank=6,
+        priority_score=91,
+        difficulty="medium",
+        core_family="health_insurance_employer_contribution",
+        notes=("Employer/employee medical premium shares and contributions.",),
+    )
+)
+PROVISION_EXTRACTION_REGISTRY["C_RETIREMENT_PENSION"].meta = ProvisionMeta(
+    priority_tier="core",
+    rank=7,
+    priority_score=89,
+    difficulty="medium",
+    core_family="pension_retirement_contribution",
+    notes=("Retirement plan eligibility and contribution terms.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_LEAVE_VACATION"].meta = ProvisionMeta(
+    priority_tier="core",
+    rank=8,
+    priority_score=88,
+    difficulty="medium",
+    core_family="paid_vacation",
+    notes=("Vacation entitlement, accrual, service tiers, and scheduling.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_SENIORITY_SYSTEM"].meta = ProvisionMeta(
+    priority_tier="core",
+    rank=9,
+    priority_score=87,
+    difficulty="high",
+    core_family="seniority",
+    notes=("Connective rule for layoff, recall, bidding, vacation, and overtime.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_DISCIPLINE_JUST_CAUSE"].meta = ProvisionMeta(
+    priority_tier="core",
+    rank=10,
+    priority_score=86,
+    difficulty="high",
+    core_family="just_cause_discipline_discharge",
+    notes=("Discipline/discharge standard central to grievance and arbitration.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_LEAVE_HOLIDAYS"].meta = ProvisionMeta(
+    priority_tier="core",
+    rank=11,
+    priority_score=84,
+    difficulty="low",
+    core_family="paid_holidays",
+    notes=("Holiday list, observed rules, eligibility, and premium pay.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_SAFETY_PPE_UNSAFE_WORK"].meta = ProvisionMeta(
+    priority_tier="core",
+    rank=12,
+    priority_score=83,
+    difficulty="medium",
+    core_family="safety_ppe_training",
+    notes=("Safety duties, PPE, unsafe-work rights, and hazard response.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_LEAVE_SICK"].meta = ProvisionMeta(
+    priority_tier="core",
+    rank=14,
+    priority_score=80,
+    difficulty="medium",
+    core_family="sick_leave_paid_leave_bank",
+    notes=("Sick leave accrual, caps, usage rules, and payout.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_UNION_SECURITY_DUES_CHECKOFF"].meta = (
+    ProvisionMeta(
+        priority_tier="conditional_core",
+        rank=15,
+        priority_score=75,
+        difficulty="low",
+        core_family="dues_checkoff_union_security",
+        notes=("Jurisdiction-conditional dues deduction and union-security terms.",),
+    )
+)
+PROVISION_EXTRACTION_REGISTRY["C_HEALTH_MEDICAL_ACTIVE_PLAN_DESIGN"].meta = (
+    ProvisionMeta(
+        priority_tier="advanced",
+        difficulty="medium",
+        core_family="active_medical_plan_design",
+        notes=("Demoted because detailed plan terms may live outside the CBA.",),
+    )
+)
+PROVISION_EXTRACTION_REGISTRY["C_UNION_ACCESS_BUSINESS"].meta = ProvisionMeta(
+    priority_tier="advanced",
+    difficulty="medium",
+    core_family="union_business_access",
+    notes=("Useful next-module provision for union capacity and access.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_LABOR_MANAGEMENT_COMMITTEE"].meta = ProvisionMeta(
+    priority_tier="advanced",
+    difficulty="low",
+    core_family="labor_management_committee",
+    notes=("Optional governance provision, not a substitute for grievance machinery.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_PREMIUM_SHIFT"].meta = ProvisionMeta(
+    priority_tier="advanced",
+    difficulty="medium",
+    core_family="shift_differential",
+    notes=("Valuable next-module premium-pay provision.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_PREMIUM_STANDBY_ON_CALL"].meta = ProvisionMeta(
+    priority_tier="advanced",
+    difficulty="medium",
+    core_family="standby_on_call_pay",
+    notes=("Valuable next-module premium-pay provision.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_JOB_SECURITY_SEVERANCE"].meta = ProvisionMeta(
+    priority_tier="advanced",
+    difficulty="medium",
+    core_family="severance",
+    notes=("Valuable next-module job-security provision.",),
+)
+PROVISION_EXTRACTION_REGISTRY["C_DISCIPLINE_PROBATION"].meta = ProvisionMeta(
+    priority_tier="advanced",
+    difficulty="medium",
+    core_family="probationary_period",
+    notes=("Valuable next-module discipline provision.",),
+)
+
+PROVISION_METADATA_REGISTRY: dict[str, ProvisionMeta] = {
+    concept_id: model_cls.meta
+    for concept_id, model_cls in PROVISION_EXTRACTION_REGISTRY.items()
+}
+
+PROVISION_STRING_FIELD_REGISTRY: dict[str, tuple[str, ...]] = {
+    concept_id: model_cls.string_detail_fields
+    for concept_id, model_cls in PROVISION_EXTRACTION_REGISTRY.items()
+}
+
 __all__ = [
     "BaseProvisionExtraction",
+    "ProvisionMeta",
     "PROVISION_EXTRACTION_REGISTRY",
     "PROVISION_FORMAT_REGISTRY",
+    "PROVISION_METADATA_REGISTRY",
+    "PROVISION_STRING_FIELD_REGISTRY",
     "ProvisionExtractionType",
     "ProvisionFormat",
     "WageBaseRateExtraction",

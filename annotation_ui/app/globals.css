@@ -268,6 +268,22 @@ body {
   margin-left: 0.25rem;
 }
 
+/* ── Tier badge (provision priority) ── */
+.tier-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.12rem 0.4rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-left: 0.25rem;
+  white-space: nowrap;
+}
+.tier-badge[data-tier="core"]             { background: #fee2e2; color: #991b1b; }
+.tier-badge[data-tier="conditional_core"] { background: #ffedd5; color: #9a3412; }
+.tier-badge[data-tier="advanced"]         { background: #ede9fe; color: #5b21b6; }
+.tier-badge[data-tier="standard"]         { background: #f1f5f9; color: #64748b; }
+
 /* ── Exists row ── */
 .exists-row {
   display: flex;
@@ -559,4 +575,78 @@ body {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* ── Detail hint ── */
+.detail-hint {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin: -0.2rem 0 0.5rem;
+}
+
+/* ── String-list attributes (named source terms) ── */
+.string-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.string-list:last-child {
+  border-bottom: none;
+}
+
+.string-list-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.string-list-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.string-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 0.1rem 0.2rem 0.1rem 0.45rem;
+  border-radius: 3px;
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+.string-chip-remove {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.95rem;
+  line-height: 1;
+  padding: 0 0.1rem;
+}
+.string-chip-remove:hover {
+  color: #991b1b;
+}
+
+.string-list-input {
+  flex: 1;
+  min-width: 8rem;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.3rem;
+  border: none;
+  background: transparent;
+}
+.string-list-input:focus {
+  outline: none;
 }

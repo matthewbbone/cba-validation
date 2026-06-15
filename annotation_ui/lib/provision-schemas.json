@@ -8,7 +8,25 @@
       "has_step_rates",
       "has_salary_rates",
       "has_hourly_rates"
-    ]
+    ],
+    "string_fields": [
+      "occupation_names",
+      "classification_names",
+      "step_names",
+      "wage_schedule_names",
+      "geographic_areas",
+      "effective_dates"
+    ],
+    "meta": {
+      "priority_tier": "core",
+      "rank": 1,
+      "priority_score": 98,
+      "difficulty": "medium",
+      "core_family": "base_wage_schedule",
+      "notes": [
+        "Core pay tables, classifications, steps, and rates."
+      ]
+    }
   },
   "C_GRIEVANCE_PROCEDURE": {
     "format": "complex",
@@ -18,7 +36,23 @@
       "has_union_representation",
       "has_written_grievance",
       "has_management_response"
-    ]
+    ],
+    "string_fields": [
+      "grievance_step_names",
+      "eligible_filers",
+      "excluded_claim_types",
+      "deadline_terms"
+    ],
+    "meta": {
+      "priority_tier": "core",
+      "rank": 3,
+      "priority_score": 95,
+      "difficulty": "high",
+      "core_family": "grievance_arbitration",
+      "notes": [
+        "Procedural backbone for contract enforcement."
+      ]
+    }
   },
   "C_ARBITRATION": {
     "format": "complex",
@@ -28,7 +62,23 @@
       "has_neutral_arbitrator",
       "has_shared_costs",
       "limits_arbitrator_authority"
-    ]
+    ],
+    "string_fields": [
+      "arbitrator_selection_terms",
+      "excluded_claim_types",
+      "forum_names",
+      "remedy_limit_terms"
+    ],
+    "meta": {
+      "priority_tier": "core",
+      "rank": 3,
+      "priority_score": 95,
+      "difficulty": "high",
+      "core_family": "grievance_arbitration",
+      "notes": [
+        "Procedural backbone for contract enforcement."
+      ]
+    }
   },
   "C_LEAVE_HOLIDAYS": {
     "format": "complex",
@@ -37,7 +87,22 @@
       "has_holiday_premium_pay",
       "has_floating_holidays",
       "has_observed_holidays"
-    ]
+    ],
+    "string_fields": [
+      "holiday_names",
+      "observed_rule_terms",
+      "eligibility_terms"
+    ],
+    "meta": {
+      "priority_tier": "core",
+      "rank": 11,
+      "priority_score": 84,
+      "difficulty": "low",
+      "core_family": "paid_holidays",
+      "notes": [
+        "Holiday list, observed rules, eligibility, and premium pay."
+      ]
+    }
   },
   "C_PREMIUM_OVERTIME": {
     "format": "complex",
@@ -47,7 +112,23 @@
       "has_weekly_overtime",
       "has_premium_multiplier",
       "has_double_time"
-    ]
+    ],
+    "string_fields": [
+      "trigger_terms",
+      "covered_employee_groups",
+      "excluded_employee_groups",
+      "premium_names"
+    ],
+    "meta": {
+      "priority_tier": "core",
+      "rank": 2,
+      "priority_score": 96,
+      "difficulty": "medium",
+      "core_family": "overtime_and_premium_pay",
+      "notes": [
+        "Overtime triggers, thresholds, multipliers, and stacking rules."
+      ]
+    }
   },
   "C_UNION_ACCESS_BUSINESS": {
     "format": "complex",
@@ -57,11 +138,50 @@
       "has_bulletin_board_rights",
       "has_meeting_rights",
       "has_paid_union_time"
-    ]
+    ],
+    "string_fields": [
+      "union_role_names",
+      "access_location_names",
+      "communication_channel_names"
+    ],
+    "meta": {
+      "priority_tier": "advanced",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": "medium",
+      "core_family": "union_business_access",
+      "notes": [
+        "Useful next-module provision for union capacity and access."
+      ]
+    }
   },
   "C_DISCIPLINE_JUST_CAUSE": {
-    "format": "binary",
-    "flags": []
+    "format": "complex",
+    "flags": [
+      "has_just_cause_standard",
+      "covers_discipline",
+      "covers_discharge",
+      "has_hearing_right",
+      "has_investigatory_right",
+      "has_probation_exception",
+      "has_progressive_discipline"
+    ],
+    "string_fields": [
+      "discipline_terms",
+      "covered_employee_groups",
+      "excluded_employee_groups",
+      "offense_terms"
+    ],
+    "meta": {
+      "priority_tier": "core",
+      "rank": 10,
+      "priority_score": 86,
+      "difficulty": "high",
+      "core_family": "just_cause_discipline_discharge",
+      "notes": [
+        "Discipline/discharge standard central to grievance and arbitration."
+      ]
+    }
   },
   "C_WAGE_INCREASES_COLA": {
     "format": "complex",
@@ -70,11 +190,42 @@
       "has_cola",
       "has_lump_sum_adjustment",
       "has_across_the_board_increase"
-    ]
+    ],
+    "string_fields": [
+      "effective_dates",
+      "covered_employee_groups",
+      "adjustment_names",
+      "cola_index_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_HEALTH_MEDICAL_ACTIVE_CONTRIBUTION": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "plan_names",
+      "fund_names",
+      "coverage_tiers",
+      "eligible_employee_groups",
+      "contribution_terms"
+    ],
+    "meta": {
+      "priority_tier": "core",
+      "rank": 6,
+      "priority_score": 91,
+      "difficulty": "medium",
+      "core_family": "health_insurance_employer_contribution",
+      "notes": [
+        "Employer/employee medical premium shares and contributions."
+      ]
+    }
   },
   "C_LEAVE_VACATION": {
     "format": "complex",
@@ -84,7 +235,22 @@
       "has_cashout",
       "has_scheduling_rules",
       "has_vacation_fund"
-    ]
+    ],
+    "string_fields": [
+      "service_band_names",
+      "vacation_schedule_terms",
+      "eligible_employee_groups"
+    ],
+    "meta": {
+      "priority_tier": "core",
+      "rank": 8,
+      "priority_score": 88,
+      "difficulty": "medium",
+      "core_family": "paid_vacation",
+      "notes": [
+        "Vacation entitlement, accrual, service tiers, and scheduling."
+      ]
+    }
   },
   "C_SAFETY_PPE_UNSAFE_WORK": {
     "format": "complex",
@@ -94,7 +260,23 @@
       "has_safety_standards",
       "has_hazard_response",
       "has_safety_committee"
-    ]
+    ],
+    "string_fields": [
+      "ppe_item_names",
+      "hazard_names",
+      "safety_standard_names",
+      "committee_names"
+    ],
+    "meta": {
+      "priority_tier": "core",
+      "rank": 12,
+      "priority_score": 83,
+      "difficulty": "medium",
+      "core_family": "safety_ppe_training",
+      "notes": [
+        "Safety duties, PPE, unsafe-work rights, and hazard response."
+      ]
+    }
   },
   "C_PREMIUM_CALL_IN_REPORTING": {
     "format": "complex",
@@ -103,7 +285,20 @@
       "has_call_back_pay",
       "has_reporting_pay",
       "has_minimum_pay_guarantee"
-    ]
+    ],
+    "string_fields": [
+      "trigger_terms",
+      "covered_employee_groups",
+      "guarantee_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_RETIREMENT_PENSION": {
     "format": "complex",
@@ -113,11 +308,41 @@
       "has_employee_contribution",
       "has_vesting_requirement",
       "has_external_fund"
-    ]
+    ],
+    "string_fields": [
+      "plan_names",
+      "fund_names",
+      "eligible_employee_groups",
+      "vesting_terms"
+    ],
+    "meta": {
+      "priority_tier": "core",
+      "rank": 7,
+      "priority_score": 89,
+      "difficulty": "medium",
+      "core_family": "pension_retirement_contribution",
+      "notes": [
+        "Retirement plan eligibility and contribution terms."
+      ]
+    }
   },
   "C_PREMIUM_SHIFT": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "shift_names",
+      "covered_employee_groups"
+    ],
+    "meta": {
+      "priority_tier": "advanced",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": "medium",
+      "core_family": "shift_differential",
+      "notes": [
+        "Valuable next-module premium-pay provision."
+      ]
+    }
   },
   "C_JOB_SECURITY_LAYOFF_ORDER": {
     "format": "complex",
@@ -127,7 +352,23 @@
       "has_bumping_rights",
       "has_inverse_seniority_order",
       "has_union_notice"
-    ]
+    ],
+    "string_fields": [
+      "layoff_unit_names",
+      "affected_employee_groups",
+      "notice_method_terms",
+      "exception_terms"
+    ],
+    "meta": {
+      "priority_tier": "core",
+      "rank": 5,
+      "priority_score": 92,
+      "difficulty": "high",
+      "core_family": "layoff_recall_bumping",
+      "notes": [
+        "Workforce reduction order, notice, and displacement rules."
+      ]
+    }
   },
   "C_TIME_REGULAR_SCHEDULE": {
     "format": "complex",
@@ -137,7 +378,20 @@
       "has_shift_schedule",
       "has_flexible_schedule",
       "has_guaranteed_hours"
-    ]
+    ],
+    "string_fields": [
+      "shift_names",
+      "workweek_definition_terms",
+      "covered_employee_groups"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_UNION_SECURITY_DUES_CHECKOFF": {
     "format": "complex",
@@ -147,7 +401,23 @@
       "has_agency_shop",
       "has_remittance_deadline",
       "has_authorization_requirement"
-    ]
+    ],
+    "string_fields": [
+      "union_names",
+      "authorization_terms",
+      "revocation_terms",
+      "fee_type_names"
+    ],
+    "meta": {
+      "priority_tier": "conditional_core",
+      "rank": 15,
+      "priority_score": 75,
+      "difficulty": "low",
+      "core_family": "dues_checkoff_union_security",
+      "notes": [
+        "Jurisdiction-conditional dues deduction and union-security terms."
+      ]
+    }
   },
   "C_WAGE_PROGRESSION": {
     "format": "complex",
@@ -157,7 +427,21 @@
       "has_seniority_progression",
       "has_training_progression",
       "has_automatic_progression"
-    ]
+    ],
+    "string_fields": [
+      "progression_step_names",
+      "classification_names",
+      "occupation_names",
+      "effective_dates"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_LEAVE_SICK": {
     "format": "complex",
@@ -167,11 +451,39 @@
       "has_carryover",
       "has_cashout",
       "has_medical_certification_requirement"
-    ]
+    ],
+    "string_fields": [
+      "sick_leave_bank_names",
+      "eligible_employee_groups",
+      "permitted_use_terms"
+    ],
+    "meta": {
+      "priority_tier": "core",
+      "rank": 14,
+      "priority_score": 80,
+      "difficulty": "medium",
+      "core_family": "sick_leave_paid_leave_bank",
+      "notes": [
+        "Sick leave accrual, caps, usage rules, and payout."
+      ]
+    }
   },
   "C_LEAVE_PERSONAL_MISC": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "leave_type_names",
+      "relationship_terms",
+      "eligibility_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_JOB_SECURITY_RECALL": {
     "format": "complex",
@@ -181,7 +493,23 @@
       "has_recall_period_limit",
       "has_recall_notice",
       "has_preference_over_new_hires"
-    ]
+    ],
+    "string_fields": [
+      "recall_list_names",
+      "affected_employee_groups",
+      "notice_method_terms",
+      "exception_terms"
+    ],
+    "meta": {
+      "priority_tier": "core",
+      "rank": 5,
+      "priority_score": 92,
+      "difficulty": "high",
+      "core_family": "layoff_recall_bumping",
+      "notes": [
+        "Recall rights for laid-off workers."
+      ]
+    }
   },
   "C_TIME_REST_MEAL_PERIODS": {
     "format": "complex",
@@ -191,7 +519,20 @@
       "has_paid_breaks",
       "has_relief_breaks",
       "has_missed_break_premium"
-    ]
+    ],
+    "string_fields": [
+      "break_type_names",
+      "shift_names",
+      "exception_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_PREMIUM_RESPONSIBILITY_SPECIALTY": {
     "format": "complex",
@@ -201,11 +542,38 @@
       "has_specialty_premium",
       "has_translation_premium",
       "has_role_premium"
-    ]
+    ],
+    "string_fields": [
+      "premium_role_names",
+      "classification_names",
+      "specialty_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_RETIREMENT_SAVINGS_ANNUITY": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "plan_names",
+      "fund_names",
+      "eligible_employee_groups",
+      "vesting_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_RECOGNITION_COVERAGE_SCOPE": {
     "format": "complex",
@@ -214,7 +582,23 @@
       "excludes_supervisors",
       "excludes_confidential_employees",
       "has_accretion_language"
-    ]
+    ],
+    "string_fields": [
+      "union_names",
+      "bargaining_unit_descriptions",
+      "included_employee_groups",
+      "excluded_employee_groups"
+    ],
+    "meta": {
+      "priority_tier": "core",
+      "rank": 4,
+      "priority_score": 94,
+      "difficulty": "low",
+      "core_family": "recognition_bargaining_unit",
+      "notes": [
+        "Defines covered employees and exclusions for downstream provisions."
+      ]
+    }
   },
   "C_HEALTH_DENTAL": {
     "format": "complex",
@@ -224,7 +608,21 @@
       "employee_paid",
       "includes_dependent_coverage",
       "has_waiting_period"
-    ]
+    ],
+    "string_fields": [
+      "plan_names",
+      "coverage_tiers",
+      "eligible_employee_groups",
+      "covered_service_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_LEAVE_PARENTAL_FAMILY": {
     "format": "complex",
@@ -234,7 +632,20 @@
       "paid",
       "has_fmla_reference",
       "has_job_protection"
-    ]
+    ],
+    "string_fields": [
+      "leave_type_names",
+      "relationship_terms",
+      "statute_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_TRAINING_TUITION_CERTIFICATION": {
     "format": "complex",
@@ -244,7 +655,20 @@
       "has_certification_support",
       "employer_paid",
       "has_professional_development"
-    ]
+    ],
+    "string_fields": [
+      "training_program_names",
+      "certification_names",
+      "eligible_employee_groups"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_JOB_SECURITY_SEVERANCE": {
     "format": "complex",
@@ -254,7 +678,22 @@
       "wage_based",
       "has_layoff_trigger",
       "has_maximum_duration"
-    ]
+    ],
+    "string_fields": [
+      "severance_plan_names",
+      "eligible_employee_groups",
+      "benefit_type_names"
+    ],
+    "meta": {
+      "priority_tier": "advanced",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": "medium",
+      "core_family": "severance",
+      "notes": [
+        "Valuable next-module job-security provision."
+      ]
+    }
   },
   "C_HEALTH_MEDICAL_ACTIVE": {
     "format": "complex",
@@ -264,7 +703,21 @@
       "employer_paid",
       "employee_paid",
       "has_external_plan"
-    ]
+    ],
+    "string_fields": [
+      "plan_names",
+      "coverage_tiers",
+      "eligible_employee_groups",
+      "covered_service_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_HEALTH_LIFE_AD_D": {
     "format": "complex",
@@ -274,7 +727,21 @@
       "employer_paid",
       "employee_paid",
       "includes_dependent_coverage"
-    ]
+    ],
+    "string_fields": [
+      "plan_names",
+      "coverage_tiers",
+      "eligible_employee_groups",
+      "covered_service_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_DISCIPLINE_PROGRESSIVE": {
     "format": "complex",
@@ -284,7 +751,20 @@
       "has_notice_requirement",
       "has_suspension_step",
       "has_discharge_step"
-    ]
+    ],
+    "string_fields": [
+      "discipline_step_names",
+      "offense_terms",
+      "notice_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_HEALTH_MEDICAL_ACTIVE_PLAN_DESIGN": {
     "format": "complex",
@@ -295,19 +775,76 @@
       "has_out_of_pocket_maximum",
       "has_coverage_tiers",
       "has_network_rules"
-    ]
+    ],
+    "string_fields": [
+      "plan_names",
+      "network_names",
+      "coverage_tiers",
+      "covered_service_names"
+    ],
+    "meta": {
+      "priority_tier": "advanced",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": "medium",
+      "core_family": "active_medical_plan_design",
+      "notes": [
+        "Demoted because detailed plan terms may live outside the CBA."
+      ]
+    }
   },
   "C_PREMIUM_STANDBY_ON_CALL": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "standby_terms",
+      "covered_employee_groups"
+    ],
+    "meta": {
+      "priority_tier": "advanced",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": "medium",
+      "core_family": "standby_on_call_pay",
+      "notes": [
+        "Valuable next-module premium-pay provision."
+      ]
+    }
   },
   "C_UNIFORM_CLOTHING_ALLOWANCE": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "covered_item_names",
+      "covered_employee_groups"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_LABOR_MANAGEMENT_COMMITTEE": {
     "format": "binary",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "committee_names",
+      "committee_purpose_terms",
+      "participant_group_names"
+    ],
+    "meta": {
+      "priority_tier": "advanced",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": "low",
+      "core_family": "labor_management_committee",
+      "notes": [
+        "Optional governance provision, not a substitute for grievance machinery."
+      ]
+    }
   },
   "C_HIRING_HALL_DISPATCH": {
     "format": "complex",
@@ -317,7 +854,20 @@
       "has_referral_priority",
       "union_operated",
       "has_registration_list"
-    ]
+    ],
+    "string_fields": [
+      "hiring_hall_names",
+      "referral_priority_terms",
+      "registration_list_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_DISCIPLINE_INVESTIGATION_APPEAL": {
     "format": "complex",
@@ -327,7 +877,20 @@
       "has_record_removal",
       "has_union_representation",
       "has_deadline"
-    ]
+    ],
+    "string_fields": [
+      "appeal_step_names",
+      "record_removal_terms",
+      "representation_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_HEALTH_DISABILITY_INCOME": {
     "format": "complex",
@@ -338,7 +901,20 @@
       "employer_paid",
       "wage_replacement_based",
       "has_waiting_period"
-    ]
+    ],
+    "string_fields": [
+      "plan_names",
+      "disability_type_names",
+      "waiting_period_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_JOB_SECURITY_BENEFIT_CONTINUATION": {
     "format": "complex",
@@ -348,7 +924,21 @@
       "includes_life_insurance_continuation",
       "applies_during_leave",
       "employer_paid"
-    ]
+    ],
+    "string_fields": [
+      "benefit_program_names",
+      "benefit_type_names",
+      "leave_type_names",
+      "eligible_employee_groups"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_HEALTH_RETIREE": {
     "format": "complex",
@@ -358,7 +948,20 @@
       "employee_paid",
       "includes_dependent_coverage",
       "has_eligibility_requirement"
-    ]
+    ],
+    "string_fields": [
+      "plan_names",
+      "eligible_retiree_groups",
+      "eligibility_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_SUBCONTRACTING_WORK_PRESERVATION": {
     "format": "complex",
@@ -368,7 +971,21 @@
       "requires_union_notice",
       "allows_union_matching",
       "protects_bargaining_unit_work"
-    ]
+    ],
+    "string_fields": [
+      "protected_work_terms",
+      "subcontracting_terms",
+      "subcontracting_exception_terms",
+      "notice_recipient_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_WORKLOAD_CLASS_SIZE_STAFFING": {
     "format": "complex",
@@ -378,7 +995,20 @@
       "has_preparation_period",
       "has_duty_free_lunch",
       "has_voluntary_extracurricular"
-    ]
+    ],
+    "string_fields": [
+      "class_size_unit_names",
+      "staffing_ratio_terms",
+      "duty_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_SENIORITY_SYSTEM": {
     "format": "complex",
@@ -388,11 +1018,41 @@
       "plantwide_seniority",
       "has_tie_breaker",
       "affects_layoff"
-    ]
+    ],
+    "string_fields": [
+      "seniority_unit_names",
+      "seniority_type_names",
+      "seniority_group_names",
+      "classification_names",
+      "break_in_service_terms",
+      "tie_breaker_terms"
+    ],
+    "meta": {
+      "priority_tier": "core",
+      "rank": 9,
+      "priority_score": 87,
+      "difficulty": "high",
+      "core_family": "seniority",
+      "notes": [
+        "Connective rule for layoff, recall, bidding, vacation, and overtime."
+      ]
+    }
   },
   "C_TIME_SCHEDULE_NOTICE_CHANGE": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "notice_trigger_terms",
+      "affected_employee_groups"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_PREMIUM_ZONE_SUBSISTENCE": {
     "format": "complex",
@@ -402,7 +1062,20 @@
       "has_remote_site_allowance",
       "distance_based",
       "overnight_based"
-    ]
+    ],
+    "string_fields": [
+      "zone_names",
+      "geographic_areas",
+      "travel_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_HEALTH_VISION": {
     "format": "complex",
@@ -412,11 +1085,37 @@
       "employee_paid",
       "includes_dependent_coverage",
       "has_waiting_period"
-    ]
+    ],
+    "string_fields": [
+      "plan_names",
+      "coverage_tiers",
+      "eligible_employee_groups",
+      "covered_service_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_LEGAL_SERVICES_FUND": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "fund_names",
+      "covered_service_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_JOB_POSTING_BIDDING_TRANSFER": {
     "format": "complex",
@@ -426,7 +1125,21 @@
       "has_transfer_rights",
       "seniority_based",
       "has_trial_period"
-    ]
+    ],
+    "string_fields": [
+      "job_posting_terms",
+      "bidding_unit_names",
+      "eligible_employee_groups",
+      "trial_period_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_SAFETY_ASSAULT_VIOLENCE": {
     "format": "complex",
@@ -436,7 +1149,20 @@
       "has_paid_release",
       "has_response_team",
       "has_reporting_requirement"
-    ]
+    ],
+    "string_fields": [
+      "violence_event_terms",
+      "response_team_names",
+      "reporting_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_RETIREMENT_INCENTIVE": {
     "format": "complex",
@@ -446,7 +1172,20 @@
       "date_based",
       "has_age_requirement",
       "has_notice_requirement"
-    ]
+    ],
+    "string_fields": [
+      "incentive_names",
+      "eligible_employee_groups",
+      "effective_dates"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_JOB_SECURITY_LAYOFF_RECALL": {
     "format": "complex",
@@ -456,7 +1195,22 @@
       "seniority_based",
       "has_bumping_rights",
       "has_notice_requirement"
-    ]
+    ],
+    "string_fields": [
+      "layoff_unit_names",
+      "recall_list_names",
+      "affected_employee_groups",
+      "notice_method_terms",
+      "exception_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_JOB_SECURITY_SUB_INCOME_BRIDGE": {
     "format": "complex",
@@ -466,15 +1220,56 @@
       "service_based",
       "has_external_fund",
       "has_duration_limit"
-    ]
+    ],
+    "string_fields": [
+      "severance_plan_names",
+      "benefit_program_names",
+      "benefit_type_names",
+      "eligible_employee_groups"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_CHILD_DEPENDENT_CARE": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "program_names",
+      "eligible_dependent_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_HEALTH_EMPLOYER_CONTRIBUTION": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "plan_names",
+      "fund_names",
+      "coverage_tiers",
+      "eligible_employee_groups",
+      "contribution_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_HEALTH_ACTIVE": {
     "format": "complex",
@@ -485,11 +1280,40 @@
       "employer_paid",
       "employee_paid",
       "has_external_trust"
-    ]
+    ],
+    "string_fields": [
+      "plan_names",
+      "trust_names",
+      "coverage_tiers",
+      "eligible_employee_groups",
+      "covered_service_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_JOB_SECURITY_LAYOFF": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "layoff_unit_names",
+      "affected_employee_groups",
+      "notice_method_terms",
+      "exception_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_WAGE_GENERAL_INCREASE": {
     "format": "complex",
@@ -499,7 +1323,20 @@
       "flat_amount_based",
       "has_effective_dates",
       "across_the_board"
-    ]
+    ],
+    "string_fields": [
+      "effective_dates",
+      "covered_employee_groups",
+      "adjustment_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_TIME_NO_CANCELLATION_SECURITY": {
     "format": "complex",
@@ -508,7 +1345,20 @@
       "has_involuntary_leave_limit",
       "has_pay_protection",
       "has_schedule_security"
-    ]
+    ],
+    "string_fields": [
+      "cancellation_terms",
+      "affected_employee_groups",
+      "pay_protection_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_JOB_SECURITY_SENIORITY": {
     "format": "complex",
@@ -518,11 +1368,39 @@
       "affects_layoff",
       "affects_recall",
       "affects_bidding"
-    ]
+    ],
+    "string_fields": [
+      "seniority_unit_names",
+      "seniority_type_names",
+      "seniority_group_names",
+      "classification_names",
+      "break_in_service_terms",
+      "tie_breaker_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_TRANSIT_COMMUTER_BENEFIT": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "benefit_program_names",
+      "transit_mode_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_WAGE_APPRENTICE": {
     "format": "complex",
@@ -532,7 +1410,19 @@
       "has_periods",
       "has_step_progression",
       "hours_based"
-    ]
+    ],
+    "string_fields": [
+      "apprenticeship_period_names",
+      "classification_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_WAGE_SCHEDULED_INCREASE": {
     "format": "complex",
@@ -542,7 +1432,20 @@
       "longevity_based",
       "has_effective_dates",
       "flat_amount_based"
-    ]
+    ],
+    "string_fields": [
+      "effective_dates",
+      "service_band_names",
+      "adjustment_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_PREMIUM_SUNDAY_HOLIDAY": {
     "format": "complex",
@@ -552,7 +1455,19 @@
       "has_double_time",
       "has_sixth_day_premium",
       "has_seventh_day_premium"
-    ]
+    ],
+    "string_fields": [
+      "day_names",
+      "holiday_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_LIGHT_DUTY_ACCOMMODATION": {
     "format": "complex",
@@ -562,27 +1477,107 @@
       "has_pay_protection",
       "disability_related",
       "has_medical_clearance"
-    ]
+    ],
+    "string_fields": [
+      "accommodation_terms",
+      "eligible_employee_groups",
+      "medical_clearance_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_HEALTH_LIFE_INSURANCE": {
     "format": "binary",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "plan_names",
+      "coverage_tiers",
+      "eligible_employee_groups",
+      "covered_service_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_PREMIUM_FOREMAN": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "role_names",
+      "classification_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_HEALTH_ACTIVE_CONTRIBUTION": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "plan_names",
+      "fund_names",
+      "coverage_tiers",
+      "eligible_employee_groups",
+      "contribution_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_LEAVE_BEREAVEMENT": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "relationship_terms",
+      "leave_type_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_JOB_SECURITY_SUBCONTRACTING": {
     "format": "binary",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "protected_work_terms",
+      "subcontracting_terms",
+      "subcontracting_exception_terms",
+      "notice_recipient_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_JOB_SECURITY_RIF_LAYOFF": {
     "format": "complex",
@@ -592,7 +1587,22 @@
       "seniority_based",
       "classification_based",
       "has_recall_pool"
-    ]
+    ],
+    "string_fields": [
+      "layoff_unit_names",
+      "recall_list_names",
+      "affected_employee_groups",
+      "notice_method_terms",
+      "exception_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_HEALTH_EXTERNAL_FUND": {
     "format": "complex",
@@ -602,11 +1612,37 @@
       "employee_contribution",
       "trustee_administered",
       "includes_health_welfare"
-    ]
+    ],
+    "string_fields": [
+      "fund_names",
+      "trustee_names",
+      "plan_names",
+      "contribution_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_PREMIUM_HAZARD": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "hazard_names",
+      "covered_employee_groups"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_HEALTH_ACTIVE_PLAN_DESIGN": {
     "format": "complex",
@@ -617,11 +1653,38 @@
       "has_out_of_pocket_maximum",
       "has_network_rules",
       "includes_dental"
-    ]
+    ],
+    "string_fields": [
+      "plan_names",
+      "network_names",
+      "coverage_tiers",
+      "covered_service_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_UNION_SECURITY": {
     "format": "binary",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "union_names",
+      "membership_terms",
+      "excluded_employee_groups"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_WAGE_INCREASE": {
     "format": "complex",
@@ -631,7 +1694,20 @@
       "flat_amount_based",
       "has_effective_dates",
       "across_the_board"
-    ]
+    ],
+    "string_fields": [
+      "effective_dates",
+      "covered_employee_groups",
+      "adjustment_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_WAGE_LONGEVITY": {
     "format": "complex",
@@ -641,7 +1717,19 @@
       "has_steps",
       "flat_amount_based",
       "percentage_based"
-    ]
+    ],
+    "string_fields": [
+      "service_band_names",
+      "covered_employee_groups"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_UNION_DUES_CHECKOFF": {
     "format": "complex",
@@ -651,7 +1739,21 @@
       "has_authorization_requirement",
       "percentage_based",
       "flat_amount_based"
-    ]
+    ],
+    "string_fields": [
+      "union_names",
+      "authorization_terms",
+      "revocation_terms",
+      "fee_type_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_HEALTH_PLAN_DESIGN": {
     "format": "complex",
@@ -662,7 +1764,21 @@
       "has_copay",
       "has_out_of_pocket_maximum",
       "has_premium_share"
-    ]
+    ],
+    "string_fields": [
+      "plan_names",
+      "network_names",
+      "coverage_tiers",
+      "covered_service_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_WAGE_MERIT_STEP": {
     "format": "complex",
@@ -672,7 +1788,20 @@
       "has_step_schedule",
       "discretionary",
       "has_review_process"
-    ]
+    ],
+    "string_fields": [
+      "step_names",
+      "eligibility_terms",
+      "review_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_DISCIPLINE_PROBATION": {
     "format": "complex",
@@ -681,7 +1810,21 @@
       "has_transfer_probation",
       "has_shortened_discipline_rights",
       "has_completion_rule"
-    ]
+    ],
+    "string_fields": [
+      "probationary_group_names",
+      "probation_completion_terms"
+    ],
+    "meta": {
+      "priority_tier": "advanced",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": "medium",
+      "core_family": "probationary_period",
+      "notes": [
+        "Valuable next-module discipline provision."
+      ]
+    }
   },
   "C_SAFETY_DRUG_TESTING": {
     "format": "complex",
@@ -691,51 +1834,205 @@
       "reasonable_suspicion_based",
       "random_testing",
       "has_discipline_consequence"
-    ]
+    ],
+    "string_fields": [
+      "testing_trigger_terms",
+      "substance_test_names",
+      "consequence_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_JOB_SECURITY_BUMPING": {
     "format": "binary",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "layoff_unit_names",
+      "affected_employee_groups",
+      "exception_terms"
+    ],
+    "meta": {
+      "priority_tier": "advanced",
+      "rank": 5,
+      "priority_score": 92,
+      "difficulty": "high",
+      "core_family": "layoff_recall_bumping",
+      "notes": [
+        "Advanced subcomponent of the layoff/recall family."
+      ]
+    }
   },
   "C_HEALTH_INSURANCE_BUYOUT": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "plan_names",
+      "eligible_employee_groups",
+      "contribution_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_JOB_SECURITY_NO_CONTRACTING_OUT": {
     "format": "binary",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "protected_work_terms",
+      "subcontracting_terms",
+      "subcontracting_exception_terms",
+      "notice_recipient_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_WAGE_SAVINGS": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "plan_names",
+      "fund_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_WAGE_VACATION_SUPP": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "fund_names",
+      "contribution_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_WAGE_ACCRUAL_VACATION": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "accrual_names",
+      "covered_employee_groups"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_PREMIUM_LEADMAN": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "role_names",
+      "classification_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_LEAVE_PERSONAL": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "leave_type_names",
+      "eligibility_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_HEALTH_WELFARE_FUND": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "fund_names",
+      "trustee_names",
+      "plan_names",
+      "contribution_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_LEAVE_SUBSISTENCE": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "geographic_areas",
+      "subsistence_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_HEALTH_DISABILITY": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "plan_names",
+      "disability_type_names",
+      "waiting_period_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_PREMIUM_GROUP_LEADER": {
     "format": "complex",
@@ -744,11 +2041,35 @@
       "tiered_premium",
       "flat_amount_based",
       "has_role_premium"
-    ]
+    ],
+    "string_fields": [
+      "role_names",
+      "tier_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_LEAVE_JURY_DUTY": {
     "format": "quantitative",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "civic_duty_terms",
+      "eligibility_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_WAGE_INCENTIVE": {
     "format": "complex",
@@ -758,11 +2079,35 @@
       "percentage_based",
       "has_cap",
       "has_bonus_components"
-    ]
+    ],
+    "string_fields": [
+      "incentive_names",
+      "performance_metric_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_PREMIUM_STANDBY": {
     "format": "binary",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "standby_terms",
+      "response_terms"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_HEALTH_PRESCRIPTION_DRUG": {
     "format": "complex",
@@ -772,10 +2117,38 @@
       "has_tiers",
       "mail_order_included",
       "generic_required"
-    ]
+    ],
+    "string_fields": [
+      "plan_names",
+      "drug_tier_names",
+      "covered_service_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   },
   "C_HEALTH_BENEFITS": {
     "format": "binary",
-    "flags": []
+    "flags": [],
+    "string_fields": [
+      "plan_names",
+      "fund_names",
+      "coverage_tiers",
+      "eligible_employee_groups",
+      "covered_service_names"
+    ],
+    "meta": {
+      "priority_tier": "standard",
+      "rank": null,
+      "priority_score": null,
+      "difficulty": null,
+      "core_family": null,
+      "notes": []
+    }
   }
 }
