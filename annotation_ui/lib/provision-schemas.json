@@ -1,6 +1,7 @@
 {
   "C_WAGE_BASE_RATE": {
     "format": "complex",
+    "description": "Base wage or salary rate.",
     "flags": [
       "has_base_rate",
       "has_rate_table",
@@ -28,6 +29,7 @@
   },
   "C_GRIEVANCE_PROCEDURE": {
     "format": "complex",
+    "description": "Grievance steps, timelines, representation, and scope.",
     "flags": [
       "has_grievance_steps",
       "has_deadlines",
@@ -53,6 +55,7 @@
   },
   "C_ARBITRATION": {
     "format": "complex",
+    "description": "Arbitration access, selection, authority, costs, and finality.",
     "flags": [
       "has_arbitration",
       "final_and_binding",
@@ -78,6 +81,7 @@
   },
   "C_LEAVE_HOLIDAYS": {
     "format": "complex",
+    "description": "Holidays and holiday pay.",
     "flags": [
       "has_paid_holidays",
       "has_holiday_premium_pay",
@@ -98,6 +102,7 @@
   },
   "C_PREMIUM_OVERTIME": {
     "format": "complex",
+    "description": "Overtime eligibility thresholds and multipliers.",
     "flags": [
       "has_overtime_threshold",
       "has_daily_overtime",
@@ -123,6 +128,7 @@
   },
   "C_UNION_ACCESS_BUSINESS": {
     "format": "complex",
+    "description": "Steward access, union business time, bulletin boards, and meeting rights.",
     "flags": [
       "has_steward_access",
       "has_union_business_time",
@@ -144,6 +150,7 @@
   },
   "C_DISCIPLINE_JUST_CAUSE": {
     "format": "complex",
+    "description": "Just cause and substantive discipline/discharge standard.",
     "flags": [
       "has_just_cause_standard",
       "covers_discipline",
@@ -170,6 +177,7 @@
   },
   "C_WAGE_INCREASES_COLA": {
     "format": "complex",
+    "description": "Annual wage increases.",
     "flags": [
       "has_scheduled_increases",
       "has_cola",
@@ -191,6 +199,7 @@
   },
   "C_HEALTH_MEDICAL_ACTIVE_CONTRIBUTION": {
     "format": "quantitative",
+    "description": "H&W Fund contribution.",
     "flags": [],
     "string_fields": [
       "coverage_tiers",
@@ -209,6 +218,7 @@
   },
   "C_LEAVE_VACATION": {
     "format": "complex",
+    "description": "Vacation and annual leave.",
     "flags": [
       "has_paid_vacation",
       "accrues_with_service",
@@ -233,6 +243,7 @@
   },
   "C_SAFETY_PPE_UNSAFE_WORK": {
     "format": "complex",
+    "description": "PPE, unsafe-work rights, safety standards, and hazard response.",
     "flags": [
       "has_ppe_requirement",
       "has_unsafe_work_right",
@@ -254,6 +265,7 @@
   },
   "C_PREMIUM_CALL_IN_REPORTING": {
     "format": "complex",
+    "description": "Call-in, call-back, reporting, and minimum-pay guarantees.",
     "flags": [
       "has_call_in_pay",
       "has_call_back_pay",
@@ -275,6 +287,7 @@
   },
   "C_RETIREMENT_PENSION": {
     "format": "complex",
+    "description": "Pension and retirement plan eligibility/contributions.",
     "flags": [
       "has_defined_benefit_pension",
       "has_employer_contribution",
@@ -299,6 +312,7 @@
   },
   "C_PREMIUM_SHIFT": {
     "format": "quantitative",
+    "description": "Shift differentials and night/weekend premiums.",
     "flags": [],
     "string_fields": [
       "covered_employee_groups"
@@ -316,6 +330,7 @@
   },
   "C_JOB_SECURITY_LAYOFF_ORDER": {
     "format": "complex",
+    "description": "Layoff notification and procedure.",
     "flags": [
       "has_layoff_notice",
       "seniority_based",
@@ -340,6 +355,7 @@
   },
   "C_TIME_REGULAR_SCHEDULE": {
     "format": "complex",
+    "description": "Regular hours and schedule structure.",
     "flags": [
       "has_regular_hours",
       "has_workweek_definition",
@@ -361,6 +377,7 @@
   },
   "C_UNION_SECURITY_DUES_CHECKOFF": {
     "format": "complex",
+    "description": "Dues checkoff, agency shop, union security, and payroll remittance.",
     "flags": [
       "has_dues_checkoff",
       "has_union_security",
@@ -382,6 +399,7 @@
   },
   "C_WAGE_PROGRESSION": {
     "format": "complex",
+    "description": "Wage progression, steps, and classification movement.",
     "flags": [
       "has_step_progression",
       "has_classification_movement",
@@ -405,6 +423,7 @@
   },
   "C_LEAVE_SICK": {
     "format": "complex",
+    "description": "Sick/personal days.",
     "flags": [
       "has_paid_sick_leave",
       "accrues_with_service",
@@ -428,6 +447,7 @@
   },
   "C_LEAVE_PERSONAL_MISC": {
     "format": "quantitative",
+    "description": "Bereavement/compassionate leave.",
     "flags": [],
     "string_fields": [],
     "meta": {
@@ -441,6 +461,7 @@
   },
   "C_JOB_SECURITY_RECALL": {
     "format": "complex",
+    "description": "Recall rights.",
     "flags": [
       "has_recall_rights",
       "seniority_based",
@@ -465,6 +486,7 @@
   },
   "C_TIME_REST_MEAL_PERIODS": {
     "format": "complex",
+    "description": "Rest periods, meal periods, and relief breaks.",
     "flags": [
       "has_rest_periods",
       "has_meal_periods",
@@ -486,6 +508,7 @@
   },
   "C_PREMIUM_RESPONSIBILITY_SPECIALTY": {
     "format": "complex",
+    "description": "Responsibility, higher-classification, specialty, translation, flight, or role premiums.",
     "flags": [
       "has_responsibility_premium",
       "has_higher_classification_premium",
@@ -508,6 +531,7 @@
   },
   "C_RETIREMENT_SAVINGS_ANNUITY": {
     "format": "quantitative",
+    "description": "Annuity Fund (CT Carpenters) contributions.",
     "flags": [],
     "string_fields": [
       "eligible_employee_groups",
@@ -524,6 +548,7 @@
   },
   "C_RECOGNITION_COVERAGE_SCOPE": {
     "format": "complex",
+    "description": "Bargaining unit scope.",
     "flags": [
       "has_bargaining_unit_scope",
       "excludes_supervisors",
@@ -548,6 +573,7 @@
   },
   "C_HEALTH_DENTAL": {
     "format": "complex",
+    "description": "Dental plan.",
     "flags": [
       "includes_dental",
       "employer_paid",
@@ -570,6 +596,7 @@
   },
   "C_LEAVE_PARENTAL_FAMILY": {
     "format": "complex",
+    "description": "Family leave.",
     "flags": [
       "has_parental_leave",
       "has_family_leave",
@@ -589,6 +616,7 @@
   },
   "C_TRAINING_TUITION_CERTIFICATION": {
     "format": "complex",
+    "description": "Training, tuition support, certification, and professional development.",
     "flags": [
       "has_training_benefit",
       "has_tuition_reimbursement",
@@ -610,6 +638,7 @@
   },
   "C_JOB_SECURITY_SEVERANCE": {
     "format": "complex",
+    "description": "Income Protection Supplement.",
     "flags": [
       "has_severance_pay",
       "service_based",
@@ -633,6 +662,7 @@
   },
   "C_HEALTH_MEDICAL_ACTIVE": {
     "format": "complex",
+    "description": "Active-worker medical umbrella record.",
     "flags": [
       "includes_medical",
       "includes_dependent_coverage",
@@ -655,6 +685,7 @@
   },
   "C_HEALTH_LIFE_AD_D": {
     "format": "complex",
+    "description": "Group life and AD&D insurance.",
     "flags": [
       "includes_life_insurance",
       "includes_add",
@@ -677,6 +708,7 @@
   },
   "C_DISCIPLINE_PROGRESSIVE": {
     "format": "complex",
+    "description": "Progressive discipline steps, warnings, and notice.",
     "flags": [
       "has_progressive_discipline",
       "has_warnings",
@@ -696,6 +728,7 @@
   },
   "C_HEALTH_MEDICAL_ACTIVE_PLAN_DESIGN": {
     "format": "complex",
+    "description": "Active-worker medical plan design, covered services, deductibles, copays, OOP limits.",
     "flags": [
       "includes_medical",
       "has_deductible",
@@ -720,6 +753,7 @@
   },
   "C_PREMIUM_STANDBY_ON_CALL": {
     "format": "quantitative",
+    "description": "Standby pay.",
     "flags": [],
     "string_fields": [
       "covered_employee_groups"
@@ -737,6 +771,7 @@
   },
   "C_UNIFORM_CLOTHING_ALLOWANCE": {
     "format": "quantitative",
+    "description": "Safety shoe program.",
     "flags": [],
     "string_fields": [
       "covered_employee_groups"
@@ -752,6 +787,7 @@
   },
   "C_LABOR_MANAGEMENT_COMMITTEE": {
     "format": "binary",
+    "description": "Labor-Management Cooperation Committee (LMCC).",
     "flags": [],
     "string_fields": [],
     "meta": {
@@ -767,6 +803,7 @@
   },
   "C_HIRING_HALL_DISPATCH": {
     "format": "complex",
+    "description": "Hiring hall, dispatch hall, and referral system.",
     "flags": [
       "has_hiring_hall",
       "has_dispatch_rules",
@@ -786,6 +823,7 @@
   },
   "C_DISCIPLINE_INVESTIGATION_APPEAL": {
     "format": "complex",
+    "description": "Disciplinary record removal.",
     "flags": [
       "has_appeal_right",
       "has_investigation_procedure",
@@ -805,6 +843,7 @@
   },
   "C_HEALTH_DISABILITY_INCOME": {
     "format": "complex",
+    "description": "Income Protection and Extended Income Protection (disability income).",
     "flags": [
       "includes_disability",
       "has_short_term_disability",
@@ -827,6 +866,7 @@
   },
   "C_JOB_SECURITY_BENEFIT_CONTINUATION": {
     "format": "complex",
+    "description": "Benefits during leaves of absence.",
     "flags": [
       "has_benefit_continuation",
       "includes_health_continuation",
@@ -848,6 +888,7 @@
   },
   "C_HEALTH_RETIREE": {
     "format": "complex",
+    "description": "Retiree health plan.",
     "flags": [
       "includes_retiree_coverage",
       "employer_paid",
@@ -869,6 +910,7 @@
   },
   "C_SUBCONTRACTING_WORK_PRESERVATION": {
     "format": "complex",
+    "description": "Subcontracting limits, non-unit work, and work preservation.",
     "flags": [
       "limits_subcontracting",
       "has_work_preservation",
@@ -892,6 +934,7 @@
   },
   "C_WORKLOAD_CLASS_SIZE_STAFFING": {
     "format": "complex",
+    "description": "School day defined.",
     "flags": [
       "has_class_size_limit",
       "has_staffing_ratio",
@@ -914,6 +957,7 @@
   },
   "C_SENIORITY_SYSTEM": {
     "format": "complex",
+    "description": "Seniority system.",
     "flags": [
       "has_seniority_system",
       "classification_based",
@@ -941,6 +985,7 @@
   },
   "C_TIME_SCHEDULE_NOTICE_CHANGE": {
     "format": "quantitative",
+    "description": "Schedule changes.",
     "flags": [],
     "string_fields": [
       "notice_trigger_terms",
@@ -957,6 +1002,7 @@
   },
   "C_PREMIUM_ZONE_SUBSISTENCE": {
     "format": "complex",
+    "description": "Zone pay, travel subsistence, and remote-site allowances.",
     "flags": [
       "has_zone_pay",
       "has_travel_subsistence",
@@ -978,6 +1024,7 @@
   },
   "C_HEALTH_VISION": {
     "format": "complex",
+    "description": "Group vision care plan.",
     "flags": [
       "includes_vision",
       "employer_paid",
@@ -1000,6 +1047,7 @@
   },
   "C_LEGAL_SERVICES_FUND": {
     "format": "quantitative",
+    "description": "Group legal services fund.",
     "flags": [],
     "string_fields": [],
     "meta": {
@@ -1013,6 +1061,7 @@
   },
   "C_JOB_POSTING_BIDDING_TRANSFER": {
     "format": "complex",
+    "description": "Job posting and promotion rights.",
     "flags": [
       "has_job_posting",
       "has_bidding_rights",
@@ -1036,6 +1085,7 @@
   },
   "C_SAFETY_ASSAULT_VIOLENCE": {
     "format": "complex",
+    "description": "Physical violence and verbal abuse policy.",
     "flags": [
       "has_assault_policy",
       "has_violence_response",
@@ -1055,6 +1105,7 @@
   },
   "C_RETIREMENT_INCENTIVE": {
     "format": "complex",
+    "description": "Retirement bonus.",
     "flags": [
       "has_retirement_bonus",
       "service_based",
@@ -1077,6 +1128,7 @@
   },
   "C_JOB_SECURITY_LAYOFF_RECALL": {
     "format": "complex",
+    "description": "Force adjustments and recall.",
     "flags": [
       "has_layoff_procedure",
       "has_recall_rights",
@@ -1099,6 +1151,7 @@
   },
   "C_JOB_SECURITY_SUB_INCOME_BRIDGE": {
     "format": "complex",
+    "description": "Supplemental Unemployment Benefit (SUB) fund.",
     "flags": [
       "has_sub_income_benefit",
       "wage_replacement_based",
@@ -1120,6 +1173,7 @@
   },
   "C_CHILD_DEPENDENT_CARE": {
     "format": "quantitative",
+    "description": "Fellowships for Day Care.",
     "flags": [],
     "string_fields": [
       "eligible_dependent_terms"
@@ -1135,6 +1189,7 @@
   },
   "C_HEALTH_EMPLOYER_CONTRIBUTION": {
     "format": "quantitative",
+    "description": "IAFF VEBA health benefit fund.",
     "flags": [],
     "string_fields": [
       "coverage_tiers",
@@ -1151,6 +1206,7 @@
   },
   "C_HEALTH_ACTIVE": {
     "format": "complex",
+    "description": "Health benefits.",
     "flags": [
       "includes_medical",
       "includes_dental",
@@ -1174,6 +1230,7 @@
   },
   "C_JOB_SECURITY_LAYOFF": {
     "format": "quantitative",
+    "description": "Dismissal pay.",
     "flags": [],
     "string_fields": [
       "affected_employee_groups",
@@ -1190,6 +1247,7 @@
   },
   "C_WAGE_GENERAL_INCREASE": {
     "format": "complex",
+    "description": "Scale increase.",
     "flags": [
       "has_general_increase",
       "percentage_based",
@@ -1212,6 +1270,7 @@
   },
   "C_TIME_NO_CANCELLATION_SECURITY": {
     "format": "complex",
+    "description": "Involuntary leave status caps.",
     "flags": [
       "has_no_cancellation_rule",
       "has_involuntary_leave_limit",
@@ -1232,6 +1291,7 @@
   },
   "C_JOB_SECURITY_SENIORITY": {
     "format": "complex",
+    "description": "Seniority.",
     "flags": [
       "has_seniority_groups",
       "classification_based",
@@ -1257,6 +1317,7 @@
   },
   "C_TRANSIT_COMMUTER_BENEFIT": {
     "format": "quantitative",
+    "description": "Transit subsidy per SMC 4.20.370.",
     "flags": [],
     "string_fields": [],
     "meta": {
@@ -1270,6 +1331,7 @@
   },
   "C_WAGE_APPRENTICE": {
     "format": "complex",
+    "description": "Apprentice wage schedule 40-82% of JW over 7 periods.",
     "flags": [
       "has_apprentice_scale",
       "percentage_of_journeyman",
@@ -1291,6 +1353,7 @@
   },
   "C_WAGE_SCHEDULED_INCREASE": {
     "format": "complex",
+    "description": "Longevity pay.",
     "flags": [
       "has_scheduled_increases",
       "service_based",
@@ -1313,6 +1376,7 @@
   },
   "C_PREMIUM_SUNDAY_HOLIDAY": {
     "format": "complex",
+    "description": "6th and 7th day in workweek.",
     "flags": [
       "has_sunday_premium",
       "has_holiday_premium",
@@ -1332,6 +1396,7 @@
   },
   "C_LIGHT_DUTY_ACCOMMODATION": {
     "format": "complex",
+    "description": "Partially disabled employees.",
     "flags": [
       "has_light_duty",
       "has_accommodation_process",
@@ -1353,6 +1418,7 @@
   },
   "C_HEALTH_LIFE_INSURANCE": {
     "format": "binary",
+    "description": "Life insurance Board-provided.",
     "flags": [],
     "string_fields": [
       "coverage_tiers",
@@ -1369,6 +1435,7 @@
   },
   "C_PREMIUM_FOREMAN": {
     "format": "quantitative",
+    "description": "Foreman and General Foreman premium.",
     "flags": [],
     "string_fields": [
       "classification_names"
@@ -1384,6 +1451,7 @@
   },
   "C_HEALTH_ACTIVE_CONTRIBUTION": {
     "format": "quantitative",
+    "description": "Active health.",
     "flags": [],
     "string_fields": [
       "coverage_tiers",
@@ -1400,6 +1468,7 @@
   },
   "C_LEAVE_BEREAVEMENT": {
     "format": "quantitative",
+    "description": "Bereavement leave.",
     "flags": [],
     "string_fields": [],
     "meta": {
@@ -1413,6 +1482,7 @@
   },
   "C_JOB_SECURITY_SUBCONTRACTING": {
     "format": "binary",
+    "description": "Subcontracting at company discretion.",
     "flags": [],
     "string_fields": [
       "protected_work_terms",
@@ -1430,6 +1500,7 @@
   },
   "C_JOB_SECURITY_RIF_LAYOFF": {
     "format": "complex",
+    "description": "Layoff.",
     "flags": [
       "has_rif_procedure",
       "has_layoff_order",
@@ -1452,6 +1523,7 @@
   },
   "C_HEALTH_EXTERNAL_FUND": {
     "format": "complex",
+    "description": "Health/Welfare.",
     "flags": [
       "has_external_fund",
       "employer_contribution",
@@ -1471,6 +1543,7 @@
   },
   "C_PREMIUM_HAZARD": {
     "format": "quantitative",
+    "description": "Hazardous work differential.",
     "flags": [],
     "string_fields": [
       "covered_employee_groups"
@@ -1486,6 +1559,7 @@
   },
   "C_HEALTH_ACTIVE_PLAN_DESIGN": {
     "format": "complex",
+    "description": "Active health plan design.",
     "flags": [
       "includes_medical",
       "has_deductible",
@@ -1508,6 +1582,7 @@
   },
   "C_UNION_SECURITY": {
     "format": "binary",
+    "description": "Union membership required as condition of employment.",
     "flags": [],
     "string_fields": [
       "excluded_employee_groups"
@@ -1523,6 +1598,7 @@
   },
   "C_WAGE_INCREASE": {
     "format": "complex",
+    "description": "Annual wage increases.",
     "flags": [
       "has_wage_increase",
       "percentage_based",
@@ -1545,6 +1621,7 @@
   },
   "C_WAGE_LONGEVITY": {
     "format": "complex",
+    "description": "Longevity pay.",
     "flags": [
       "has_longevity_pay",
       "service_based",
@@ -1567,6 +1644,7 @@
   },
   "C_UNION_DUES_CHECKOFF": {
     "format": "complex",
+    "description": "Monthly dues checkoff.",
     "flags": [
       "has_dues_checkoff",
       "has_remittance_deadline",
@@ -1586,6 +1664,7 @@
   },
   "C_HEALTH_PLAN_DESIGN": {
     "format": "complex",
+    "description": "Health plan design options.",
     "flags": [
       "includes_medical",
       "has_plan_options",
@@ -1608,6 +1687,7 @@
   },
   "C_WAGE_MERIT_STEP": {
     "format": "complex",
+    "description": "Step advancement on salary schedule.",
     "flags": [
       "has_merit_step",
       "performance_based",
@@ -1627,6 +1707,7 @@
   },
   "C_DISCIPLINE_PROBATION": {
     "format": "complex",
+    "description": "Probation 90 working days.",
     "flags": [
       "has_probation_period",
       "has_transfer_probation",
@@ -1649,6 +1730,7 @@
   },
   "C_SAFETY_DRUG_TESTING": {
     "format": "complex",
+    "description": "Work accident investigation protocol.",
     "flags": [
       "has_drug_testing",
       "accident_triggered",
@@ -1670,6 +1752,7 @@
   },
   "C_JOB_SECURITY_BUMPING": {
     "format": "binary",
+    "description": "Bumping rights to former classification.",
     "flags": [],
     "string_fields": [
       "affected_employee_groups",
@@ -1688,6 +1771,7 @@
   },
   "C_HEALTH_INSURANCE_BUYOUT": {
     "format": "quantitative",
+    "description": "Health insurance opt-out payment $1,200/year.",
     "flags": [],
     "string_fields": [
       "eligible_employee_groups"
@@ -1703,6 +1787,7 @@
   },
   "C_JOB_SECURITY_NO_CONTRACTING_OUT": {
     "format": "binary",
+    "description": "Subcontracting limitation.",
     "flags": [],
     "string_fields": [
       "protected_work_terms",
@@ -1720,6 +1805,7 @@
   },
   "C_WAGE_SAVINGS": {
     "format": "quantitative",
+    "description": "Savings/deferred compensation contribution.",
     "flags": [],
     "string_fields": [],
     "meta": {
@@ -1733,6 +1819,7 @@
   },
   "C_WAGE_VACATION_SUPP": {
     "format": "quantitative",
+    "description": "Vacation/Supplemental dues contribution $2.95/hr.",
     "flags": [],
     "string_fields": [],
     "meta": {
@@ -1746,6 +1833,7 @@
   },
   "C_WAGE_ACCRUAL_VACATION": {
     "format": "quantitative",
+    "description": "Vacation/holiday pay accrual ($0.50/hr).",
     "flags": [],
     "string_fields": [
       "covered_employee_groups"
@@ -1761,6 +1849,7 @@
   },
   "C_PREMIUM_LEADMAN": {
     "format": "quantitative",
+    "description": "Leadman premium.",
     "flags": [],
     "string_fields": [
       "classification_names"
@@ -1776,6 +1865,7 @@
   },
   "C_LEAVE_PERSONAL": {
     "format": "quantitative",
+    "description": "Perfect Attendance Days (paid personal time).",
     "flags": [],
     "string_fields": [],
     "meta": {
@@ -1789,6 +1879,7 @@
   },
   "C_HEALTH_WELFARE_FUND": {
     "format": "quantitative",
+    "description": "Welfare fund employer contributions.",
     "flags": [],
     "string_fields": [],
     "meta": {
@@ -1802,6 +1893,7 @@
   },
   "C_LEAVE_SUBSISTENCE": {
     "format": "quantitative",
+    "description": "Subsistence.",
     "flags": [],
     "string_fields": [
       "geographic_areas"
@@ -1817,6 +1909,7 @@
   },
   "C_HEALTH_DISABILITY": {
     "format": "quantitative",
+    "description": "Short-term disability $400/week max 26 weeks.",
     "flags": [],
     "string_fields": [
       "waiting_period_terms"
@@ -1832,6 +1925,7 @@
   },
   "C_PREMIUM_GROUP_LEADER": {
     "format": "complex",
+    "description": "Group leader premium $1.20/$0.80/$0.40 per hour by tier.",
     "flags": [
       "has_group_leader_premium",
       "tiered_premium",
@@ -1850,6 +1944,7 @@
   },
   "C_LEAVE_JURY_DUTY": {
     "format": "quantitative",
+    "description": "Jury duty.",
     "flags": [],
     "string_fields": [],
     "meta": {
@@ -1863,6 +1958,7 @@
   },
   "C_WAGE_INCENTIVE": {
     "format": "complex",
+    "description": "Incentive pay.",
     "flags": [
       "has_incentive_pay",
       "performance_based",
@@ -1882,6 +1978,7 @@
   },
   "C_PREMIUM_STANDBY": {
     "format": "binary",
+    "description": "Standby provision.",
     "flags": [],
     "string_fields": [],
     "meta": {
@@ -1895,6 +1992,7 @@
   },
   "C_HEALTH_PRESCRIPTION_DRUG": {
     "format": "complex",
+    "description": "3-tier HMO prescription co-pay.",
     "flags": [
       "includes_prescription_drug",
       "has_copay",
@@ -1914,6 +2012,7 @@
   },
   "C_HEALTH_BENEFITS": {
     "format": "binary",
+    "description": "Health and welfare benefits.",
     "flags": [],
     "string_fields": [
       "coverage_tiers",

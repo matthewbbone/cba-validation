@@ -21,6 +21,7 @@ export interface ProvisionMeta {
 
 export interface ProvisionSchema {
   format: ProvisionFormat;
+  description?: string; // generic provision description (class docstring)
   flags: string[]; // boolean flag field names (complex only)
   string_fields?: string[]; // typed string-list attribute names (all formats)
   meta?: ProvisionMeta; // tier/rank metadata

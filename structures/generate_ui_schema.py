@@ -5,6 +5,7 @@ Generate provision UI schema for the annotation tool.
 Outputs JSON to stdout mapping each concept_id to:
     {
         "format": "binary" | "quantitative" | "complex",
+        "description": str,           # generic provision description (class docstring)
         "flags": [str, ...],          # boolean flag field names (complex only)
         "string_fields": [str, ...],  # typed string-list attribute names (all formats)
         "meta": {                     # ProvisionMeta, identifies tier/rank
@@ -35,6 +36,9 @@ for concept_id, fmt in PROVISION_FORMAT_REGISTRY.items():
     cls = PROVISION_EXTRACTION_REGISTRY[concept_id]
     entry: dict = {
         "format": fmt,
+        # Generic provision description (class docstring), used as the card
+        # subtext in the annotation UI — not a document-specific example.
+        "description": (cls.__doc__ or "").strip(),
         "flags": [],
         "string_fields": list(cls.string_detail_fields),
         "meta": cls.meta.model_dump(mode="json"),

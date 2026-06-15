@@ -383,7 +383,7 @@ function AnnotationApp() {
                     index={i}
                     conceptId={p.conceptId}
                     category={p.category}
-                    label={p.label}
+                    label={schema.description || p.label}
                     schema={schema}
                     annotation={
                       annotations[i] ?? emptyAnnotation(p.conceptId, p.category, schema)
