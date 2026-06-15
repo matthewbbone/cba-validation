@@ -1,6 +1,6 @@
-# Provision Structures for Deterministic CBA Extraction
+# Provision Structures for Deterministic CBA Comparisons
 
-This project compares LLM and human extractions from collective bargaining agreements by converting provision text into deterministic attributes. Every provision extraction includes `exists` and `summarize`; comparison should otherwise rely on booleans, numeric values, durations, money amounts, percentages, multipliers, and the small set of retained string-list attributes that affect generosity or comparability.
+This project compares LLM and human extractions from collective bargaining agreements by converting provision text into easily verifiable attributes. Every provision extraction includes `exists` and `summarize`; comparison should otherwise rely on booleans, numeric values, durations, money amounts, percentages, multipliers, and the small set of retained string-list attributes that affect generosity or comparability.
 
 ## Core Provision Strategy
 
@@ -17,6 +17,27 @@ Non-core provisions remain in the schema so the project can expand coverage over
 Provision attributes should be directly verifiable from the CBA. Numeric and boolean attributes are preferred. String-list attributes are retained only when the literal surface form changes how generosity should be compared, such as covered groups, excluded groups, bargaining-unit scope, classifications, effective dates, concrete thresholds, deadlines, waiting periods, exceptions, or similar rule boundaries.
 
 Do not add string attributes merely to capture labels. Plan names, fund names, certification names, step names, program names, union names, forum names, committee names, and broad eligibility prose are intentionally excluded unless a future schema normalizes them into categorical or numeric comparison fields.
+
+## Core Provisions
+
+| Concept ID | Category | Description |
+|---|---|---|
+| `C_WAGE_BASE_RATE` | Compensation | Base wage or salary rates for covered jobs, classifications, or employees. |
+| `C_PREMIUM_OVERTIME` | Compensation | Overtime eligibility, thresholds, multipliers, and related premium-pay rules. |
+| `C_ARBITRATION` | Disputes | Rules for referring unresolved disputes to arbitration and defining arbitral authority. |
+| `C_GRIEVANCE_PROCEDURE` | Disputes | Procedures for filing, processing, and resolving contractual grievances. |
+| `C_RECOGNITION_COVERAGE_SCOPE` | Recognition | Recognition clause defining the bargaining unit, covered employees, and exclusions. |
+| `C_JOB_SECURITY_LAYOFF_ORDER` | Security | Rules determining layoff order, notice, seniority application, and displacement rights. |
+| `C_JOB_SECURITY_RECALL` | Security | Recall rights, recall order, notice, duration, and preference after layoff. |
+| `C_HEALTH_MEDICAL_ACTIVE_CONTRIBUTION` | Healthcare | Employer or employee contributions toward active employee medical coverage. |
+| `C_RETIREMENT_PENSION` | Ancillary | Pension or retirement plan eligibility, participation, contributions, and vesting. |
+| `C_LEAVE_VACATION` | Leave | Vacation entitlement, accrual, scheduling, carryover, and payout rules. |
+| `C_SENIORITY_SYSTEM` | Security | Seniority definitions and rules affecting rights such as layoff, recall, bidding, and scheduling. |
+| `C_DISCIPLINE_JUST_CAUSE` | Disputes | Just-cause standards and substantive protections against discipline or discharge. |
+| `C_LEAVE_HOLIDAYS` | Leave | Paid holidays, holiday observance rules, and holiday premium pay. |
+| `C_SAFETY_PPE_UNSAFE_WORK` | Safety | Safety protections, PPE obligations, hazard response, and unsafe-work rights. |
+| `C_LEAVE_SICK` | Leave | Paid sick leave entitlement, accrual, carryover, use, certification, and payout rules. |
+| `C_UNION_SECURITY_DUES_CHECKOFF` | Recognition | Union-security and dues-checkoff rules, including payroll deduction requirements. |
 
 ## Provision Concepts by Dictionary Category
 
@@ -163,35 +184,6 @@ Do not add string attributes merely to capture labels. Plan names, fund names, c
 | `C_WORKLOAD_CLASS_SIZE_STAFFING` | standard | `complex` | `values[]`, `flags.has_class_size_limit`, `flags.has_staffing_ratio`, `flags.has_preparation_period`, `flags.has_duty_free_lunch`, `flags.has_voluntary_extracurricular`, `staffing_ratio_terms`, `duty_terms` | Workload, class-size, staffing-ratio, preparation-time, or duty-assignment protections. |
 | `C_TIME_SCHEDULE_NOTICE_CHANGE` | standard | `quantitative` | `value`, `notice_trigger_terms`, `affected_employee_groups` | Advance notice requirements and remedies for schedule changes or cancellations. |
 | `C_TIME_NO_CANCELLATION_SECURITY` | standard | `complex` | `values[]`, `flags.has_no_cancellation_rule`, `flags.has_involuntary_leave_limit`, `flags.has_pay_protection`, `flags.has_schedule_security`, `affected_employee_groups` | Schedule-security protections limiting cancellations, involuntary leave, or lost pay. |
-
-## Ranked Core Families
-
-The deep research workflow ranked target families by importance for common CBA comparison. These priorities determine the `meta.priority_tier`, `meta.rank`, and related metadata on each provision class.
-
-- `C_WAGE_BASE_RATE`: core, rank 1, score 98, difficulty medium. Family: `base_wage_schedule`. Core pay tables, classifications, steps, and rates.
-- `C_PREMIUM_OVERTIME`: core, rank 2, score 96, difficulty medium. Family: `overtime_and_premium_pay`. Overtime triggers, thresholds, multipliers, and stacking rules.
-- `C_ARBITRATION`: core, rank 3, score 95, difficulty high. Family: `grievance_arbitration`. Procedural backbone for contract enforcement.
-- `C_GRIEVANCE_PROCEDURE`: core, rank 3, score 95, difficulty high. Family: `grievance_arbitration`. Procedural backbone for contract enforcement.
-- `C_RECOGNITION_COVERAGE_SCOPE`: core, rank 4, score 94, difficulty low. Family: `recognition_bargaining_unit`. Defines covered employees and exclusions for downstream provisions.
-- `C_JOB_SECURITY_BUMPING`: advanced, rank 5, score 92, difficulty high. Family: `layoff_recall_bumping`. Advanced subcomponent of the layoff/recall family.
-- `C_JOB_SECURITY_LAYOFF_ORDER`: core, rank 5, score 92, difficulty high. Family: `layoff_recall_bumping`. Workforce reduction order, notice, and displacement rules.
-- `C_JOB_SECURITY_RECALL`: core, rank 5, score 92, difficulty high. Family: `layoff_recall_bumping`. Recall rights for laid-off workers.
-- `C_HEALTH_MEDICAL_ACTIVE_CONTRIBUTION`: core, rank 6, score 91, difficulty medium. Family: `health_insurance_employer_contribution`. Employer/employee medical premium shares and contributions.
-- `C_RETIREMENT_PENSION`: core, rank 7, score 89, difficulty medium. Family: `pension_retirement_contribution`. Retirement plan eligibility and contribution terms.
-- `C_LEAVE_VACATION`: core, rank 8, score 88, difficulty medium. Family: `paid_vacation`. Vacation entitlement, accrual, service tiers, and scheduling.
-- `C_SENIORITY_SYSTEM`: core, rank 9, score 87, difficulty high. Family: `seniority`. Connective rule for layoff, recall, bidding, vacation, and overtime.
-- `C_DISCIPLINE_JUST_CAUSE`: core, rank 10, score 86, difficulty high. Family: `just_cause_discipline_discharge`. Discipline/discharge standard central to grievance and arbitration.
-- `C_LEAVE_HOLIDAYS`: core, rank 11, score 84, difficulty low. Family: `paid_holidays`. Holiday list, observed rules, eligibility, and premium pay.
-- `C_SAFETY_PPE_UNSAFE_WORK`: core, rank 12, score 83, difficulty medium. Family: `safety_ppe_training`. Safety duties, PPE, unsafe-work rights, and hazard response.
-- `C_LEAVE_SICK`: core, rank 14, score 80, difficulty medium. Family: `sick_leave_paid_leave_bank`. Sick leave accrual, caps, usage rules, and payout.
-- `C_UNION_SECURITY_DUES_CHECKOFF`: conditional_core, rank 15, score 75, difficulty low. Family: `dues_checkoff_union_security`. Jurisdiction-conditional dues deduction and union-security terms.
-- `C_DISCIPLINE_PROBATION`: advanced, unranked, difficulty medium. Family: `probationary_period`. Valuable next-module discipline provision.
-- `C_HEALTH_MEDICAL_ACTIVE_PLAN_DESIGN`: advanced, unranked, difficulty medium. Family: `active_medical_plan_design`. Demoted because detailed plan terms may live outside the CBA.
-- `C_JOB_SECURITY_SEVERANCE`: advanced, unranked, difficulty medium. Family: `severance`. Valuable next-module job-security provision.
-- `C_LABOR_MANAGEMENT_COMMITTEE`: advanced, unranked, difficulty low. Family: `labor_management_committee`. Optional governance provision, not a substitute for grievance machinery.
-- `C_PREMIUM_SHIFT`: advanced, unranked, difficulty medium. Family: `shift_differential`. Valuable next-module premium-pay provision.
-- `C_PREMIUM_STANDBY_ON_CALL`: advanced, unranked, difficulty medium. Family: `standby_on_call_pay`. Valuable next-module premium-pay provision.
-- `C_UNION_ACCESS_BUSINESS`: advanced, unranked, difficulty medium. Family: `union_business_access`. Useful next-module provision for union capacity and access.
 
 ## Document-Level Metadata Still Needed
 
