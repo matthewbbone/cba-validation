@@ -61,7 +61,7 @@ export interface ProvisionAnnotation {
   concept_id: string;
   category: string;
   format: ProvisionFormat;
-  exists: boolean;
+  exists: boolean | null; // null = no decision made yet
   summarize: string;
   // binary: none of the below
   // quantitative: single value or null

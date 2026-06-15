@@ -33,8 +33,27 @@ function generateSessionId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
+// Annotation keys are namespaced by the PDF stem (document_id), matching the
+// S3 object path annotations/{pid}/{source}/{document_id}.json.
 function cbaKey(source: string, filename: string): string {
-  return `${source}/${filename}`;
+  const documentId = filename.replace(/\.[^./]+$/, "");
+  return `${source}/${documentId}`;
+}
+
+// Require an explicit present/absent decision for every provision, plus a
+// summary when the provision is marked present. Returns an error message for
+// the first incomplete provision, or null if all are complete.
+function validateAnnotations(anns: ProvisionAnnotation[]): string | null {
+  for (let i = 0; i < anns.length; i++) {
+    const a = anns[i];
+    if (a.exists === null) {
+      return `Provision ${i + 1}: choose whether it is present (Yes/No).`;
+    }
+    if (a.exists && !a.summarize.trim()) {
+      return `Provision ${i + 1}: add a summary describing the provision.`;
+    }
+  }
+  return null;
 }
 
 // ── Inner component (needs useSearchParams, must be inside Suspense) ─────────
@@ -45,6 +64,8 @@ function AnnotationApp() {
   const [appState, setAppState] = useState<AppState>("loading-progress");
   const [prolific, setProlific] = useState<ProlificContext | null>(null);
   const [completedKeys, setCompletedKeys] = useState<Set<string>>(new Set());
+  // Session-local: CBAs skipped this session, so they aren't immediately re-served.
+  const [skippedKeys, setSkippedKeys] = useState<Set<string>>(new Set());
   const [session, setSession] = useState<SessionData | null>(null);
   const [sessionId, setSessionId] = useState<string>("");
   const [annotations, setAnnotations] = useState<ProvisionAnnotation[]>([]);
@@ -73,12 +94,16 @@ function AnnotationApp() {
 
   // ── Load a new CBA session ───────────────────────────────────────────────
 
-  const loadSession = useCallback(async (excludeKeys: string[]) => {
+  const loadSession = useCallback(async (excludeKeys: string[], pid: string) => {
     setStatus(null);
     setPdfLoaded(false);
     try {
-      const exclude = encodeURIComponent(JSON.stringify(excludeKeys));
-      const res = await fetch(`/api/session?exclude=${exclude}`);
+      const res = await fetch("/api/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pid, exclude: excludeKeys }),
+      });
+      if (!res.ok) throw new Error("Session request failed");
       const data: SessionData = await res.json();
 
       if (data.exhausted) {
@@ -135,6 +160,7 @@ function AnnotationApp() {
       let serverCompleted: string[] = [];
       try {
         const res = await fetch(`/api/progress?pid=${encodeURIComponent(ctx.prolific_pid)}`);
+        if (!res.ok) throw new Error("Progress request failed");
         const json = await res.json();
         serverCompleted = json.completed ?? [];
       } catch {
@@ -169,7 +195,7 @@ function AnnotationApp() {
         }
       }
 
-      await loadSession(serverCompleted);
+      await loadSession(serverCompleted, ctx.prolific_pid);
     })();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -200,6 +226,13 @@ function AnnotationApp() {
 
   async function handleSubmit() {
     if (!session || !prolific) return;
+
+    const validationError = validateAnnotations(annotations);
+    if (validationError) {
+      setStatus({ type: "error", msg: validationError });
+      return;
+    }
+
     setSubmitting(true);
     setStatus(null);
 
@@ -225,7 +258,10 @@ function AnnotationApp() {
       }
 
       setStatus({ type: "success", msg: "Saved! Loading next CBA…" });
-      setTimeout(() => loadSession(Array.from(next)), 900);
+      const exclude = Array.from(
+        new Set(Array.from(next).concat(Array.from(skippedKeys)))
+      );
+      setTimeout(() => loadSession(exclude, prolific.prolific_pid), 900);
     } catch {
       setStatus({ type: "error", msg: "Failed to save. Please try again." });
     } finally {
@@ -236,8 +272,16 @@ function AnnotationApp() {
   // ── Skip ─────────────────────────────────────────────────────────────────
 
   function handleSkip() {
+    if (!session || !prolific) return;
+    const key = cbaKey(session.cba.source, session.cba.filename);
+    const nextSkipped = new Set(skippedKeys);
+    nextSkipped.add(key);
+    setSkippedKeys(nextSkipped);
     clearDraft();
-    loadSession(Array.from(completedKeys));
+    const exclude = Array.from(
+      new Set(Array.from(completedKeys).concat(Array.from(nextSkipped)))
+    );
+    loadSession(exclude, prolific.prolific_pid);
   }
 
   // ── Overlay states ───────────────────────────────────────────────────────

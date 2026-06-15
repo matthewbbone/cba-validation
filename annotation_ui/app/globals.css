@@ -309,8 +309,19 @@ body {
   transition: background 0.1s, border-color 0.1s;
 }
 
+/* Visually hide the native control but keep it focusable & keyboard-operable
+   (arrow-key navigation within the group, focus ring via :focus-within). */
 .flag-option input[type="radio"] {
-  display: none;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  margin: 0;
+}
+
+.flag-option:focus-within {
+  outline: 2px solid #3b82f6;
+  outline-offset: 1px;
 }
 
 .flag-selected {

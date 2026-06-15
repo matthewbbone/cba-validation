@@ -17,10 +17,18 @@ export async function POST(req: NextRequest) {
     provisions,
   };
 
-  if (isS3Configured()) {
-    await writeAnnotationToS3(prolific.prolific_pid, record);
-  } else {
-    appendAnnotationRecord(record);
+  try {
+    if (isS3Configured()) {
+      await writeAnnotationToS3(prolific.prolific_pid, record);
+    } else {
+      appendAnnotationRecord(record);
+    }
+  } catch (err) {
+    console.error("[submit] Failed to persist annotation:", err);
+    return NextResponse.json(
+      { ok: false, error: "Failed to persist annotation." },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({ ok: true });

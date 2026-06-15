@@ -12,7 +12,7 @@ function emptyValue(): AnnotationValue {
 }
 
 function emptyAnnotation(conceptId: string, category: string, schema: ProvisionSchema): ProvisionAnnotation {
-  const base = { concept_id: conceptId, category, format: schema.format, exists: true, summarize: "" };
+  const base = { concept_id: conceptId, category, format: schema.format, exists: null, summarize: "" };
   if (schema.format === "quantitative") return { ...base, value: emptyValue() };
   if (schema.format === "complex") {
     const flags: Record<string, boolean | null> = {};
@@ -28,8 +28,9 @@ function flagLabel(name: string): string {
 
 // ── Tri-state flag radio ──────────────────────────────────────────────────────
 
-function FlagRow({ name, value, onChange }: {
-  name: string;
+function FlagRow({ name, groupName, value, onChange }: {
+  name: string;       // display label (the flag's field name)
+  groupName: string;  // deterministic, unique native radio-group name
   value: boolean | null;
   onChange: (v: boolean | null) => void;
 }) {
@@ -38,11 +39,11 @@ function FlagRow({ name, value, onChange }: {
       <span className="flag-label">{flagLabel(name)}</span>
       <div className="flag-radios">
         {([true, false, null] as (boolean | null)[]).map((opt) => {
-          const id = `${name}-${opt === null ? "null" : String(opt)}`;
+          const id = `${groupName}-${opt === null ? "null" : String(opt)}`;
           const label = opt === true ? "Yes" : opt === false ? "No" : "?";
           return (
             <label key={id} className={`flag-option${value === opt ? " flag-selected" : ""}`}>
-              <input type="radio" name={name} checked={value === opt} onChange={() => onChange(opt)} />
+              <input type="radio" name={groupName} checked={value === opt} onChange={() => onChange(opt)} />
               {label}
             </label>
           );
@@ -59,10 +60,11 @@ function parseNum(s: string): number | null {
   return isNaN(n) ? null : n;
 }
 
-function ValueEditor({ value, onChange, onRemove }: {
+function ValueEditor({ value, onChange, onRemove, idPrefix }: {
   value: AnnotationValue;
   onChange: (v: AnnotationValue) => void;
   onRemove?: () => void;
+  idPrefix: string; // deterministic prefix scoping this value's radio groups
 }) {
   function set(patch: Partial<AnnotationValue>) {
     onChange({ ...value, ...patch });
@@ -162,7 +164,7 @@ function ValueEditor({ value, onChange, onRemove }: {
                 <label key={String(opt)} className={`flag-option${value[attr] === opt ? " flag-selected" : ""}`}>
                   <input
                     type="radio"
-                    name={`${attr}-${Math.random()}`}
+                    name={`${idPrefix}-${attr}`}
                     checked={value[attr] === opt}
                     onChange={() => set({ [attr]: opt })}
                   />
@@ -230,7 +232,12 @@ export function ProvisionForm({ index, conceptId, category, label, schema, annot
         <div className="flag-radios">
           {[true, false].map((opt) => (
             <label key={String(opt)} className={`flag-option${annotation.exists === opt ? " flag-selected" : ""}`}>
-              <input type="radio" checked={annotation.exists === opt} onChange={() => handleExistsChange(opt)} />
+              <input
+                type="radio"
+                name={`${conceptId}-exists`}
+                checked={annotation.exists === opt}
+                onChange={() => handleExistsChange(opt)}
+              />
               {opt ? "Yes" : "No"}
             </label>
           ))}
@@ -255,6 +262,7 @@ export function ProvisionForm({ index, conceptId, category, label, schema, annot
           <ValueEditor
             value={annotation.value ?? emptyValue()}
             onChange={(v) => set({ value: v })}
+            idPrefix={`${conceptId}-value`}
           />
         </div>
       )}
@@ -278,6 +286,7 @@ export function ProvisionForm({ index, conceptId, category, label, schema, annot
             <ValueEditor
               key={i}
               value={v}
+              idPrefix={`${conceptId}-${i}`}
               onChange={(updated) => {
                 const next = [...(annotation.values ?? [])];
                 next[i] = updated;
@@ -300,6 +309,7 @@ export function ProvisionForm({ index, conceptId, category, label, schema, annot
                   <FlagRow
                     key={flagName}
                     name={flagName}
+                    groupName={`${conceptId}-flag-${flagName}`}
                     value={(annotation.flags ?? {})[flagName] ?? null}
                     onChange={(v) =>
                       set({ flags: { ...(annotation.flags ?? {}), [flagName]: v } })

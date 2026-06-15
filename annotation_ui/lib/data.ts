@@ -22,6 +22,13 @@ function getS3(): S3Client {
   return s3;
 }
 
+// ── Document id ──────────────────────────────────────────────────────────────
+// The stem of the original PDF, used as the annotation object's basename.
+// e.g. "3693ABBYY.pdf" → "3693ABBYY"
+export function documentId(filename: string): string {
+  return filename.replace(/\.[^./]+$/, "");
+}
+
 // ── CBA list ─────────────────────────────────────────────────────────────────
 export function getAllCBAs(): CBA[] {
   return cbaManifest as CBA[];
@@ -35,7 +42,7 @@ export function getRandomCBA(): CBA {
 export function getRandomCBAExcluding(excludeKeys: string[]): CBA | null {
   const excluded = new Set(excludeKeys);
   const available = getAllCBAs().filter(
-    (c) => !excluded.has(`${c.source}/${c.filename}`)
+    (c) => !excluded.has(`${c.source}/${documentId(c.filename)}`)
   );
   if (available.length === 0) return null;
   return available[Math.floor(Math.random() * available.length)];
@@ -84,7 +91,7 @@ export async function writeAnnotationToS3(
   prolificPid: string,
   record: AnnotationRecord
 ): Promise<void> {
-  const key = `annotations/${prolificPid}/${record.cba_source}/${record.cba_filename}.json`;
+  const key = `annotations/${prolificPid}/${record.cba_source}/${documentId(record.cba_filename)}.json`;
   await getS3().send(
     new PutObjectCommand({
       Bucket: BUCKET!,
@@ -110,7 +117,7 @@ export async function getCompletedCBAsForPID(prolificPid: string): Promise<strin
     );
     for (const obj of response.Contents ?? []) {
       if (!obj.Key) continue;
-      // Strip "annotations/{pid}/" prefix and ".json" suffix → "source/filename"
+      // Strip "annotations/{pid}/" prefix and ".json" suffix → "source/document_id"
       const rel = obj.Key.slice(prefix.length);
       const cbaKey = rel.endsWith(".json") ? rel.slice(0, -5) : rel;
       if (cbaKey) keys.push(cbaKey);
@@ -126,11 +133,9 @@ const REPO_ROOT = path.resolve(process.cwd(), "..");
 const ANNOTATIONS_PATH = path.join(REPO_ROOT, "data", "annotations", "human_annotations.jsonl");
 
 export function appendAnnotationRecord(record: AnnotationRecord): void {
-  try {
-    const dir = path.dirname(ANNOTATIONS_PATH);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.appendFileSync(ANNOTATIONS_PATH, JSON.stringify(record) + "\n", "utf-8");
-  } catch (err) {
-    console.error("[submit] Could not write annotation to disk:", err);
-  }
+  // Let write failures propagate — the caller must surface them so an
+  // annotation is never silently lost on a failed local write.
+  const dir = path.dirname(ANNOTATIONS_PATH);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.appendFileSync(ANNOTATIONS_PATH, JSON.stringify(record) + "\n", "utf-8");
 }
