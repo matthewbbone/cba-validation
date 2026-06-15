@@ -2,6 +2,16 @@
 
 This project compares LLM and human extractions from collective bargaining agreements by converting provision text into deterministic attributes. Every provision extraction includes `exists` and `summarize`; comparison should otherwise rely on booleans, numeric values, durations, money amounts, percentages, multipliers, and the small set of retained string-list attributes that affect generosity or comparability.
 
+## Core Provision Strategy
+
+The full dictionary contains 99 provision concepts, but validation should start with a smaller core set. The core provisions are the terms most likely to appear across CBAs and most likely to determine the economic and procedural value of an agreement: base wages, overtime, grievance and arbitration machinery, recognition scope, layoff and recall, health contributions, retirement, vacation, seniority, discipline, holidays, safety, sick leave, and conditional union-security or dues-checkoff rules.
+
+Prioritizing these provisions keeps the human annotation workload tractable and avoids spreading validation effort too thin across rare or highly idiosyncratic clauses. A focused core set makes it easier to build a reliable human benchmark, compare annotators against one another, compare LLM extractions against human extractions, and diagnose where a model is failing. It also ensures that disagreement is measured on provisions that matter for downstream generosity scoring rather than on marginal concepts that may appear infrequently or require specialized interpretation.
+
+The purpose of structuring the core provisions is not just to identify whether a clause exists. Each core provision should be represented through deterministic attributes that can be compared mechanically: booleans for rights and rule features, numeric values for amounts and thresholds, durations for time limits, and tightly scoped string lists only where the literal value affects comparability. This allows validation to ask concrete questions such as whether two extractors found the same overtime multiplier, the same grievance deadline, the same covered employee group, or the same employer health contribution.
+
+Non-core provisions remain in the schema so the project can expand coverage over time. They should be treated as standard or advanced targets until the core provision benchmark is stable enough to support broader extraction and generosity validation.
+
 ## Attribute Policy
 
 Provision attributes should be directly verifiable from the CBA. Numeric and boolean attributes are preferred. String-list attributes are retained only when the literal surface form changes how generosity should be compared, such as covered groups, excluded groups, bargaining-unit scope, classifications, effective dates, concrete thresholds, deadlines, waiting periods, exceptions, or similar rule boundaries.
