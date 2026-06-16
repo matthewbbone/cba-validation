@@ -11,6 +11,27 @@ function emptyValue(): AnnotationValue {
   };
 }
 
+function normalizeValue(value: Partial<AnnotationValue> | null | undefined): AnnotationValue {
+  return {
+    money: value?.money ?? null,
+    percent: value?.percent ?? null,
+    duration: value?.duration
+      ? {
+          hours: value.duration.hours ?? null,
+          days: value.duration.days ?? null,
+          weeks: value.duration.weeks ?? null,
+          months: value.duration.months ?? null,
+          years: value.duration.years ?? null,
+        }
+      : null,
+    number: value?.number ?? null,
+    multiplier: value?.multiplier ?? null,
+    included: value?.included ?? null,
+    employer_paid: value?.employer_paid ?? null,
+    employee_paid: value?.employee_paid ?? null,
+  };
+}
+
 function emptyStringFields(schema: ProvisionSchema): Record<string, string[]> {
   const fields: Record<string, string[]> = {};
   for (const f of schema.string_fields ?? []) fields[f] = [];
@@ -29,10 +50,60 @@ function emptyAnnotation(conceptId: string, category: string, schema: ProvisionS
   if (schema.format === "quantitative") return { ...base, value: emptyValue() };
   if (schema.format === "complex") {
     const flags: Record<string, boolean | null> = {};
-    for (const f of schema.flags) flags[f] = null;
+    for (const f of schema.flags ?? []) flags[f] = null;
     return { ...base, values: [], flags };
   }
   return base;
+}
+
+function normalizeStringFields(
+  value: ProvisionAnnotation["string_fields"],
+  schema: ProvisionSchema
+): Record<string, string[]> {
+  const fields = emptyStringFields(schema);
+  for (const fieldName of schema.string_fields ?? []) {
+    const fieldValue = value?.[fieldName];
+    fields[fieldName] = Array.isArray(fieldValue)
+      ? fieldValue.filter((v): v is string => typeof v === "string")
+      : [];
+  }
+  return fields;
+}
+
+function normalizeAnnotation(
+  annotation: ProvisionAnnotation | undefined,
+  conceptId: string,
+  category: string,
+  schema: ProvisionSchema
+): ProvisionAnnotation {
+  const base = emptyAnnotation(conceptId, category, schema);
+  if (!annotation) return base;
+
+  const normalized: ProvisionAnnotation = {
+    ...base,
+    exists:
+      annotation.exists === true ? true : annotation.exists === false ? false : null,
+    summarize: typeof annotation.summarize === "string" ? annotation.summarize : "",
+    string_fields: normalizeStringFields(annotation.string_fields, schema),
+  };
+
+  if (schema.format === "quantitative") {
+    normalized.value = normalizeValue(annotation.value);
+  }
+
+  if (schema.format === "complex") {
+    normalized.values = Array.isArray(annotation.values)
+      ? annotation.values.map((v) => normalizeValue(v))
+      : [];
+    normalized.flags = {};
+    for (const flagName of schema.flags ?? []) {
+      const flagValue = annotation.flags?.[flagName];
+      normalized.flags[flagName] =
+        flagValue === true ? true : flagValue === false ? false : null;
+    }
+  }
+
+  return normalized;
 }
 
 function flagLabel(name: string): string {
@@ -127,11 +198,13 @@ function ValueEditor({ value, onChange, onRemove, idPrefix }: {
   onRemove?: () => void;
   idPrefix: string; // deterministic prefix scoping this value's radio groups
 }) {
+  const normalizedValue = normalizeValue(value);
+
   function set(patch: Partial<AnnotationValue>) {
-    onChange({ ...value, ...patch });
+    onChange(normalizeValue({ ...normalizedValue, ...patch }));
   }
 
-  const dur = value.duration ?? { hours: null, days: null, weeks: null, months: null, years: null };
+  const dur = normalizedValue.duration ?? { hours: null, days: null, weeks: null, months: null, years: null };
 
   return (
     <div className="value-editor">
@@ -148,7 +221,7 @@ function ValueEditor({ value, onChange, onRemove, idPrefix }: {
             step="0.01"
             className="value-input"
             placeholder="e.g. 2.00"
-            value={value.money?.amount ?? ""}
+            value={normalizedValue.money?.amount ?? ""}
             onChange={(e) => set({ money: e.target.value ? { amount: parseFloat(e.target.value) } : null })}
           />
         </div>
@@ -161,7 +234,7 @@ function ValueEditor({ value, onChange, onRemove, idPrefix }: {
             step="0.01"
             className="value-input"
             placeholder="e.g. 5 for 5%"
-            value={value.percent !== null ? (value.percent.value * 100).toFixed(4).replace(/\.?0+$/, "") : ""}
+            value={normalizedValue.percent !== null ? (normalizedValue.percent.value * 100).toFixed(4).replace(/\.?0+$/, "") : ""}
             onChange={(e) => set({ percent: e.target.value ? { value: parseFloat(e.target.value) / 100 } : null })}
           />
         </div>
@@ -174,7 +247,7 @@ function ValueEditor({ value, onChange, onRemove, idPrefix }: {
             step="0.5"
             className="value-input"
             placeholder="e.g. 8"
-            value={value.number ?? ""}
+            value={normalizedValue.number ?? ""}
             onChange={(e) => set({ number: parseNum(e.target.value) })}
           />
         </div>
@@ -187,7 +260,7 @@ function ValueEditor({ value, onChange, onRemove, idPrefix }: {
             step="0.25"
             className="value-input"
             placeholder="e.g. 1.5"
-            value={value.multiplier ?? ""}
+            value={normalizedValue.multiplier ?? ""}
             onChange={(e) => set({ multiplier: parseNum(e.target.value) })}
           />
         </div>
@@ -222,11 +295,11 @@ function ValueEditor({ value, onChange, onRemove, idPrefix }: {
             <span className="value-field-label">{flagLabel(attr)}</span>
             <div className="flag-radios">
               {([null, true, false] as (boolean | null)[]).map((opt) => (
-                <label key={String(opt)} className={`flag-option${value[attr] === opt ? " flag-selected" : ""}`}>
+                <label key={String(opt)} className={`flag-option${normalizedValue[attr] === opt ? " flag-selected" : ""}`}>
                   <input
                     type="radio"
                     name={`${idPrefix}-${attr}`}
-                    checked={value[attr] === opt}
+                    checked={normalizedValue[attr] === opt}
                     onChange={() => set({ [attr]: opt })}
                   />
                   {opt === null ? "?" : opt ? "Yes" : "No"}
@@ -253,21 +326,23 @@ export interface ProvisionFormProps {
 }
 
 export function ProvisionForm({ index, conceptId, category, label, schema, annotation, onChange }: ProvisionFormProps) {
+  const current = normalizeAnnotation(annotation, conceptId, category, schema);
+
   function set(patch: Partial<ProvisionAnnotation>) {
-    onChange({ ...annotation, ...patch });
+    onChange({ ...current, ...patch });
   }
 
   function handleExistsChange(exists: boolean) {
     if (!exists) {
       // Clear all detail fields when marking absent — absent provisions must
       // carry no normalized detail (mirrors validate_presence_consistency).
-      const cleared: ProvisionAnnotation = { ...annotation, exists: false, summarize: annotation.summarize };
+      const cleared: ProvisionAnnotation = { ...current, exists: false, summarize: current.summarize };
       cleared.string_fields = emptyStringFields(schema);
       if (schema.format === "quantitative") cleared.value = null;
       if (schema.format === "complex") {
         cleared.values = [];
         const flags: Record<string, boolean | null> = {};
-        for (const f of schema.flags) flags[f] = null;
+        for (const f of schema.flags ?? []) flags[f] = null;
         cleared.flags = flags;
       }
       onChange(cleared);
@@ -300,11 +375,11 @@ export function ProvisionForm({ index, conceptId, category, label, schema, annot
         <span className="exists-label">Present in this CBA?</span>
         <div className="flag-radios">
           {[true, false].map((opt) => (
-            <label key={String(opt)} className={`flag-option${annotation.exists === opt ? " flag-selected" : ""}`}>
+            <label key={String(opt)} className={`flag-option${current.exists === opt ? " flag-selected" : ""}`}>
               <input
                 type="radio"
                 name={`${conceptId}-exists`}
-                checked={annotation.exists === opt}
+                checked={current.exists === opt}
                 onChange={() => handleExistsChange(opt)}
               />
               {opt ? "Yes" : "No"}
@@ -319,50 +394,50 @@ export function ProvisionForm({ index, conceptId, category, label, schema, annot
         <textarea
           className="provision-textarea"
           placeholder="Describe what the CBA says about this provision…"
-          value={annotation.summarize}
+          value={current.summarize}
           onChange={(e) => set({ summarize: e.target.value })}
         />
       </div>
 
       {/* Detail fields — only when present */}
-      {annotation.exists && schema.format === "quantitative" && (
+      {current.exists && schema.format === "quantitative" && (
         <div className="detail-section">
           <p className="detail-heading">Value</p>
           <ValueEditor
-            value={annotation.value ?? emptyValue()}
+            value={current.value ?? emptyValue()}
             onChange={(v) => set({ value: v })}
             idPrefix={`${conceptId}-value`}
           />
         </div>
       )}
 
-      {annotation.exists && schema.format === "complex" && (
+      {current.exists && schema.format === "complex" && (
         <div className="detail-section">
           {/* Values list */}
           <div className="detail-heading-row">
             <p className="detail-heading">Values</p>
             <button
               className="btn btn-add"
-              onClick={() => set({ values: [...(annotation.values ?? []), emptyValue()] })}
+              onClick={() => set({ values: [...(current.values ?? []), emptyValue()] })}
             >
               + Add value
             </button>
           </div>
-          {(annotation.values ?? []).length === 0 && (
+          {(current.values ?? []).length === 0 && (
             <p className="empty-hint">No values added yet.</p>
           )}
-          {(annotation.values ?? []).map((v, i) => (
+          {(current.values ?? []).map((v, i) => (
             <ValueEditor
               key={i}
               value={v}
               idPrefix={`${conceptId}-${i}`}
               onChange={(updated) => {
-                const next = [...(annotation.values ?? [])];
+                const next = [...(current.values ?? [])];
                 next[i] = updated;
                 set({ values: next });
               }}
               onRemove={() => {
-                const next = [...(annotation.values ?? [])];
+                const next = [...(current.values ?? [])];
                 next.splice(i, 1);
                 set({ values: next });
               }}
@@ -370,18 +445,18 @@ export function ProvisionForm({ index, conceptId, category, label, schema, annot
           ))}
 
           {/* Flags */}
-          {schema.flags.length > 0 && (
+          {(schema.flags ?? []).length > 0 && (
             <>
               <p className="detail-heading" style={{ marginTop: "0.75rem" }}>Flags</p>
               <div className="flags-grid">
-                {schema.flags.map((flagName) => (
+                {(schema.flags ?? []).map((flagName) => (
                   <FlagRow
                     key={flagName}
                     name={flagName}
                     groupName={`${conceptId}-flag-${flagName}`}
-                    value={(annotation.flags ?? {})[flagName] ?? null}
+                    value={(current.flags ?? {})[flagName] ?? null}
                     onChange={(v) =>
-                      set({ flags: { ...(annotation.flags ?? {}), [flagName]: v } })
+                      set({ flags: { ...(current.flags ?? {}), [flagName]: v } })
                     }
                   />
                 ))}
@@ -392,7 +467,7 @@ export function ProvisionForm({ index, conceptId, category, label, schema, annot
       )}
 
       {/* Typed string-list attributes — named source terms, all formats */}
-      {annotation.exists && (schema.string_fields?.length ?? 0) > 0 && (
+      {current.exists && (schema.string_fields?.length ?? 0) > 0 && (
         <div className="detail-section">
           <p className="detail-heading">Named terms</p>
           <p className="detail-hint">
@@ -402,9 +477,9 @@ export function ProvisionForm({ index, conceptId, category, label, schema, annot
             <StringListInput
               key={fieldName}
               name={fieldName}
-              values={(annotation.string_fields ?? {})[fieldName] ?? []}
+              values={(current.string_fields ?? {})[fieldName] ?? []}
               onChange={(v) =>
-                set({ string_fields: { ...(annotation.string_fields ?? {}), [fieldName]: v } })
+                set({ string_fields: { ...(current.string_fields ?? {}), [fieldName]: v } })
               }
             />
           ))}
@@ -414,4 +489,4 @@ export function ProvisionForm({ index, conceptId, category, label, schema, annot
   );
 }
 
-export { emptyAnnotation };
+export { emptyAnnotation, normalizeAnnotation };

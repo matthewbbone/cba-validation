@@ -11,7 +11,7 @@ import type {
   DraftState,
 } from "@/lib/types";
 import provisionSchemas from "@/lib/provision-schemas.json";
-import { ProvisionForm, emptyAnnotation } from "./components/ProvisionForm";
+import { ProvisionForm, emptyAnnotation, normalizeAnnotation } from "./components/ProvisionForm";
 
 const SCHEMAS = provisionSchemas as Record<string, ProvisionSchema>;
 
@@ -52,6 +52,13 @@ function validateAnnotations(anns: ProvisionAnnotation[]): string | null {
     }
   }
   return null;
+}
+
+function normalizeAnnotationsForSession(session: SessionData, anns: ProvisionAnnotation[]): ProvisionAnnotation[] {
+  return session.provisions.map((p, i) => {
+    const schema = SCHEMAS[p.conceptId] ?? { format: "binary" as const, flags: [] };
+    return normalizeAnnotation(anns[i], p.conceptId, p.category, schema);
+  });
 }
 
 // ── Inner component (needs useSearchParams, must be inside Suspense) ─────────
@@ -182,9 +189,11 @@ function AnnotationApp() {
           const draft: DraftState = JSON.parse(draftRaw);
           const key = cbaKey(draft.cba.source, draft.cba.filename);
           if (!completedSet.has(key)) {
-            setSession({ cba: draft.cba, provisions: draft.provisions });
+            const draftSession = { cba: draft.cba, provisions: draft.provisions };
+            const normalizedDraft = normalizeAnnotationsForSession(draftSession, draft.annotations ?? []);
+            setSession(draftSession);
             setSessionId(draft.sessionId);
-            setAnnotations(draft.annotations);
+            setAnnotations(normalizedDraft);
             setAppState("annotating");
             return;
           }
@@ -225,7 +234,8 @@ function AnnotationApp() {
   async function handleSubmit() {
     if (!session || !prolific) return;
 
-    const validationError = validateAnnotations(annotations);
+    const normalizedAnnotations = normalizeAnnotationsForSession(session, annotations);
+    const validationError = validateAnnotations(normalizedAnnotations);
     if (validationError) {
       setStatus({ type: "error", msg: validationError });
       return;
@@ -234,7 +244,7 @@ function AnnotationApp() {
     setSubmitting(true);
     setStatus(null);
 
-    const payload: SubmitPayload = { sessionId, cba: session.cba, provisions: annotations, prolific };
+    const payload: SubmitPayload = { sessionId, cba: session.cba, provisions: normalizedAnnotations, prolific };
 
     try {
       const res = await fetch("/api/submit", {
@@ -389,7 +399,11 @@ function AnnotationApp() {
                       annotations[i] ?? emptyAnnotation(p.conceptId, p.category, schema)
                     }
                     onChange={(updated) =>
-                      setAnnotations((prev) => prev.map((a, j) => (j === i ? updated : a)))
+                      setAnnotations((prev) => {
+                        const next = normalizeAnnotationsForSession(session, prev);
+                        next[i] = updated;
+                        return next;
+                      })
                     }
                   />
                 );
