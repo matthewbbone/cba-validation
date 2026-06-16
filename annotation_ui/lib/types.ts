@@ -21,7 +21,8 @@ export interface ProvisionMeta {
 
 export interface ProvisionSchema {
   format: ProvisionFormat;
-  description?: string; // generic provision description (class docstring)
+  title?: string; // short, human-friendly heading shown in bold to raters
+  description?: string; // plain-language explanation shown as card subtext
   flags: string[]; // boolean flag field names (complex only)
   string_fields?: string[]; // typed string-list attribute names (all formats)
   meta?: ProvisionMeta; // tier/rank metadata

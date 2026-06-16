@@ -1,7 +1,8 @@
 {
   "C_WAGE_BASE_RATE": {
     "format": "complex",
-    "description": "Base wage or salary rate.",
+    "title": "Base wage or salary rate",
+    "description": "The basic hourly wage or salary paid to employees — including any pay tables, job-classification rates, or step schedules that set those amounts.",
     "flags": [
       "has_base_rate",
       "has_rate_table",
@@ -29,7 +30,8 @@
   },
   "C_GRIEVANCE_PROCEDURE": {
     "format": "complex",
-    "description": "Grievance steps, timelines, representation, and scope.",
+    "title": "Grievance procedure",
+    "description": "The step-by-step process for raising and resolving a workplace complaint or dispute — including deadlines, who is allowed to file, and the role of union representatives.",
     "flags": [
       "has_grievance_steps",
       "has_deadlines",
@@ -55,7 +57,8 @@
   },
   "C_ARBITRATION": {
     "format": "complex",
-    "description": "Arbitration access, selection, authority, costs, and finality.",
+    "title": "Arbitration",
+    "description": "Whether disputes that cannot be settled internally go to a neutral outside decision-maker (an arbitrator) for a final ruling — including how that person is chosen, who pays, and any limits on their authority.",
     "flags": [
       "has_arbitration",
       "final_and_binding",
@@ -81,7 +84,8 @@
   },
   "C_LEAVE_HOLIDAYS": {
     "format": "complex",
-    "description": "Holidays and holiday pay.",
+    "title": "Paid holidays",
+    "description": "Recognized holidays (e.g. Christmas, Labor Day) that employees get off, and any extra (\"premium\") pay for employees who work on them.",
     "flags": [
       "has_paid_holidays",
       "has_holiday_premium_pay",
@@ -102,7 +106,8 @@
   },
   "C_PREMIUM_OVERTIME": {
     "format": "complex",
-    "description": "Overtime eligibility thresholds and multipliers.",
+    "title": "Overtime pay",
+    "description": "Extra pay for hours worked beyond a daily or weekly limit — including the threshold that triggers it (e.g. over 8 hours a day) and the pay rate multiplier (e.g. time-and-a-half).",
     "flags": [
       "has_overtime_threshold",
       "has_daily_overtime",
@@ -150,7 +155,8 @@
   },
   "C_DISCIPLINE_JUST_CAUSE": {
     "format": "complex",
-    "description": "Just cause and substantive discipline/discharge standard.",
+    "title": "Just cause for discipline or firing",
+    "description": "Whether the employer must have a fair, provable reason (\"just cause\") before disciplining or firing an employee — rather than being able to do so at will. May also cover the right to a hearing or investigation.",
     "flags": [
       "has_just_cause_standard",
       "covers_discipline",
@@ -199,7 +205,8 @@
   },
   "C_HEALTH_MEDICAL_ACTIVE_CONTRIBUTION": {
     "format": "quantitative",
-    "description": "H&W Fund contribution.",
+    "title": "Employer health-insurance contribution",
+    "description": "How much the employer pays toward employees' medical/health coverage — often stated as a contribution into a Health & Welfare (H&W) fund.",
     "flags": [],
     "string_fields": [
       "coverage_tiers",
@@ -218,7 +225,8 @@
   },
   "C_LEAVE_VACATION": {
     "format": "complex",
-    "description": "Vacation and annual leave.",
+    "title": "Paid vacation",
+    "description": "Paid time off for vacation — including how much employees earn, how it builds up with years of service, and any rules for scheduling or cashing it out.",
     "flags": [
       "has_paid_vacation",
       "accrues_with_service",
@@ -243,7 +251,8 @@
   },
   "C_SAFETY_PPE_UNSAFE_WORK": {
     "format": "complex",
-    "description": "PPE, unsafe-work rights, safety standards, and hazard response.",
+    "title": "Safety & protective equipment",
+    "description": "Workplace safety rules, employer-provided personal protective equipment (PPE — e.g. gloves, hard hats, safety boots), and an employee's right to refuse unsafe work.",
     "flags": [
       "has_ppe_requirement",
       "has_unsafe_work_right",
@@ -287,7 +296,8 @@
   },
   "C_RETIREMENT_PENSION": {
     "format": "complex",
-    "description": "Pension and retirement plan eligibility/contributions.",
+    "title": "Pension / retirement plan",
+    "description": "A retirement plan funded during employment — including who is eligible, how much the employer and employee contribute, and vesting (how long someone must work before the benefit is locked in and theirs to keep).",
     "flags": [
       "has_defined_benefit_pension",
       "has_employer_contribution",
@@ -330,7 +340,8 @@
   },
   "C_JOB_SECURITY_LAYOFF_ORDER": {
     "format": "complex",
-    "description": "Layoff notification and procedure.",
+    "title": "Layoff procedure & order",
+    "description": "Rules for how layoffs are carried out — including advance notice and the order in which employees are let go (often by seniority, meaning longest-serving last).",
     "flags": [
       "has_layoff_notice",
       "seniority_based",
@@ -423,7 +434,8 @@
   },
   "C_LEAVE_SICK": {
     "format": "complex",
-    "description": "Sick/personal days.",
+    "title": "Sick leave",
+    "description": "Paid time off for illness — including how it builds up, whether unused days carry over to the next year, and any requirement for a doctor's note.",
     "flags": [
       "has_paid_sick_leave",
       "accrues_with_service",
@@ -461,7 +473,8 @@
   },
   "C_JOB_SECURITY_RECALL": {
     "format": "complex",
-    "description": "Recall rights.",
+    "title": "Recall rights",
+    "description": "The right of laid-off employees to be called back to work before new people are hired — usually based on seniority and within a set time window.",
     "flags": [
       "has_recall_rights",
       "seniority_based",
@@ -548,7 +561,8 @@
   },
   "C_RECOGNITION_COVERAGE_SCOPE": {
     "format": "complex",
-    "description": "Bargaining unit scope.",
+    "title": "Who the contract covers",
+    "description": "Defines the \"bargaining unit\" — which jobs and employees this contract applies to, and which are left out (e.g. supervisors or confidential staff).",
     "flags": [
       "has_bargaining_unit_scope",
       "excludes_supervisors",
@@ -957,7 +971,8 @@
   },
   "C_SENIORITY_SYSTEM": {
     "format": "complex",
-    "description": "Seniority system.",
+    "title": "Seniority system",
+    "description": "How length of service (\"seniority\") is measured and used to decide things like layoffs, recalls, job bids, vacation choice, and overtime.",
     "flags": [
       "has_seniority_system",
       "classification_based",

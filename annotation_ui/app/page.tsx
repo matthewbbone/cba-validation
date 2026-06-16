@@ -11,7 +11,7 @@ import type {
   DraftState,
 } from "@/lib/types";
 import provisionSchemas from "@/lib/provision-schemas.json";
-import { ProvisionForm, emptyAnnotation, normalizeAnnotation } from "./components/ProvisionForm";
+import { ProvisionForm, emptyAnnotation } from "./components/ProvisionForm";
 
 const SCHEMAS = provisionSchemas as Record<string, ProvisionSchema>;
 
@@ -52,13 +52,6 @@ function validateAnnotations(anns: ProvisionAnnotation[]): string | null {
     }
   }
   return null;
-}
-
-function normalizeAnnotationsForSession(session: SessionData, anns: ProvisionAnnotation[]): ProvisionAnnotation[] {
-  return session.provisions.map((p, i) => {
-    const schema = SCHEMAS[p.conceptId] ?? { format: "binary" as const, flags: [] };
-    return normalizeAnnotation(anns[i], p.conceptId, p.category, schema);
-  });
 }
 
 // ── Inner component (needs useSearchParams, must be inside Suspense) ─────────
@@ -189,11 +182,9 @@ function AnnotationApp() {
           const draft: DraftState = JSON.parse(draftRaw);
           const key = cbaKey(draft.cba.source, draft.cba.filename);
           if (!completedSet.has(key)) {
-            const draftSession = { cba: draft.cba, provisions: draft.provisions };
-            const normalizedDraft = normalizeAnnotationsForSession(draftSession, draft.annotations ?? []);
-            setSession(draftSession);
+            setSession({ cba: draft.cba, provisions: draft.provisions });
             setSessionId(draft.sessionId);
-            setAnnotations(normalizedDraft);
+            setAnnotations(draft.annotations);
             setAppState("annotating");
             return;
           }
@@ -234,8 +225,7 @@ function AnnotationApp() {
   async function handleSubmit() {
     if (!session || !prolific) return;
 
-    const normalizedAnnotations = normalizeAnnotationsForSession(session, annotations);
-    const validationError = validateAnnotations(normalizedAnnotations);
+    const validationError = validateAnnotations(annotations);
     if (validationError) {
       setStatus({ type: "error", msg: validationError });
       return;
@@ -244,7 +234,7 @@ function AnnotationApp() {
     setSubmitting(true);
     setStatus(null);
 
-    const payload: SubmitPayload = { sessionId, cba: session.cba, provisions: normalizedAnnotations, prolific };
+    const payload: SubmitPayload = { sessionId, cba: session.cba, provisions: annotations, prolific };
 
     try {
       const res = await fetch("/api/submit", {
@@ -352,7 +342,7 @@ function AnnotationApp() {
   return (
     <div className="app">
       <header className="header">
-        <h1>CBA Annotation Tool</h1>
+        <h1>Collective Bargaining Agreement (CBA) Annotation Tool</h1>
         {session && (
           <span className="cba-id">
             {session.cba.source} / {session.cba.filename}
@@ -393,17 +383,13 @@ function AnnotationApp() {
                     index={i}
                     conceptId={p.conceptId}
                     category={p.category}
-                    label={schema.description || p.label}
+                    label={p.label}
                     schema={schema}
                     annotation={
                       annotations[i] ?? emptyAnnotation(p.conceptId, p.category, schema)
                     }
                     onChange={(updated) =>
-                      setAnnotations((prev) => {
-                        const next = normalizeAnnotationsForSession(session, prev);
-                        next[i] = updated;
-                        return next;
-                      })
+                      setAnnotations((prev) => prev.map((a, j) => (j === i ? updated : a)))
                     }
                   />
                 );
