@@ -119,3 +119,128 @@ export interface DraftState {
   annotations: ProvisionAnnotation[];
   savedAt: string;
 }
+
+// ── Extraction review ─────────────────────────────────────────────────────────
+// A reviewer reads the source PDF beside everything the extractor recorded for
+// one concept in one document, and judges it. Distinct from the rater-facing
+// annotation flow above: this audits the machine output rather than coding the
+// contract from scratch.
+
+/**
+ * Independent problem flags, not a scale. A reviewer sets any combination —
+ * an extraction can be both hallucinating and confusing — and an empty set is a
+ * meaningful, common answer: no problems found.
+ */
+export type ReviewIssue = "missing" | "hallucinating" | "confusing";
+
+export const REVIEW_ISSUES: ReviewIssue[] = ["missing", "hallucinating", "confusing"];
+
+/**
+ * Overall assessment flags. Recorded as a set rather than a single value so the
+ * buttons behave as toggles like the issue row. Note these are not logically
+ * independent — good and bad together is contradictory — but nothing enforces
+ * that, so treat a multi-flag row as reviewer ambivalence, not as a scale point.
+ */
+export type ReviewQuality = "good" | "okay" | "bad";
+
+export const REVIEW_QUALITIES: ReviewQuality[] = ["good", "okay", "bad"];
+
+/**
+ * One reviewable slice of the corpus: a single (extraction document, concept_id)
+ * pair. `run` is carried because a PDF can be extracted by more than one batch,
+ * and those extractions must never be merged.
+ */
+export interface ReviewUnit {
+  source: string; // data/cbas/<source>/ directory
+  filename: string; // the PDF
+  run: string; // extraction batch
+  documentId: string;
+  conceptId: string;
+  category: string;
+  label: string;
+  nRecords: number;
+  nFields: number;
+  offDictionary: boolean; // concept_id absent from the provision dictionary
+}
+
+// Extraction rows, kept loose on purpose: the source arrays carry ~500 distinct
+// keys across batches and unrecognised ones are passed through by the builder.
+export interface ExtractionRecordRow {
+  concept_id: string;
+  concept_label?: string | null;
+  measurement_status?: string | null;
+  status_reason?: string | null;
+  status_flags?: string[] | null;
+  evidence_pointer?: string | null;
+  [key: string]: unknown;
+}
+
+export interface ExtractionFieldRow {
+  concept_id: string;
+  field_name?: string | null;
+  field_value?: unknown;
+  field_unit?: string | null;
+  value_type?: string | null;
+  support_status?: string | null;
+  note?: string | null;
+  evidence_pointer?: string | null;
+  [key: string]: unknown;
+}
+
+export interface DimensionRow {
+  dimension_id: string | null;
+  area: string | null;
+  provenance: string | null;
+  note?: string | null;
+  evidence_pointer?: string | null;
+  [key: string]: unknown;
+}
+
+export interface ExtractionDetail {
+  run: string;
+  documentId: string;
+  document: Record<string, unknown>;
+  metadata: Record<string, unknown>;
+  quality: Record<string, unknown>;
+  concept_records: ExtractionRecordRow[];
+  concept_fields: ExtractionFieldRow[];
+  dimension_coverage: DimensionRow[];
+}
+
+/** Persisted judgement — one row per (reviewer, run, document, concept). */
+export interface ExtractionReviewRecord {
+  session_id: string;
+  timestamp: string;
+  reviewer: string;
+  cba_source: string;
+  cba_filename: string;
+  run: string;
+  document_id: string;
+  concept_id: string;
+  /** Overall assessment flags. Empty means the reviewer did not rate it. */
+  quality: ReviewQuality[];
+  /** Specific problem flags. Empty means reviewed with no problems found. */
+  issues: ReviewIssue[];
+  comment: string;
+  // What the reviewer was actually shown, so a judgement stays interpretable
+  // even after the aggregate is rebuilt.
+  n_records: number;
+  n_fields: number;
+}
+
+export interface ReviewSubmitPayload {
+  sessionId: string;
+  reviewer: string;
+  unit: ReviewUnit;
+  quality: ReviewQuality[];
+  issues: ReviewIssue[];
+  comment: string;
+}
+
+export interface ReviewDraft {
+  unitKey: string;
+  quality: ReviewQuality[];
+  issues: ReviewIssue[];
+  comment: string;
+  savedAt: string;
+}
