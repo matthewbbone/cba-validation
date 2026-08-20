@@ -13,10 +13,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ completed: [], count: 0, done: {}, pool: {} });
   }
 
-  const completed = getCompletedUnits(annotator);
+  const completed = await getCompletedUnits(annotator);
   let pool: Record<string, number> = {};
   try {
-    pool = bandCounts();
+    pool = await bandCounts();
   } catch {
     // The tally is a convenience; a missing pipeline artifact is reported by /api/session.
   }
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     completed,
     count: completed.length,
-    done: getBandTally(annotator),
+    done: await getBandTally(annotator),
     pool,
   });
 }

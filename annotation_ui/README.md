@@ -19,13 +19,59 @@ There is no build step for data — the app reads the pipeline's output directly
 
 | Input | What it provides |
 |---|---|
-| `../results/concept_similarity/chunks.jsonl` | chunk text, offsets, page range |
-| `../results/concept_similarity/lookup.json` | the (chunk × concept) similarity scores |
-| `../results/concept_similarity/concepts.json` | the 34 concepts and their descriptions |
-| `../stg_01_ocr/{source}/{engine}/{doc}/full.txt` | re-read at submit to verify every span |
+| `results/concept_similarity/chunks.jsonl` | chunk text, offsets, page range |
+| `results/concept_similarity/lookup.json` | the (chunk × concept) similarity scores |
+| `results/concept_similarity/concepts.json` | the 34 concepts and their descriptions |
+| `stg_01_ocr/{source}/{engine}/{doc}/full.txt` | re-read at submit to verify every span |
 
-All of those are gitignored, so this tool only runs against a local checkout that has
-them. Submissions append to `../annotations/chunk_span_annotations.jsonl`.
+## Storage: local disk or S3
+
+Those four paths are read through [lib/storage.ts](lib/storage.ts), which has two
+backends selected by one environment variable:
+
+| | `S3_BUCKET_NAME` unset | `S3_BUCKET_NAME` set |
+|---|---|---|
+| reads | repo working tree | `s3://$S3_BUCKET_NAME/[$S3_PREFIX/]<same path>` |
+| writes | append to `annotations/chunk_span_annotations.jsonl` | one object per judgement |
+
+**The path vocabulary is identical in both modes** — a path like
+`stg_01_ocr/dol_archive/ATH-MaaS_OvisOCR2/document_549/full.txt` is the file on disk,
+the S3 key, *and* the `source_file` recorded on every row. There is no mapping table to
+drift out of sync.
+
+To populate a bucket:
+
+```bash
+S3_BUCKET_NAME=my-bucket npm run upload-corpus            # --dry-run to preview
+S3_BUCKET_NAME=my-bucket npm run dev                      # read from S3
+```
+
+`upload-corpus` uploads the 20 `full.txt` files plus the three pipeline artifacts (~14 MB)
+and skips objects already present at the same size, so a re-run after a partial upload
+costs only what is missing. It deliberately does **not** upload the per-page `.md`/`.txt`
+files: `full.txt` was built from them and nothing in the app reads them.
+
+In S3 mode each judgement is written to its own object:
+
+```
+chunk_annotations/{annotator-slug}/{band}/{source}/{engine}/{document}/{chunk}/{concept}.json
+```
+
+One object per unit, so a re-annotation overwrites instead of appending a duplicate and
+two annotators cannot clobber each other — S3 has no append, so a shared JSONL would mean
+read-modify-write of the whole object per submission. The band sits in the key so progress
+readback is a single `ListObjectsV2` on the annotator's prefix: both the unit identity and
+its stratum come out of the key, with no object fetches.
+
+**Cost of a cold process:** the first request fetches ~9.5 MB of artifacts
+(`chunks.jsonl` + `lookup.json`), about 6–7 s. Everything after that is served from
+memory — measured 0.27 s per session and 0.28 s per submit against a production build.
+`full.txt` is fetched whole and cached per document; it is never range-read, because span
+offsets are *character* offsets and the corpus contains 21 distinct non-ASCII characters,
+so a byte range would silently return the wrong slice.
+
+For hosted deployment see the header of [amplify.yml](../amplify.yml), which lists the
+three environment variables and the three IAM actions the SSR role needs.
 
 URL parameters, all optional:
 
@@ -97,6 +143,9 @@ One JSON object per line:
 negative label; `yes` or `partly` with zero spans is also meaningful — relevant, but with
 no cleanly delimitable passage. A `no` carrying spans is rejected as a contradiction.
 
+`source_file` is the repo-relative path that is also the S3 key, so a row is resolvable
+against either backend.
+
 `start`/`end` are half-open character offsets into `source_file` — JS UTF-16 code units,
 which equal Python `str` indices for anything outside the astral planes. The invariant
 every consumer can rely on:
@@ -162,4 +211,5 @@ to the earlier PDF-and-structured-form task. Nothing in the app imports them any
 the concept descriptions now come from the pipeline's `concepts.json`, which composes
 `tier_1_concepts.md` with `provision-schemas.json` at build time. They are kept because
 `provision-schemas.json` carries hand-edited rater copy. The extraction-review tab and the
-S3/Prolific plumbing were removed earlier.
+Prolific plumbing were removed earlier; the S3 layer is unrelated to the old PDF-serving
+code and shares none of it.

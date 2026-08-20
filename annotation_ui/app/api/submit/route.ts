@@ -1,16 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  findChunk,
-  findConcept,
-  fullTextPath,
-  fullTextRelPath,
-  pageAtOffset,
-  readFullText,
-} from "@/lib/chunks";
+import { findChunk, findConcept, fullTextPath, pageAtOffset, readFullText } from "@/lib/chunks";
 import { appendSpanRecord } from "@/lib/data";
 import { isBand, isRelevance } from "@/lib/types";
 import type { ChunkRef, Span, SpanAnnotationRecord, SpanSubmitPayload } from "@/lib/types";
-import fs from "fs";
 
 function isChunkRef(v: unknown): v is ChunkRef {
   if (!v || typeof v !== "object") return false;
@@ -53,10 +45,10 @@ export async function POST(req: NextRequest) {
     return bad("A relevance verdict (yes / partly / no) is required.");
   }
 
-  const concept = findConcept(body.conceptId);
+  const concept = await findConcept(body.conceptId);
   if (!concept) return bad(`Unknown concept "${body.conceptId}".`);
 
-  const row = findChunk(body.chunk);
+  const row = await findChunk(body.chunk);
   if (!row) {
     return bad(
       `No such chunk: ${body.chunk.documentId} chunk ${body.chunk.chunkId}. ` +
@@ -64,13 +56,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let filePath: string;
+  let relPath: string;
   try {
-    filePath = fullTextPath(body.chunk);
+    relPath = fullTextPath(body.chunk);
   } catch {
     return bad("Invalid document path.");
   }
-  if (!fs.existsSync(filePath)) return bad(`No full.txt for ${body.chunk.documentId}.`);
 
   const spans: unknown = body.spans;
   if (!Array.isArray(spans)) return bad("`spans` must be an array.");
@@ -82,7 +73,15 @@ export async function POST(req: NextRequest) {
     return bad('A "no" verdict cannot carry evidence spans.');
   }
 
-  const fullText = readFullText(body.chunk);
+  // Read rather than probe-then-read: a separate existence check would double the
+  // S3 transfer on every submission, and a failed read is the same answer.
+  let fullText: string;
+  try {
+    fullText = await readFullText(body.chunk);
+  } catch (err) {
+    console.error("[submit] Failed to read full.txt:", relPath, err);
+    return bad(`Could not read ${relPath}. The document may not be uploaded yet.`);
+  }
   const verified: Span[] = [];
 
   for (let i = 0; i < spans.length; i++) {
@@ -130,7 +129,7 @@ export async function POST(req: NextRequest) {
     engine: body.chunk.engine,
     document_id: body.chunk.documentId,
     chunk_id: body.chunk.chunkId,
-    source_file: fullTextRelPath(body.chunk),
+    source_file: relPath,
     chunk_char_start: row.char_start,
     chunk_char_end: row.char_end,
     page_start: row.page_start,
@@ -143,7 +142,7 @@ export async function POST(req: NextRequest) {
   };
 
   try {
-    appendSpanRecord(record);
+    await appendSpanRecord(record);
   } catch (err) {
     console.error("[submit] Failed to persist annotation:", err);
     return NextResponse.json(

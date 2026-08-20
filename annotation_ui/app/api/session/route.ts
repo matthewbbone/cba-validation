@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 
   let pool;
   try {
-    pool = getPool();
+    pool = await getPool();
   } catch (err) {
     console.error("[session] Failed to read the pipeline artifacts:", err);
     return NextResponse.json(
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ exhausted: true, band, poolSize: 0 });
   }
 
-  const done = new Set<string>([...getCompletedUnits(annotator), ...exclude]);
+  const done = new Set<string>([...(await getCompletedUnits(annotator)), ...exclude]);
   const poolSize = candidates.length;
 
   const remaining = candidates.filter((u) => {
@@ -99,15 +99,15 @@ export async function POST(req: NextRequest) {
     const [source, engine, documentId] = picked.documentKey.split("/");
     const chunk: ChunkRef = { source, engine, documentId, chunkId: picked.chunkId };
 
-    const row = findChunk(chunk);
-    const concept = findConcept(picked.conceptId);
+    const row = await findChunk(chunk);
+    const concept = await findConcept(picked.conceptId);
     if (!row || !concept) {
       console.error("[session] Pool references a missing chunk or concept:", picked);
       shortlist.splice(i, 1);
       continue;
     }
 
-    const position = chunkPosition(chunk);
+    const position = await chunkPosition(chunk);
     const unit: AnnotationUnit = {
       chunk,
       concept,
@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
       chunkCount: position.count,
       band,
     };
-    return NextResponse.json({ ...unit, poolSize, bandCounts: bandCounts() });
+    return NextResponse.json({ ...unit, poolSize, bandCounts: await bandCounts() });
   }
 
   return NextResponse.json({ error: "Failed to load a chunk." }, { status: 500 });
