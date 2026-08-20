@@ -1,434 +1,643 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type {
-  SessionData,
-  ProvisionAnnotation,
-  ProvisionSchema,
-  SubmitPayload,
-  ProlificContext,
-  DraftState,
+  AnnotationUnit,
+  Band,
+  Relevance,
+  Span,
+  SpanDraft,
+  SpanSubmitPayload,
 } from "@/lib/types";
-import provisionSchemas from "@/lib/provision-schemas.json";
-import { ProvisionForm, emptyAnnotation } from "./ProvisionForm";
+import { BANDS, DEFAULT_BAND, isBand, RELEVANCE_OPTIONS, unitKey } from "@/lib/types";
 import { AppShell } from "./AppShell";
+import { ChunkText, type Selection } from "./ChunkText";
 
-const TITLE = "Collective Bargaining Agreement (CBA) Annotation Tool";
+const TITLE = "CBA Provision Span Annotation";
 
-const SCHEMAS = provisionSchemas as Record<string, ProvisionSchema>;
+const LS_ANNOTATOR = "cba-spans:annotator";
+const LS_BAND = "cba-spans:band";
+const LS_DRAFT = "cba-spans:draft";
 
-const LS_PID = "cba-annotation:prolific_pid";
-const LS_STUDY = "cba-annotation:study_id";
-const LS_SESSION = "cba-annotation:prolific_session_id";
-const LS_DRAFT = "cba-annotation:draft";
-
-const ANNOTATION_TARGET = process.env.NEXT_PUBLIC_ANNOTATION_TARGET
-  ? parseInt(process.env.NEXT_PUBLIC_ANNOTATION_TARGET, 10)
-  : 0;
-const COMPLETION_URL = process.env.NEXT_PUBLIC_PROLIFIC_COMPLETION_URL ?? "";
-
-type AppState = "no-pid" | "loading-progress" | "annotating" | "completed";
+type AppState = "no-annotator" | "loading" | "annotating" | "exhausted";
 
 function generateSessionId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
-// Annotation keys are namespaced by the PDF stem (document_id), matching the
-// S3 object path annotations/{pid}/{source}/{document_id}.json.
-function cbaKey(source: string, filename: string): string {
-  const documentId = filename.replace(/\.[^./]+$/, "");
-  return `${source}/${documentId}`;
+function areaClass(area: string): string {
+  return `area-${area.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}`;
 }
 
-// Require an explicit present/absent decision for every provision, plus a
-// summary when the provision is marked present. Returns an error message for
-// the first incomplete provision, or null if all are complete.
-function validateAnnotations(anns: ProvisionAnnotation[]): string | null {
-  for (let i = 0; i < anns.length; i++) {
-    const a = anns[i];
-    if (a.exists === null) {
-      return `Provision ${i + 1}: choose whether it is present (Yes/No).`;
-    }
-    if (a.exists && !a.summarize.trim()) {
-      return `Provision ${i + 1}: add a summary describing the provision.`;
-    }
-  }
-  return null;
+/** Collapses whitespace so a multi-line quote fits on one or two lines. */
+function preview(text: string, max = 220): string {
+  const flat = text.replace(/\s+/g, " ").trim();
+  return flat.length > max ? flat.slice(0, max - 1) + "…" : flat;
 }
 
-// ── Inner component (needs useSearchParams, must be inside Suspense) ─────────
-
-/** `tabs` is the shared tab bar, rendered into this view's own header. */
-export default function AnnotationApp({ tabs }: { tabs?: React.ReactNode }) {
+export default function AnnotationApp() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const docFilter = searchParams.get("doc") ?? "";
+  const conceptFilter = searchParams.get("concept") ?? "";
 
-  const [appState, setAppState] = useState<AppState>("loading-progress");
-  const [prolific, setProlific] = useState<ProlificContext | null>(null);
+  const [appState, setAppState] = useState<AppState>("loading");
+  const [annotator, setAnnotator] = useState("");
+  const [nameInput, setNameInput] = useState("");
+  const [band, setBand] = useState<Band>(DEFAULT_BAND);
+
+  const [unit, setUnit] = useState<AnnotationUnit | null>(null);
+  const [sessionId, setSessionId] = useState("");
+  const [relevance, setRelevance] = useState<Relevance | null>(null);
+  const [spans, setSpans] = useState<Span[]>([]);
+  const [pending, setPending] = useState<Selection | null>(null);
+  const [pendingNote, setPendingNote] = useState("");
+  const [activeSpanIndex, setActiveSpanIndex] = useState<number | null>(null);
+
   const [completedKeys, setCompletedKeys] = useState<Set<string>>(new Set());
-  // Session-local: CBAs skipped this session, so they aren't immediately re-served.
+  // Session-local: units skipped this session, so they aren't re-served at once.
   const [skippedKeys, setSkippedKeys] = useState<Set<string>>(new Set());
-  const [session, setSession] = useState<SessionData | null>(null);
-  const [sessionId, setSessionId] = useState<string>("");
-  const [annotations, setAnnotations] = useState<ProvisionAnnotation[]>([]);
+  const [bandDone, setBandDone] = useState<Record<string, number>>({});
+  const [bandPool, setBandPool] = useState<Record<string, number>>({});
+
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState<{ type: "success" | "error"; msg: string } | null>(null);
-  const [pdfLoaded, setPdfLoaded] = useState(false);
 
   const draftTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // ── Draft helpers ────────────────────────────────────────────────────────
+  // ── Draft helpers ──────────────────────────────────────────────────────────
 
-  function saveDraft(sid: string, s: SessionData, anns: ProvisionAnnotation[]) {
-    const draft: DraftState = {
+  function saveDraft(sid: string, u: AnnotationUnit, r: Relevance | null, s: Span[]) {
+    const draft: SpanDraft = {
       sessionId: sid,
-      cba: s.cba,
-      provisions: s.provisions,
-      annotations: anns,
+      unit: u,
+      relevance: r,
+      spans: s,
       savedAt: new Date().toISOString(),
     };
-    localStorage.setItem(LS_DRAFT, JSON.stringify(draft));
+    try {
+      localStorage.setItem(LS_DRAFT, JSON.stringify(draft));
+    } catch {
+      // A quota failure must not break annotating; the draft is a convenience.
+    }
   }
 
   function clearDraft() {
     localStorage.removeItem(LS_DRAFT);
   }
 
-  // ── Load a new CBA session ───────────────────────────────────────────────
+  function resetUnitState() {
+    setPending(null);
+    setPendingNote("");
+    setActiveSpanIndex(null);
+    setRelevance(null);
+  }
 
-  const loadSession = useCallback(async (excludeKeys: string[], pid: string) => {
-    setStatus(null);
-    setPdfLoaded(false);
-    try {
-      const res = await fetch("/api/session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pid, exclude: excludeKeys }),
-      });
-      if (!res.ok) throw new Error("Session request failed");
-      const data: SessionData = await res.json();
+  // ── Load a unit ────────────────────────────────────────────────────────────
 
-      if (data.exhausted) {
-        setAppState("completed");
-        return;
-      }
-
-      const newSessionId = generateSessionId();
-      const newAnnotations = data.provisions.map((p) => {
-        const schema = SCHEMAS[p.conceptId] ?? { format: "binary" as const, flags: [] };
-        return emptyAnnotation(p.conceptId, p.category, schema);
-      });
-
-      setSession(data);
-      setSessionId(newSessionId);
-      setAnnotations(newAnnotations);
-      setAppState("annotating");
-      saveDraft(newSessionId, data, newAnnotations);
-    } catch {
-      setStatus({ type: "error", msg: "Failed to load session." });
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // ── Initialise on mount: resolve PID + fetch server progress ────────────
-
-  useEffect(() => {
-    const urlPid = searchParams.get("PROLIFIC_PID");
-    const urlStudy = searchParams.get("STUDY_ID") ?? "";
-    const urlProlificSession = searchParams.get("SESSION_ID") ?? "";
-
-    let ctx: ProlificContext;
-
-    if (urlPid) {
-      ctx = { prolific_pid: urlPid, study_id: urlStudy, prolific_session_id: urlProlificSession };
-      localStorage.setItem(LS_PID, urlPid);
-      localStorage.setItem(LS_STUDY, urlStudy);
-      localStorage.setItem(LS_SESSION, urlProlificSession);
-    } else {
-      const storedPid = localStorage.getItem(LS_PID);
-      if (!storedPid) {
-        setAppState("no-pid");
-        return;
-      }
-      ctx = {
-        prolific_pid: storedPid,
-        study_id: localStorage.getItem(LS_STUDY) ?? "",
-        prolific_session_id: localStorage.getItem(LS_SESSION) ?? "",
-      };
-    }
-
-    setProlific(ctx);
-
-    (async () => {
-      let serverCompleted: string[] = [];
+  const loadUnit = useCallback(
+    async (who: string, forBand: Band, exclude: string[]) => {
+      setStatus(null);
+      resetUnitState();
       try {
-        const res = await fetch(`/api/progress?pid=${encodeURIComponent(ctx.prolific_pid)}`);
-        if (!res.ok) throw new Error("Progress request failed");
-        const json = await res.json();
-        serverCompleted = json.completed ?? [];
-      } catch {
-        // non-fatal: proceed with empty server list
+        const res = await fetch("/api/session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            annotator: who,
+            band: forBand,
+            exclude,
+            doc: docFilter || undefined,
+            concept: conceptFilter || undefined,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error ?? "Session request failed");
+
+        if (data.exhausted) {
+          setUnit(null);
+          setAppState("exhausted");
+          return;
+        }
+
+        const next = data as AnnotationUnit;
+        if (data.bandCounts) setBandPool(data.bandCounts);
+        const sid = generateSessionId();
+        setUnit(next);
+        setSessionId(sid);
+        setSpans([]);
+        setAppState("annotating");
+        saveDraft(sid, next, null, []);
+      } catch (err) {
+        setStatus({
+          type: "error",
+          msg: err instanceof Error ? err.message : "Failed to load a chunk.",
+        });
+        setAppState("annotating");
       }
+    },
+    [docFilter, conceptFilter]
+  );
 
-      const completedSet = new Set(serverCompleted);
+  const refreshProgress = useCallback(async (who: string) => {
+    try {
+      const res = await fetch(`/api/progress?annotator=${encodeURIComponent(who)}`);
+      if (!res.ok) return [] as string[];
+      const json = await res.json();
+      setBandDone(json.done ?? {});
+      if (json.pool) setBandPool(json.pool);
+      return (json.completed ?? []) as string[];
+    } catch {
+      return [] as string[]; // non-fatal: proceed with an empty completed list
+    }
+  }, []);
 
-      if (ANNOTATION_TARGET > 0 && completedSet.size >= ANNOTATION_TARGET) {
-        setCompletedKeys(completedSet);
-        setAppState("completed");
-        return;
-      }
+  // ── Start: annotator, then progress, then draft or a new unit ──────────────
 
+  const start = useCallback(
+    async (who: string, forBand: Band) => {
+      setAnnotator(who);
+      setBand(forBand);
+      localStorage.setItem(LS_ANNOTATOR, who);
+      localStorage.setItem(LS_BAND, forBand);
+      setAppState("loading");
+
+      const completed = await refreshProgress(who);
+      const completedSet = new Set(completed);
       setCompletedKeys(completedSet);
 
-      // Try to restore a draft
-      const draftRaw = localStorage.getItem(LS_DRAFT);
-      if (draftRaw) {
+      const raw = localStorage.getItem(LS_DRAFT);
+      if (raw) {
         try {
-          const draft: DraftState = JSON.parse(draftRaw);
-          const key = cbaKey(draft.cba.source, draft.cba.filename);
-          if (!completedSet.has(key)) {
-            setSession({ cba: draft.cba, provisions: draft.provisions });
+          const draft: SpanDraft = JSON.parse(raw);
+          const key = unitKey(draft.unit.chunk, draft.unit.concept.conceptId);
+          // A draft from a different band, document or concept must not be restored
+          // while a filter is pinned: the header would advertise one thing while the
+          // panel showed another, and the row would be attributed to the wrong stratum.
+          const matches =
+            draft.unit.band === forBand &&
+            (!docFilter || draft.unit.chunk.documentId === docFilter) &&
+            (!conceptFilter || draft.unit.concept.conceptId === conceptFilter);
+          if (!completedSet.has(key) && matches) {
+            setUnit(draft.unit);
             setSessionId(draft.sessionId);
-            setAnnotations(draft.annotations);
+            setSpans(draft.spans ?? []);
+            resetUnitState();
+            setRelevance(draft.relevance ?? null);
             setAppState("annotating");
             return;
           }
+          clearDraft();
         } catch {
           clearDraft();
         }
       }
 
-      await loadSession(serverCompleted, ctx.prolific_pid);
-    })();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // ── Auto-save draft (debounced 500 ms) ──────────────────────────────────
+      await loadUnit(who, forBand, completed);
+    },
+    [loadUnit, refreshProgress, docFilter, conceptFilter]
+  );
 
   useEffect(() => {
-    if (appState !== "annotating" || !session) return;
+    const urlBand = searchParams.get("band");
+    const storedBand = typeof window !== "undefined" ? localStorage.getItem(LS_BAND) : null;
+    const initialBand: Band = isBand(urlBand)
+      ? urlBand
+      : isBand(storedBand)
+        ? storedBand
+        : DEFAULT_BAND;
+
+    const fromUrl = searchParams.get("annotator");
+    const stored = typeof window !== "undefined" ? localStorage.getItem(LS_ANNOTATOR) : null;
+    const who = (fromUrl ?? stored ?? "").trim();
+    if (!who) {
+      setBand(initialBand);
+      setAppState("no-annotator");
+      return;
+    }
+    start(who, initialBand);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Auto-save draft (debounced 500 ms) ─────────────────────────────────────
+
+  useEffect(() => {
+    if (appState !== "annotating" || !unit) return;
     if (draftTimer.current) clearTimeout(draftTimer.current);
-    draftTimer.current = setTimeout(() => {
-      saveDraft(sessionId, session, annotations);
-    }, 500);
+    draftTimer.current = setTimeout(() => saveDraft(sessionId, unit, relevance, spans), 500);
     return () => {
       if (draftTimer.current) clearTimeout(draftTimer.current);
     };
-  }, [annotations, session, sessionId, appState]);
+  }, [spans, relevance, unit, sessionId, appState]);
 
-  // ── Completion redirect ──────────────────────────────────────────────────
+  // ── Band switching ─────────────────────────────────────────────────────────
 
-  useEffect(() => {
-    if (appState !== "completed" || !COMPLETION_URL) return;
-    const t = setTimeout(() => {
-      window.location.href = COMPLETION_URL;
-    }, 5000);
-    return () => clearTimeout(t);
-  }, [appState]);
+  function switchBand(next: Band) {
+    if (next === band || !annotator) return;
+    localStorage.setItem(LS_BAND, next);
+    // Keep the URL authoritative: it wins over localStorage on mount, so without
+    // this a reload would drop back to the band the link was opened with, and the
+    // rows that followed would carry the wrong stratum.
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("band", next);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    clearDraft();
+    setBand(next);
+    setUnit(null);
+    setSpans([]);
+    setAppState("loading");
+    loadUnit(annotator, next, Array.from(completedKeys).concat(Array.from(skippedKeys)));
+  }
 
-  // ── Submit ───────────────────────────────────────────────────────────────
+  // ── Spans ──────────────────────────────────────────────────────────────────
 
-  async function handleSubmit() {
-    if (!session || !prolific) return;
+  function commitPending() {
+    if (!pending) return;
+    const dupe = spans.some((s) => s.start === pending.start && s.end === pending.end);
+    if (dupe) {
+      setStatus({ type: "error", msg: "That passage is already recorded." });
+      setPending(null);
+      setPendingNote("");
+      return;
+    }
+    const next = [...spans, { ...pending, note: pendingNote.trim(), page: null }].sort(
+      (a, b) => a.start - b.start
+    );
+    setSpans(next);
+    setPending(null);
+    setPendingNote("");
+    setStatus(null);
+    // Highlighting evidence implies the passage is relevant; don't make the
+    // annotator state the obvious twice, but leave it overridable.
+    if (relevance === null) setRelevance("yes");
+    window.getSelection()?.removeAllRanges();
+  }
 
-    const validationError = validateAnnotations(annotations);
-    if (validationError) {
-      setStatus({ type: "error", msg: validationError });
+  function removeSpan(i: number) {
+    setSpans((prev) => prev.filter((_, j) => j !== i));
+    setActiveSpanIndex(null);
+  }
+
+  function updateNote(i: number, note: string) {
+    setSpans((prev) => prev.map((s, j) => (j === i ? { ...s, note } : s)));
+  }
+
+  function chooseRelevance(next: Relevance) {
+    setRelevance(next);
+    setStatus(null);
+  }
+
+  // ── Submit / skip ──────────────────────────────────────────────────────────
+
+  async function submit() {
+    if (!unit || !annotator || !relevance) return;
+    if (relevance === "no" && spans.length > 0) {
+      setStatus({
+        type: "error",
+        msg: 'Remove the spans, or change the verdict — a "no" cannot carry evidence.',
+      });
       return;
     }
 
+    const payload: SpanSubmitPayload = {
+      sessionId,
+      annotator,
+      chunk: unit.chunk,
+      conceptId: unit.concept.conceptId,
+      band: unit.band,
+      relevance,
+      spans,
+    };
+
     setSubmitting(true);
     setStatus(null);
-
-    const payload: SubmitPayload = { sessionId, cba: session.cba, provisions: annotations, prolific };
-
     try {
       const res = await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("Submit failed");
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data?.error ?? "Submit failed");
 
-      const key = cbaKey(session.cba.source, session.cba.filename);
-      const next = new Set(completedKeys);
-      next.add(key);
-      setCompletedKeys(next);
+      const key = unitKey(unit.chunk, unit.concept.conceptId);
+      const nextCompleted = new Set(completedKeys);
+      nextCompleted.add(key);
+      setCompletedKeys(nextCompleted);
+      setBandDone((prev) => ({ ...prev, [unit.band]: (prev[unit.band] ?? 0) + 1 }));
       clearDraft();
 
-      if (ANNOTATION_TARGET > 0 && next.size >= ANNOTATION_TARGET) {
-        setAppState("completed");
-        return;
-      }
-
-      setStatus({ type: "success", msg: "Saved! Loading next CBA…" });
-      const exclude = Array.from(
-        new Set(Array.from(next).concat(Array.from(skippedKeys)))
-      );
-      setTimeout(() => loadSession(exclude, prolific.prolific_pid), 900);
-    } catch {
-      setStatus({ type: "error", msg: "Failed to save. Please try again." });
+      setStatus({ type: "success", msg: "Saved. Loading next…" });
+      const exclude = Array.from(nextCompleted).concat(Array.from(skippedKeys));
+      setTimeout(() => loadUnit(annotator, band, exclude), 700);
+    } catch (err) {
+      setStatus({
+        type: "error",
+        msg: err instanceof Error ? err.message : "Failed to save. Please try again.",
+      });
     } finally {
       setSubmitting(false);
     }
   }
 
-  // ── Skip ─────────────────────────────────────────────────────────────────
-
-  function handleSkip() {
-    if (!session || !prolific) return;
-    const key = cbaKey(session.cba.source, session.cba.filename);
+  function skip() {
+    if (!unit || !annotator) return;
     const nextSkipped = new Set(skippedKeys);
-    nextSkipped.add(key);
+    nextSkipped.add(unitKey(unit.chunk, unit.concept.conceptId));
     setSkippedKeys(nextSkipped);
     clearDraft();
-    const exclude = Array.from(
-      new Set(Array.from(completedKeys).concat(Array.from(nextSkipped)))
-    );
-    loadSession(exclude, prolific.prolific_pid);
+    loadUnit(annotator, band, Array.from(completedKeys).concat(Array.from(nextSkipped)));
   }
 
-  // ── Overlay states ───────────────────────────────────────────────────────
+  // ── Band selector ──────────────────────────────────────────────────────────
 
-  if (appState === "no-pid") {
+  const bandSelector = (
+    <div className="band-bar">
+      <span className="band-bar-label">Similarity percentile within document</span>
+      <div className="band-buttons">
+        {BANDS.map((b) => {
+          const done = bandDone[b.id] ?? 0;
+          const pool = bandPool[b.id];
+          return (
+            <button
+              key={b.id}
+              className={`band-btn${b.id === band ? " band-btn-active" : ""}`}
+              onClick={() => switchBand(b.id)}
+              disabled={submitting}
+              title={`${b.lo}–${b.hi}th percentile${pool ? ` · ${pool.toLocaleString()} units` : ""}`}
+            >
+              <span className="band-btn-label">{b.label}</span>
+              <span className="band-btn-count">
+                {done}
+                {pool ? ` / ${pool.toLocaleString()}` : ""}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  // ── Gate / overlay states ──────────────────────────────────────────────────
+
+  if (appState === "no-annotator") {
     return (
-      <AppShell title={TITLE} tabs={tabs}>
+      <AppShell title={TITLE}>
         <div className="overlay-screen">
           <div className="overlay-card">
-            <h2>Welcome</h2>
+            <h2>Who is annotating?</h2>
             <p>
-              Please access this tool via your Prolific study link. Your Prolific
-              participant ID is required to save your progress.
+              Enter a name or initials. It labels every judgement you submit and lets the tool
+              skip passages you have already seen.
             </p>
+            <form
+              className="name-form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const who = nameInput.trim();
+                if (who) start(who, band);
+              }}
+            >
+              <input
+                className="name-input"
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                placeholder="e.g. mb"
+                autoFocus
+              />
+              <button className="btn btn-primary" type="submit" disabled={!nameInput.trim()}>
+                Start
+              </button>
+            </form>
           </div>
         </div>
       </AppShell>
     );
   }
 
-  if (appState === "loading-progress") {
+  if (appState === "loading") {
     return (
-      <AppShell title={TITLE} tabs={tabs}>
+      <AppShell title={TITLE}>
         <div className="overlay-screen">
           <div className="overlay-card">
             <div className="spinner" />
-            <p>Loading your progress…</p>
+            <p>Loading…</p>
           </div>
         </div>
       </AppShell>
     );
   }
 
-  if (appState === "completed") {
-    const target = ANNOTATION_TARGET > 0 ? ANNOTATION_TARGET : completedKeys.size;
+  if (appState === "exhausted") {
+    const label = BANDS.find((b) => b.id === band)?.label ?? band;
     return (
-      <AppShell title={TITLE} tabs={tabs}>
+      <AppShell title={TITLE} right={<span className="cba-id">{annotator}</span>}>
+        {bandSelector}
         <div className="overlay-screen">
           <div className="overlay-card">
-            <h2>All done!</h2>
+            <h2>Nothing left in this band</h2>
             <p>
-              You have completed {target} annotation{target !== 1 ? "s" : ""}. Thank you
-              for your contribution to this research.
+              You have covered every passage in the <strong>{label}</strong> band
+              {docFilter || conceptFilter ? " matching the current filter" : ""}. Pick another
+              band above, or widen the filter.
             </p>
-            {COMPLETION_URL && (
-              <>
-                <p className="redirect-note">You will be redirected to Prolific in 5 seconds…</p>
-                <a href={COMPLETION_URL} className="btn btn-primary completion-btn">
-                  Return to Prolific now
-                </a>
-              </>
-            )}
+            <p className="hint-text">{completedKeys.size} judgements submitted in total.</p>
           </div>
         </div>
       </AppShell>
     );
   }
 
-  // ── Annotating ───────────────────────────────────────────────────────────
+  // ── Annotating ─────────────────────────────────────────────────────────────
 
-  const pdfSrc = session ? `/api/pdf/${session.cba.source}/${session.cba.filename}` : null;
-  const completedCount = completedKeys.size;
-  const targetLabel =
-    ANNOTATION_TARGET > 0 ? `${completedCount} / ${ANNOTATION_TARGET}` : `${completedCount}`;
+  const c = unit?.concept;
+  const canSubmit = !!relevance && !(relevance === "no" && spans.length > 0);
 
   return (
     <AppShell
       title={TITLE}
-      tabs={tabs}
       right={
         <>
-          {session && (
+          {unit && (
             <span className="cba-id">
-              {session.cba.source} / {session.cba.filename}
+              {unit.chunk.source} / {unit.chunk.documentId} · chunk {unit.chunkIndex} of{" "}
+              {unit.chunkCount}
+              {unit.pageStart !== null && (
+                <>
+                  {" "}
+                  · p{unit.pageStart}
+                  {unit.pageEnd !== null && unit.pageEnd !== unit.pageStart
+                    ? `–${unit.pageEnd}`
+                    : ""}
+                </>
+              )}
             </span>
           )}
-          <span className="cba-id" style={{ color: "#86efac" }}>
-            {targetLabel} completed
-          </span>
+          {(docFilter || conceptFilter) && (
+            <span className="filter-chip">
+              filtered: {[docFilter, conceptFilter].filter(Boolean).join(" + ")}
+            </span>
+          )}
+          <span className="cba-id done-count">{completedKeys.size} done</span>
+          <span className="cba-id">{annotator}</span>
         </>
       }
     >
+      {bandSelector}
       <div className="main">
-        <div className="pdf-panel">
-          {!pdfSrc && <div className="pdf-loading">Loading CBA…</div>}
-          {pdfSrc && (
-            <iframe
-              key={pdfSrc}
-              src={pdfSrc}
-              title="CBA PDF"
-              onLoad={() => setPdfLoaded(true)}
-              style={{ opacity: pdfLoaded ? 1 : 0, transition: "opacity 0.2s" }}
+        <div className="text-panel">
+          {!unit && <div className="text-loading">Loading passage…</div>}
+          {unit && (
+            <ChunkText
+              key={unitKey(unit.chunk, unit.concept.conceptId)}
+              text={unit.text}
+              offset={unit.charStart}
+              spans={spans}
+              activeSpanIndex={activeSpanIndex}
+              onSelect={(sel) => {
+                if (sel) setPendingNote("");
+                setPending(sel);
+              }}
+              onSpanClick={(i) => setActiveSpanIndex(i)}
             />
           )}
         </div>
 
         <div className="annotation-panel">
           <div className="annotation-scroll">
-            {!session && (
-              <p style={{ color: "#94a3b8", fontSize: "0.85rem", padding: "0.5rem" }}>
-                Loading provisions…
-              </p>
+            {c && (
+              <div className="concept-card">
+                <div className="concept-head">
+                  <span className={`area-badge ${areaClass(c.area)}`}>{c.area}</span>
+                  <span className="concept-id">{c.conceptId}</span>
+                </div>
+                <p className="concept-label">{c.label}</p>
+                {c.description && <p className="concept-desc">{c.description}</p>}
+              </div>
             )}
-            {session &&
-              session.provisions.map((p, i) => {
-                const schema = SCHEMAS[p.conceptId] ?? { format: "binary" as const, flags: [] };
-                return (
-                  <ProvisionForm
-                    key={p.conceptId}
-                    index={i}
-                    conceptId={p.conceptId}
-                    category={p.category}
-                    label={p.label}
-                    schema={schema}
-                    annotation={
-                      annotations[i] ?? emptyAnnotation(p.conceptId, p.category, schema)
+
+            <div className="relevance-block">
+              <div className="relevance-question">Does this passage address the concept?</div>
+              <div className="relevance-options">
+                {RELEVANCE_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.id}
+                    className={`relevance-btn${relevance === opt.id ? " relevance-btn-active" : ""}`}
+                    onClick={() => chooseRelevance(opt.id)}
+                    title={opt.hint}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <p className="hint-text">
+              Highlight the passages that are evidence for the concept, then add them. A passage
+              can be relevant with no clean span to mark — submit it as such.
+            </p>
+
+            {pending && (
+              <div className="span-pending">
+                <div className="span-pending-head">
+                  Selected
+                  <span className="span-offsets">
+                    [{pending.start}–{pending.end}]
+                  </span>
+                </div>
+                <blockquote className="span-quote">{preview(pending.text, 400)}</blockquote>
+                <input
+                  className="span-note-input"
+                  value={pendingNote}
+                  onChange={(e) => setPendingNote(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      commitPending();
                     }
-                    onChange={(updated) =>
-                      setAnnotations((prev) => prev.map((a, j) => (j === i ? updated : a)))
-                    }
+                  }}
+                  placeholder="Note (optional)"
+                  autoFocus
+                />
+                <div className="span-pending-actions">
+                  <button
+                    className="btn btn-skip btn-sm"
+                    onClick={() => {
+                      setPending(null);
+                      setPendingNote("");
+                      window.getSelection()?.removeAllRanges();
+                    }}
+                  >
+                    Discard
+                  </button>
+                  <button className="btn btn-primary btn-sm" onClick={commitPending}>
+                    Add span
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="span-list">
+              <div className="span-list-head">
+                {spans.length === 0
+                  ? "No spans added yet"
+                  : `${spans.length} span${spans.length === 1 ? "" : "s"}`}
+              </div>
+              {spans.map((s, i) => (
+                <div
+                  key={`${s.start}-${s.end}`}
+                  className={`span-item${i === activeSpanIndex ? " span-item-active" : ""}`}
+                  onMouseEnter={() => setActiveSpanIndex(i)}
+                  onMouseLeave={() => setActiveSpanIndex(null)}
+                >
+                  <div className="span-item-head">
+                    <span className="span-num">{i + 1}</span>
+                    <span className="span-offsets">
+                      [{s.start}–{s.end}]
+                    </span>
+                    <button
+                      className="span-remove"
+                      onClick={() => removeSpan(i)}
+                      title="Remove this span"
+                      aria-label={`Remove span ${i + 1}`}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <blockquote className="span-quote" title={s.text}>
+                    {preview(s.text)}
+                  </blockquote>
+                  <input
+                    className="span-note-input"
+                    value={s.note}
+                    onChange={(e) => updateNote(i, e.target.value)}
+                    placeholder="Note (optional)"
                   />
-                );
-              })}
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="footer">
-            <button
-              className="btn btn-skip"
-              onClick={handleSkip}
-              disabled={submitting || !session}
-            >
-              Skip CBA
-            </button>
-
-            {status && (
-              <span className={`status-msg status-${status.type}`}>{status.msg}</span>
+            {status && <span className={`status-msg status-${status.type}`}>{status.msg}</span>}
+            {!relevance && (
+              <span className="footer-hint">Choose a verdict above to submit.</span>
             )}
-
-            <button
-              className="btn btn-primary"
-              onClick={handleSubmit}
-              disabled={submitting || !session}
-            >
-              {submitting ? "Saving…" : "Submit & Next"}
-            </button>
+            <div className="footer-actions">
+              <button className="btn btn-skip" onClick={skip} disabled={submitting || !unit}>
+                Skip
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={submit}
+                disabled={submitting || !unit || !canSubmit}
+              >
+                {submitting
+                  ? "Saving…"
+                  : `Submit${spans.length ? ` ${spans.length}` : ""}`}
+              </button>
+            </div>
           </div>
         </div>
       </div>

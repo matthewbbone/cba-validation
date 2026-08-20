@@ -5,5 +5,11 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "chonkie>=1.7.0",
+    "jsonschema>=4.26.0",
+    "numpy>=2.5.2",
     "openai>=2.41.1",
+    "sentence-transformers>=5.0",
+    "torch>=2.13.0",
+    "transformers>=4.57",
 ]

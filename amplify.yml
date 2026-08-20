@@ -1,3 +1,7 @@
+# UNUSED as of the span-annotation rework: annotation_ui now reads stg_01_ocr/ and
+# results/tier_1_concepts.md from the local repo and appends submissions to
+# annotations/span_annotations.jsonl. None of those survive a hosted deploy, so the
+# tool is local-only (`npm run dev`). Kept in case a hosted variant is revived.
 version: 1
 applications:
   - frontend:
