@@ -39,6 +39,7 @@ DATASET_REVISION = "a3c393f5d103fd0c516374e4fdff676c8176dcb1"
 MODEL_ID = "google/embeddinggemma-300m"
 MODEL_REVISION = "57c266a740f537b4dc058e1b0cda161fd15afa75"
 TOKENIZER_ID = MODEL_ID
+TOKENIZER_REVISION = MODEL_REVISION
 
 RECIPE_ID = "markdown"
 RECIPE_REPOSITORY = "chonkie-ai/recipes"
@@ -771,7 +772,7 @@ def resolve_device(requested: str) -> str:
 def build_chunker(
     *,
     tokenizer_id: str,
-    model_revision: str,
+    tokenizer_revision: str,
     recipe: str,
     recipe_revision: str,
     chunk_size: int,
@@ -790,7 +791,7 @@ def build_chunker(
     tokenizer_path = hf_hub_download(
         repo_id=tokenizer_id,
         filename="tokenizer.json",
-        revision=model_revision,
+        revision=tokenizer_revision,
     )
     tokenizer = TokieTokenizer.from_json(tokenizer_path)
     if recipe == "none":
@@ -818,26 +819,69 @@ def load_embedding_model(model_id: str, model_revision: str, device: str) -> Any
     return SentenceTransformer(model_id, revision=model_revision, device=device)
 
 
-def embed_chunks(model: Any, chunks: Sequence[Mapping[str, Any]], batch_size: int) -> Any:
+def _prompt_name(value: str | None) -> str | None:
+    if value is None or value.casefold() == "none":
+        return None
+    return value
+
+
+def _encode_texts(
+    model: Any,
+    texts: Sequence[str],
+    batch_size: int,
+    *,
+    prompt_name: str | None,
+    asymmetric_method: str,
+) -> Any:
+    """Encode using an explicit model-card prompt and normalized output."""
+
+    kwargs = {
+        "batch_size": batch_size,
+        "normalize_embeddings": True,
+        "show_progress_bar": False,
+    }
+    prompt_name = _prompt_name(prompt_name)
+    method = getattr(model, asymmetric_method, None)
+    expected_prompt = asymmetric_method.removeprefix("encode_")
+    if prompt_name == expected_prompt and callable(method):
+        return method(list(texts), **kwargs)
+    if prompt_name is None:
+        return model.encode(list(texts), **kwargs)
+    return model.encode(list(texts), prompt_name=prompt_name, **kwargs)
+
+
+def embed_chunks(
+    model: Any,
+    chunks: Sequence[Mapping[str, Any]],
+    batch_size: int,
+    document_prompt_name: str | None = "document",
+) -> Any:
     import numpy as np
 
-    vectors = model.encode_document(
+    vectors = _encode_texts(
+        model,
         [chunk["embed_text"] for chunk in chunks],
-        batch_size=batch_size,
-        normalize_embeddings=True,
-        show_progress_bar=False,
+        batch_size,
+        prompt_name=document_prompt_name,
+        asymmetric_method="encode_document",
     )
     return np.asarray(vectors, dtype="float32")
 
 
-def embed_queries(model: Any, query_texts: Sequence[str], batch_size: int) -> Any:
+def embed_queries(
+    model: Any,
+    query_texts: Sequence[str],
+    batch_size: int,
+    query_prompt_name: str | None = "query",
+) -> Any:
     import numpy as np
 
-    vectors = model.encode_query(
-        list(query_texts),
-        batch_size=batch_size,
-        normalize_embeddings=True,
-        show_progress_bar=False,
+    vectors = _encode_texts(
+        model,
+        query_texts,
+        batch_size,
+        prompt_name=query_prompt_name,
+        asymmetric_method="encode_query",
     )
     return np.asarray(vectors, dtype="float32")
 
@@ -1021,11 +1065,11 @@ def _cache_params(args: argparse.Namespace, device: str, versions: Mapping[str, 
         "model_id": args.model,
         "model_revision": args.model_revision,
         "tokenizer_id": args.tokenizer,
-        # The CLI intentionally has one HF model revision: the default tokenizer
-        # belongs to the same repository and is pinned to that exact commit.
-        "tokenizer_revision": args.model_revision,
+        "tokenizer_revision": args.tokenizer_revision,
         "tokenizer_backend": "tokie",
         "tokenizer_backend_version": versions.get("tokie"),
+        "query_prompt_name": _prompt_name(args.query_prompt_name),
+        "document_prompt_name": _prompt_name(args.document_prompt_name),
         "recipe_id": args.recipe,
         "recipe_repository": RECIPE_REPOSITORY if args.recipe != "none" else None,
         "recipe_revision": args.recipe_revision if args.recipe != "none" else None,
@@ -1054,6 +1098,17 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--model", default=MODEL_ID)
     parser.add_argument("--model-revision", default=MODEL_REVISION)
     parser.add_argument("--tokenizer", default=TOKENIZER_ID)
+    parser.add_argument("--tokenizer-revision", default=TOKENIZER_REVISION)
+    parser.add_argument(
+        "--query-prompt-name",
+        default="query",
+        help="Sentence Transformers prompt name for category queries, or 'none'",
+    )
+    parser.add_argument(
+        "--document-prompt-name",
+        default="document",
+        help="Sentence Transformers prompt name for chunks, or 'none'",
+    )
     parser.add_argument("--recipe", default=RECIPE_ID, help="Chonkie recipe name, or 'none'")
     parser.add_argument("--recipe-revision", default=RECIPE_REVISION)
     parser.add_argument("--chunk-size", type=int, default=DEFAULT_CHUNK_SIZE)
@@ -1133,7 +1188,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
 
     query_vectors = embed_queries(
-        model, [_field(category, "query_text") for category in categories], args.batch_size
+        model,
+        [_field(category, "query_text") for category in categories],
+        args.batch_size,
+        args.query_prompt_name,
     )
     if query_vectors.shape[0] != EXPECTED_CATEGORIES:
         raise AssertionError(
@@ -1176,13 +1234,18 @@ def main(argv: Sequence[str] | None = None) -> int:
                 )
                 chunker = build_chunker(
                     tokenizer_id=args.tokenizer,
-                    model_revision=args.model_revision,
+                    tokenizer_revision=args.tokenizer_revision,
                     recipe=args.recipe,
                     recipe_revision=args.recipe_revision,
                     chunk_size=args.chunk_size,
                 )
             chunks, stats = chunk_contract(contract.text, chunker)
-            vectors = embed_chunks(model, chunks, args.batch_size)
+            vectors = embed_chunks(
+                model,
+                chunks,
+                args.batch_size,
+                args.document_prompt_name,
+            )
             if vectors.shape[0] != len(chunks):
                 raise AssertionError("embedding row count does not match chunk count")
             save_contract_cache(
@@ -1260,7 +1323,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "recipe_language": RECIPE_LANGUAGE,
             "chunk_size_tokens": args.chunk_size,
             "tokenizer": args.tokenizer,
-            "tokenizer_revision": args.model_revision,
+            "tokenizer_revision": args.tokenizer_revision,
             "tokenizer_backend": "tokie",
             "tokenizer_backend_version": versions.get("tokie"),
             "alignment_window_chars": ALIGNMENT_WINDOW,
@@ -1271,6 +1334,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             "round_before_ranking_decimals": args.decimals,
             "tie_breaker": "numeric chunk_id ascending",
             "query_template": "{category}. {official description}",
+            "query_prompt_name": _prompt_name(args.query_prompt_name),
+            "document_prompt_name": _prompt_name(args.document_prompt_name),
             "cutoff_chunk_count": "max(1, ceil(fraction * document_chunks))",
             "primary_recall": "positive character overlap with any gold segment",
         },

@@ -87,8 +87,8 @@ body {
 /* The reading surface. Text here must stay selectable — spans are captured from
    the browser selection, so never add user-select: none inside .ocr-page. */
 .ocr-page {
+  width: 100%;
   padding: 2rem 2.4rem 6rem;
-  max-width: 74ch;
   font-size: 1rem;
   line-height: 1.65;
   color: #1f2937;

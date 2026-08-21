@@ -14,9 +14,11 @@ import csv
 import json
 import tempfile
 import unittest
+from pathlib import Path
 from types import SimpleNamespace
 
 from pipeline.cuad_validation import evaluate_recall as recall
+from pipeline.cuad_validation import evaluate_models as model_comparison
 from pipeline.cuad_validation import prepare_cuad_data as data
 
 
@@ -157,6 +159,60 @@ class ChunkOffsetTests(unittest.TestCase):
         self.assertTrue(all(source[c["char_start"] : c["char_end"]] == c["text"] for c in chunks))
         self.assertEqual(stats["n_offset_corrections"], 1)
         self.assertEqual(stats["n_blank_skipped"], 1)
+
+
+class EmbeddingProfileTests(unittest.TestCase):
+    def test_prompt_profiles_route_to_asymmetric_or_generic_encode(self) -> None:
+        class FakeModel:
+            def __init__(self) -> None:
+                self.calls: list[tuple[str, object, dict[str, object]]] = []
+
+            def encode_query(self, texts: object, **kwargs: object) -> list[list[float]]:
+                self.calls.append(("query", texts, kwargs))
+                return [[1.0, 0.0]]
+
+            def encode_document(self, texts: object, **kwargs: object) -> list[list[float]]:
+                self.calls.append(("document", texts, kwargs))
+                return [[0.0, 1.0]]
+
+            def encode(self, texts: object, **kwargs: object) -> list[list[float]]:
+                self.calls.append(("generic", texts, kwargs))
+                return [[0.5, 0.5]]
+
+        model = FakeModel()
+        recall.embed_queries(model, ["query"], 4, "query")
+        recall.embed_chunks(model, [{"embed_text": "document"}], 4, "document")
+        recall.embed_queries(model, ["query"], 4, "web_search_query")
+        recall.embed_chunks(model, [{"embed_text": "document"}], 4, "none")
+
+        self.assertEqual([call[0] for call in model.calls], ["query", "document", "generic", "generic"])
+        self.assertEqual(model.calls[2][2]["prompt_name"], "web_search_query")
+        self.assertNotIn("prompt_name", model.calls[3][2])
+
+    def test_model_loop_pins_profiles_and_fixed_chunk_tokenizer(self) -> None:
+        args = model_comparison._build_parser().parse_args([])  # noqa: SLF001
+        profiles = model_comparison.MODEL_PROFILES
+        self.assertEqual(
+            [profile.model_id for profile in profiles],
+            [
+                "google/embeddinggemma-300m",
+                "microsoft/harrier-oss-v1-0.6b",
+                "Qwen/Qwen3-Embedding-0.6B",
+            ],
+        )
+        command = model_comparison.evaluator_command(
+            profiles[1], args, Path("out"), Path("cache")
+        )
+        self.assertEqual(command[command.index("--tokenizer") + 1], recall.TOKENIZER_ID)
+        self.assertEqual(
+            command[command.index("--tokenizer-revision") + 1],
+            recall.TOKENIZER_REVISION,
+        )
+        self.assertEqual(
+            command[command.index("--query-prompt-name") + 1],
+            "web_search_query",
+        )
+        self.assertEqual(command[command.index("--document-prompt-name") + 1], "none")
 
 
 class RankingAndIntervalTests(unittest.TestCase):

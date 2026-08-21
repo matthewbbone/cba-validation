@@ -43,7 +43,7 @@ For each CUAD category, the query is exactly:
 
 Each contract is independently split with Chonkie's markdown `RecursiveChunker`, using
 the same Tokie tokenizer backend selected by `runner.py` and a 512-token chunk size.
-The tokenizer JSON is downloaded at the model revision rather than from a mutable Hub
+The tokenizer JSON is downloaded at its pinned revision rather than from a mutable Hub
 branch. The defaults pin:
 
 - model: `google/embeddinggemma-300m`, revision
@@ -52,8 +52,9 @@ branch. The defaults pin:
   `bd588a8b1beb3b387ab999f1f86806e7fcea3dd8`
 - recipe: `markdown`
 
-As in `runner.py`, contract chunks use `encode_document`, category queries use
-`encode_query`, both sides are L2-normalized, and their dot product is cosine similarity.
+As in `runner.py`, contract chunks and category queries use the model's asymmetric
+document/query prompt profiles, both sides are L2-normalized, and their dot product is
+cosine similarity.
 Chonkie-reported offsets are checked against the exact source slice. A locally shifted
 offset is realigned to the nearest nearby exact match, with the earliest start breaking
 an equal-distance tie; out-of-order or unresolved chunks fail the run.
@@ -96,11 +97,35 @@ Useful overrides are visible with:
 uv run python -m pipeline.cuad_validation.evaluate_recall --help
 ```
 
-They include dataset and model revisions, local input/output paths, model, tokenizer,
-recipe and recipe revision, chunk size, batch size, device, score decimals, cache
-directory, and `--force`. Changing an override makes the resulting run a different
-benchmark; the resolved values and installed library versions are recorded in output
-metadata.
+They include dataset, model, and tokenizer revisions; query/document prompt names;
+local input/output paths; model; tokenizer; recipe and recipe revision; chunk size;
+batch size; device; score decimals; cache directory; and `--force`. Changing an
+override makes the resulting run a different benchmark; the resolved values and
+installed library versions are recorded in output metadata.
+
+## Three-model comparison
+
+Run the locked comparison for the three Hugging Face models with:
+
+```bash
+uv run python -m pipeline.cuad_validation.evaluate_models
+```
+
+The driver runs each evaluator in a separate process so accelerator memory is released
+between models. Dataset, category queries, 512-token chunks, EmbeddingGemma tokenizer,
+recipe, ranking, and recall definitions remain fixed. Only the embedding model and its
+official query/document prompt profile change:
+
+| Model | Pinned revision | Query prompt | Document prompt |
+| --- | --- | --- | --- |
+| `google/embeddinggemma-300m` | `57c266a740f537b4dc058e1b0cda161fd15afa75` | `query` | `document` |
+| `microsoft/harrier-oss-v1-0.6b` | `f9b9dc8d367d443f2479d27aa5d8d2850c0774ee` | `web_search_query` | none |
+| `Qwen/Qwen3-Embedding-0.6B` | `97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3` | `query` | none |
+
+Outputs and caches are isolated by model under `model_comparison/` and `model_cache/`.
+The driver also writes `model_comparison.json` and `model_comparison.csv` at the
+comparison root. Use `--summarize-only` to rebuild those comparison files from completed
+model summaries without loading model weights.
 
 The standard-library test suite is offline and does not load model weights:
 
