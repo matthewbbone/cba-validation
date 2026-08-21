@@ -1,4 +1,12 @@
-# CBA provision span annotation
+# CBA annotation UI
+
+Two views behind a tab bar:
+
+- **Annotate** — span annotation over pipeline chunks (the default; everything below).
+- **Review extractions** — audit what the LLM extractor recorded for one
+  (document, concept), against the source PDF. See [the section at the end](#extraction-review).
+
+## Span annotation
 
 An annotator reads one **chunk** of a collective bargaining agreement beside one
 provision concept, judges whether the passage addresses that concept, and highlights the
@@ -23,6 +31,8 @@ There is no build step for data — the app reads the pipeline's output directly
 | `results/concept_similarity/lookup.json` | the (chunk × concept) similarity scores |
 | `results/concept_similarity/concepts.json` | the 34 concepts and their descriptions |
 | `stg_01_ocr/{source}/{engine}/{doc}/full.txt` | re-read at submit to verify every span |
+| `annotation_ui/data/review-extractions.json` | the review tab's extraction detail (~7 MB) |
+| `cbas/{source}/{filename}` (S3 only) | the source PDFs the review tab displays |
 
 ## Storage: local disk or S3
 
@@ -44,6 +54,15 @@ To populate a bucket:
 ```bash
 S3_BUCKET_NAME=my-bucket npm run upload-corpus            # --dry-run to preview
 S3_BUCKET_NAME=my-bucket npm run dev                      # read from S3
+```
+
+`pipeline/runner.py` understands the same two backends and the same repo-relative paths,
+so it can read the corpus from the bucket and write its artifacts straight back — no
+`upload-corpus` step, and a run interrupted on one machine resumes on another because the
+per-document cache lives in the bucket too:
+
+```bash
+S3_BUCKET_NAME=my-bucket uv run python pipeline/runner.py
 ```
 
 `upload-corpus` uploads the 20 `full.txt` files plus the three pipeline artifacts (~14 MB)
@@ -213,3 +232,49 @@ the concept descriptions now come from the pipeline's `concepts.json`, which com
 `provision-schemas.json` carries hand-edited rater copy. The extraction-review tab and the
 Prolific plumbing were removed earlier; the S3 layer is unrelated to the old PDF-serving
 code and shares none of it.
+
+---
+
+## Extraction review
+
+Restored from commit `acd0448`. A reviewer sees the source PDF beside everything the
+extractor recorded for one (document, concept) — the concept records, their fields, and
+the evidence pointers — and flags overall quality (`good`/`okay`/`bad`) and specific
+problems (`missing`/`hallucinating`/`confusing`), with an optional comment. Both rows are
+independent toggle sets, and an empty set is a meaningful answer: reviewed, nothing wrong.
+
+This is a different task from span annotation and shares none of its types: it audits
+machine output rather than coding the contract from scratch. 4,029 units over 129
+extraction documents.
+
+### What it needs
+
+```bash
+npm run prepare-data      # builds data/review-extractions.json from the aggregate
+npm run upload-corpus     # only if the app reads from S3
+```
+
+`prepare-data` streams `review/cba_provisions_aggregate.jsonl.gz` (66 MB) and emits
+`lib/review-units.json` (the unit index, bundled) plus `data/review-extractions.json`
+(the 7 MB detail, read server-side). Its other three stages are dormant — their input
+trees were removed from the repo — and skip with a notice.
+
+The PDF panel is served by `/api/pdf/{source}/{filename}`, which in S3 mode 307-redirects
+to a presigned URL so the browser fetches the file directly; some contracts are 25 MB and
+proxying them through the server would be wasteful. Locally it falls back to reading
+`data/cbas/{source}/{filename}`, which this checkout does not have — so the PDF panel is
+S3-only in practice, while the rest of the review view works either way.
+
+### Output
+
+S3: `reviews/{reviewer}/{run}/{document}/{concept}.json`, one object per unit — the same
+layout as before the rework, so judgements submitted earlier are still found. Locally:
+appended to `annotations/extraction_reviews.jsonl`.
+
+### One fix on restore
+
+The view used to open on the first concept of the first document whichever way, so a
+reviewer resuming landed on work they had already done — shown ticked in the sidebar
+while on screen. Re-submitting only overwrote its own object, so nothing was corrupted,
+but it wasted the reviewer's attention. The auto-selection is now keyed on the load that
+brought the progress in, so it lands on the first *outstanding* concept instead.

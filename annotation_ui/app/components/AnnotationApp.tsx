@@ -36,7 +36,8 @@ function preview(text: string, max = 220): string {
   return flat.length > max ? flat.slice(0, max - 1) + "…" : flat;
 }
 
-export default function AnnotationApp() {
+/** `tabs` is the shared tab bar, rendered into this view's own header. */
+export default function AnnotationApp({ tabs }: { tabs?: React.ReactNode }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -383,7 +384,7 @@ export default function AnnotationApp() {
 
   if (appState === "no-annotator") {
     return (
-      <AppShell title={TITLE}>
+      <AppShell title={TITLE} tabs={tabs}>
         <div className="overlay-screen">
           <div className="overlay-card">
             <h2>Who is annotating?</h2>
@@ -418,7 +419,7 @@ export default function AnnotationApp() {
 
   if (appState === "loading") {
     return (
-      <AppShell title={TITLE}>
+      <AppShell title={TITLE} tabs={tabs}>
         <div className="overlay-screen">
           <div className="overlay-card">
             <div className="spinner" />
@@ -432,7 +433,7 @@ export default function AnnotationApp() {
   if (appState === "exhausted") {
     const label = BANDS.find((b) => b.id === band)?.label ?? band;
     return (
-      <AppShell title={TITLE} right={<span className="cba-id">{annotator}</span>}>
+      <AppShell title={TITLE} tabs={tabs} right={<span className="cba-id">{annotator}</span>}>
         {bandSelector}
         <div className="overlay-screen">
           <div className="overlay-card">
@@ -457,6 +458,7 @@ export default function AnnotationApp() {
   return (
     <AppShell
       title={TITLE}
+      tabs={tabs}
       right={
         <>
           {unit && (

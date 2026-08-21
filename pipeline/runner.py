@@ -4,10 +4,11 @@
 Deterministic given the same inputs and parameters, and safe to re-run: chunking and
 embedding are cached per document, so an interrupted run costs one document, not the corpus.
 
-    uv run python pipeline/runner.py                       # full build
+    uv run python pipeline/runner.py                       # full build, local files
     uv run python pipeline/runner.py --doc 243Abby         # one document (smoke test)
     uv run python pipeline/runner.py --stage chunk         # chunk only, no model load
     uv run python pipeline/runner.py --force               # ignore the cache and rebuild
+    S3_BUCKET_NAME=my-bucket uv run python pipeline/runner.py    # read and write S3
 
 Four stages:
   1. chunk each stg_01_ocr/**/full.txt with chonkie's RecursiveChunker (markdown recipe)
@@ -15,17 +16,35 @@ Four stages:
   3. cosine-similarity every chunk against every tier-1 concept description
   4. write a document > chunk > concept > score lookup, plus the cached artifacts
 
+Storage: every path below is **repo-relative**, and resolves either against the repo
+working tree or against an S3 bucket when S3_BUCKET_NAME is set -- the same two-backend,
+one-vocabulary arrangement as annotation_ui/lib/storage.ts, so a path means the same thing
+to the pipeline, to the UI, and in the bucket. Inputs read:
+
+    stg_01_ocr/{source}/{engine}/{document}/full.txt
+    results/tier_1_concepts.md
+    annotation_ui/lib/provision-schemas.json      (the concept descriptions)
+
+and everything under results/concept_similarity/ is written back, including the per-document
+cache -- so a run interrupted on one machine can be resumed on another.
+
+Note this script cannot run on the Amplify SSR runtime: it is Python, needs torch, and
+loads a 1.2 GB model. S3 support is for running it on a machine that has no checkout of
+the corpus (an EC2 box, a colleague's laptop) and for landing the artifacts straight in the
+bucket instead of uploading them afterwards.
+
 Unlike review/aggregate_provisions.py and review/report_extraction_diagnostics.py, this script
 is NOT stdlib-only -- it cannot be. It needs chonkie, sentence-transformers, transformers,
-torch and numpy, declared in pyproject.toml. Install with:
+torch, numpy and boto3, declared in pyproject.toml. Install with:
 
-    uv add chonkie "sentence-transformers>=5.0" "transformers>=4.57" torch numpy jsonschema
+    uv add chonkie "sentence-transformers>=5.0" "transformers>=4.57" torch numpy jsonschema boto3
 """
 
 from __future__ import annotations
 
 import argparse
 import bisect
+import io
 import json
 import os
 import re
@@ -33,7 +52,9 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-SCHEMA_VERSION = "concept_similarity_v1"
+# v2: chunks.jsonl `source_file` is repo-relative rather than an absolute local
+# path, so the artifact is portable between a checkout and the bucket.
+SCHEMA_VERSION = "concept_similarity_v2"
 
 MODEL_ID = "google/embeddinggemma-300m"
 
@@ -50,6 +71,132 @@ PAGE_SEP_RE = re.compile(r"^--- Page (\d+) ---[ \t]*$", re.MULTILINE)
 # The OCR emits this literal string as the entire content of a blank/unreadable page.
 # 7 pages corpus-wide. Only dropped under --drop-filler.
 OCR_FILLER = "The quick brown fox jumps over the lazy dog."
+
+
+# --------------------------------------------------------------------------------------
+# Storage -- local working tree or S3, behind one repo-relative path vocabulary
+# --------------------------------------------------------------------------------------
+
+
+class Store:
+    """Reads and writes repo-relative paths against the working tree or a bucket.
+
+    S3 mode is selected purely by a bucket being configured, so a local checkout with no
+    AWS credentials keeps behaving exactly as before.
+    """
+
+    def __init__(self, repo_root, bucket=None, prefix="", region=None):
+        self.repo_root = Path(repo_root)
+        self.bucket = bucket or None
+        self.prefix = (prefix or "").strip("/")
+        self.region = region or os.environ.get("AWS_REGION") or "us-east-1"
+        self._client = None
+
+    # -- plumbing ------------------------------------------------------------------
+
+    @property
+    def client(self):
+        if self._client is None:
+            import boto3  # imported lazily so local runs need no AWS SDK at all
+
+            self._client = boto3.client("s3", region_name=self.region)
+        return self._client
+
+    def describe(self):
+        if not self.bucket:
+            return f"local:{self.repo_root}"
+        return f"s3://{self.bucket}/{self.prefix + '/' if self.prefix else ''}"
+
+    def key(self, rel):
+        return f"{self.prefix}/{rel}" if self.prefix else rel
+
+    def local(self, rel):
+        """Resolve a repo-relative path, refusing anything that escapes the repo."""
+        resolved = (self.repo_root / rel).resolve()
+        if not str(resolved).startswith(str(self.repo_root) + os.sep):
+            raise ValueError(f"path escapes the repo: {rel}")
+        return resolved
+
+    # -- reads ---------------------------------------------------------------------
+
+    def read_bytes(self, rel):
+        if not self.bucket:
+            return self.local(rel).read_bytes()
+        return self.client.get_object(Bucket=self.bucket, Key=self.key(rel))["Body"].read()
+
+    def read_text(self, rel):
+        return self.read_bytes(rel).decode("utf-8")
+
+    def exists(self, rel):
+        if not self.bucket:
+            try:
+                return self.local(rel).is_file()
+            except ValueError:
+                return False
+        from botocore.exceptions import ClientError
+
+        try:
+            # HEAD, not GET: the cache probe would otherwise pull the whole object.
+            self.client.head_object(Bucket=self.bucket, Key=self.key(rel))
+            return True
+        except ClientError:
+            return False
+
+    def list_paths(self, rel_prefix):
+        """Repo-relative paths under `rel_prefix`, sorted, in both backends."""
+        if not self.bucket:
+            root = self.local(rel_prefix)
+            if not root.is_dir():
+                return []
+            return sorted(
+                str(p.relative_to(self.repo_root))
+                for p in root.rglob("*")
+                if p.is_file() and not p.name.startswith(".")
+            )
+
+        paginator = self.client.get_paginator("list_objects_v2")
+        strip = len(self.prefix) + 1 if self.prefix else 0
+        out = []
+        for page in paginator.paginate(Bucket=self.bucket, Prefix=self.key(rel_prefix)):
+            for obj in page.get("Contents", []):
+                out.append(obj["Key"][strip:])
+        return sorted(out)
+
+    # -- writes --------------------------------------------------------------------
+    # Locally: write a .partial then os.replace, so a half-written artifact is never
+    # mistaken for a finished one. On S3: a PutObject is already atomic per object.
+
+    def write_bytes(self, rel, data, content_type=None):
+        if not self.bucket:
+            target = self.local(rel)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            partial = target.with_suffix(target.suffix + ".partial")
+            partial.write_bytes(data)
+            os.replace(partial, target)
+            return
+        extra = {"ContentType": content_type} if content_type else {}
+        self.client.put_object(Bucket=self.bucket, Key=self.key(rel), Body=data, **extra)
+
+    def write_text(self, rel, text, content_type="text/plain; charset=utf-8"):
+        self.write_bytes(rel, text.encode("utf-8"), content_type)
+
+    def write_json(self, rel, obj, indent=2):
+        separators = (",", ":") if indent is None else None
+        body = json.dumps(obj, ensure_ascii=False, indent=indent, separators=separators)
+        self.write_text(rel, body, "application/json")
+
+    def write_jsonl(self, rel, rows):
+        body = "".join(
+            json.dumps(r, ensure_ascii=False, separators=(",", ":")) + "\n" for r in rows
+        )
+        self.write_text(rel, body, "application/x-ndjson")
+
+    def write_npy(self, rel, array):
+        import numpy as np
+
+        buf = io.BytesIO()
+        np.save(buf, array)
+        self.write_bytes(rel, buf.getvalue(), "application/octet-stream")
 
 
 # --------------------------------------------------------------------------------------
@@ -89,18 +236,20 @@ def resolve_device(requested):
 # Concepts
 # --------------------------------------------------------------------------------------
 
-def parse_tier1(path, parser):
+def parse_tier1(store, rel, parser):
     """Rows of the pipe table in results/tier_1_concepts.md, in file order.
 
     Hand-maintained, so the parse is forgiving: rows are taken only after the |---| row and
     short rows are skipped. The file has no trailing newline on its last row.
     """
-    if not Path(path).is_file():
-        parser.error(f"concept list not found: {path}")
+    try:
+        raw_text = store.read_text(rel)
+    except Exception as exc:  # noqa: BLE001 -- missing locally or in the bucket
+        parser.error(f"could not read the concept list {rel} from {store.describe()}: {exc}")
 
     concepts = []
     past_separator = False
-    for raw in Path(path).read_text(encoding="utf-8").split("\n"):
+    for raw in raw_text.split("\n"):
         line = raw.strip()
         if not line.startswith("|"):
             continue
@@ -120,11 +269,11 @@ def parse_tier1(path, parser):
             "status": cells[3] if len(cells) > 3 else "",
         })
     if not concepts:
-        parser.error(f"no concept rows parsed from {path}")
+        parser.error(f"no concept rows parsed from {rel}")
     return concepts
 
 
-def load_concepts(concepts_md, schemas_json, parser):
+def load_concepts(store, concepts_rel, schemas_rel, parser):
     """Compose the query text for each tier-1 concept.
 
     tier_1_concepts.md is the authority on which concepts exist and supplies the label and
@@ -133,16 +282,17 @@ def load_concepts(concepts_md, schemas_json, parser):
     only `description` is read from it -- and a missing one is a hard error rather than a
     silently shorter query string.
     """
-    concepts = parse_tier1(concepts_md, parser)
+    concepts = parse_tier1(store, concepts_rel, parser)
 
-    if not Path(schemas_json).is_file():
-        parser.error(f"provision schemas not found: {schemas_json}")
-    schemas = json.loads(Path(schemas_json).read_text(encoding="utf-8"))
+    try:
+        schemas = json.loads(store.read_text(schemas_rel))
+    except Exception as exc:  # noqa: BLE001
+        parser.error(f"could not read the provision schemas {schemas_rel} from {store.describe()}: {exc}")
 
     missing = [c["concept_id"] for c in concepts if not schemas.get(c["concept_id"], {}).get("description")]
     if missing:
         parser.error(
-            f"{len(missing)} tier-1 concept(s) have no description in {schemas_json}: "
+            f"{len(missing)} tier-1 concept(s) have no description in {schemas_rel}: "
             f"{', '.join(missing[:5])}"
         )
 
@@ -156,29 +306,31 @@ def load_concepts(concepts_md, schemas_json, parser):
 # Documents and page provenance
 # --------------------------------------------------------------------------------------
 
-def discover_documents(ocr_root, parser):
-    """Every stg_01_ocr/{source}/{engine}/{document_id}/full.txt, sorted for stable chunk ids."""
-    root = Path(ocr_root)
-    if not root.is_dir():
-        parser.error(f"OCR root not found: {root}")
+def discover_documents(store, ocr_root, parser):
+    """Every stg_01_ocr/{source}/{engine}/{document_id}/full.txt, sorted for stable chunk ids.
 
+    Only full.txt is looked for. The per-page .md/.txt files it was built from are not read
+    by anything here, and on S3 they may not have been uploaded at all.
+    """
     docs = []
-    for path in sorted(root.glob("*/*/*/full.txt")):
-        document_id = path.parent.name
-        engine = path.parent.parent.name
-        source = path.parent.parent.parent.name
-        if source.startswith(".") or engine.startswith(".") or document_id.startswith("."):
+    for rel in store.list_paths(ocr_root.rstrip("/") + "/"):
+        parts = rel.split("/")
+        # stg_01_ocr / source / engine / document / full.txt
+        if len(parts) != 5 or parts[-1] != "full.txt":
+            continue
+        _, source, engine, document_id, _ = parts
+        if any(x.startswith(".") for x in (source, engine, document_id)):
             continue
         docs.append({
             "key": f"{source}/{engine}/{document_id}",
             "source": source,
             "engine": engine,
             "document_id": document_id,
-            "path": path,
+            "rel": rel,
         })
     if not docs:
-        parser.error(f"no full.txt files under {root}")
-    return docs
+        parser.error(f"no full.txt files under {ocr_root} in {store.describe()}")
+    return sorted(docs, key=lambda d: d["rel"])
 
 
 def page_offsets(full_text):
@@ -241,9 +393,9 @@ def build_chunker(chunk_size, tokenizer, recipe, parser):
         )
 
 
-def chunk_document(doc, chunker, drop_filler):
+def chunk_document(store, doc, chunker, drop_filler):
     """Chunk one full.txt into rows carrying text, exact offsets and a page range."""
-    full_text = doc["path"].read_text(encoding="utf-8")
+    full_text = store.read_text(doc["rel"])
     numbers, starts = page_offsets(full_text)
 
     rows = []
@@ -271,7 +423,8 @@ def chunk_document(doc, chunker, drop_filler):
             "source": doc["source"],
             "engine": doc["engine"],
             "document_id": doc["document_id"],
-            "source_file": str(doc["path"]),
+            # Repo-relative, so the row resolves against a checkout or the bucket.
+            "source_file": doc["rel"],
             "char_start": start,
             "char_end": end,
             "page_start": first_page,
@@ -313,7 +466,7 @@ def cache_params(args, model_id):
     }
 
 
-def load_cached(cache_dir, document_key, params):
+def load_cached(store, cache_dir, document_key, params):
     """Cached (rows, vectors, stats) for one document, or None.
 
     The meta file is the commit marker. Stats come back with the vectors so a warm re-run
@@ -322,38 +475,34 @@ def load_cached(cache_dir, document_key, params):
     import numpy as np
 
     slug = cache_slug(document_key)
-    meta_path = cache_dir / f"{slug}.meta.json"
-    npz_path = cache_dir / f"{slug}.npz"
-    if not (meta_path.exists() and npz_path.exists()):
-        return None
+    meta_rel = f"{cache_dir}/{slug}.meta.json"
+    npz_rel = f"{cache_dir}/{slug}.npz"
     try:
-        meta = json.loads(meta_path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
+        meta = json.loads(store.read_text(meta_rel))
+    except Exception:  # noqa: BLE001 -- absent, unreadable or malformed: treat as a miss
         return None
     if meta.get("params") != params:
         return None
     try:
-        vectors = np.load(npz_path)["vectors"]
-    except (OSError, ValueError, KeyError):
+        vectors = np.load(io.BytesIO(store.read_bytes(npz_rel)))["vectors"]
+    except Exception:  # noqa: BLE001
         return None
     if len(meta.get("rows", [])) != len(vectors):
         return None
     return meta["rows"], vectors, meta.get("stats", {})
 
 
-def save_cached(cache_dir, document_key, params, rows, vectors, stats):
-    """Write vectors then meta, each atomically. Meta last: it is what marks the entry usable."""
+def save_cached(store, cache_dir, document_key, params, rows, vectors, stats):
+    """Write vectors then meta. Meta last: it is what marks the entry usable."""
     import numpy as np
 
     slug = cache_slug(document_key)
-    npz_path = cache_dir / f"{slug}.npz"
-    npz_partial = npz_path.with_suffix(".npz.partial")
-    with open(npz_partial, "wb") as fh:
-        np.savez(fh, vectors=vectors)
-    os.replace(npz_partial, npz_path)
-
-    meta_path = cache_dir / f"{slug}.meta.json"
-    write_json(meta_path, {"params": params, "stats": stats, "rows": rows}, indent=None)
+    buf = io.BytesIO()
+    np.savez(buf, vectors=vectors)
+    store.write_bytes(f"{cache_dir}/{slug}.npz", buf.getvalue(), "application/octet-stream")
+    store.write_json(
+        f"{cache_dir}/{slug}.meta.json", {"params": params, "stats": stats, "rows": rows}, indent=None
+    )
 
 
 def embed_rows(model, rows, batch_size):
@@ -375,26 +524,6 @@ def embed_rows(model, rows, batch_size):
 # Output
 # --------------------------------------------------------------------------------------
 
-def write_json(path, obj, indent=2):
-    """Atomic write -- a half-finished artifact must never look like a finished one."""
-    partial = Path(str(path) + ".partial")
-    separators = (",", ":") if indent is None else None
-    partial.write_text(
-        json.dumps(obj, ensure_ascii=False, indent=indent, separators=separators),
-        encoding="utf-8",
-    )
-    os.replace(partial, path)
-
-
-def write_jsonl(path, rows):
-    partial = Path(str(path) + ".partial")
-    with open(partial, "w", encoding="utf-8") as fh:
-        for row in rows:
-            fh.write(json.dumps(row, ensure_ascii=False, separators=(",", ":")))
-            fh.write("\n")
-    os.replace(partial, path)
-
-
 # --------------------------------------------------------------------------------------
 # main
 # --------------------------------------------------------------------------------------
@@ -404,11 +533,12 @@ def main(argv=None):
     repo = here.parent
 
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--ocr-root", default=str(repo / "stg_01_ocr"))
-    parser.add_argument("--concepts", default=str(repo / "results" / "tier_1_concepts.md"))
+    # All paths are repo-relative and resolve against the working tree or the bucket.
+    parser.add_argument("--ocr-root", default="stg_01_ocr")
+    parser.add_argument("--concepts", default="results/tier_1_concepts.md")
     parser.add_argument(
         "--schemas",
-        default=str(repo / "annotation_ui" / "lib" / "provision-schemas.json"),
+        default="annotation_ui/lib/provision-schemas.json",
         help="source of the plain-language concept descriptions",
     )
     parser.add_argument(
@@ -417,6 +547,16 @@ def main(argv=None):
         help="default: results/concept_similarity (a --doc run writes to its _partial subdir)",
     )
     parser.add_argument("--cache-dir", default=None, help="default: <out-dir>/_cache")
+    parser.add_argument(
+        "--s3-bucket",
+        default=os.environ.get("S3_BUCKET_NAME"),
+        help="read and write S3 instead of the working tree (env: S3_BUCKET_NAME)",
+    )
+    parser.add_argument(
+        "--s3-prefix",
+        default=os.environ.get("S3_PREFIX", ""),
+        help="optional key prefix within the bucket (env: S3_PREFIX)",
+    )
     parser.add_argument("--model", default=MODEL_ID)
     parser.add_argument("--tokenizer", default=MODEL_ID, help="chonkie counts chunk_size in these tokens")
     parser.add_argument("--recipe", default="markdown", help="chonkie recursive recipe, or 'none'")
@@ -439,30 +579,29 @@ def main(argv=None):
     parser.add_argument("--decimals", type=int, default=4, help="rounding for stored scores")
     args = parser.parse_args(argv)
 
-    default_out = repo / "results" / "concept_similarity"
-    out_dir = Path(args.out_dir) if args.out_dir else default_out
+    store = Store(repo, bucket=args.s3_bucket, prefix=args.s3_prefix)
+    print(f"storage: {store.describe()}")
+
+    default_out = "results/concept_similarity"
+    out_dir = args.out_dir.rstrip("/") if args.out_dir else default_out
     # The cache is always the shared one, so a --doc run still warms it for the full build.
-    cache_dir = Path(args.cache_dir) if args.cache_dir else default_out / "_cache"
-    out_dir.mkdir(parents=True, exist_ok=True)
-    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_dir = args.cache_dir.rstrip("/") if args.cache_dir else f"{default_out}/_cache"
 
-    concepts = load_concepts(args.concepts, args.schemas, parser)
+    concepts = load_concepts(store, args.concepts, args.schemas, parser)
     concept_ids = [c["concept_id"] for c in concepts]
-    print(f"concepts: {len(concepts)} tier-1 (descriptions from {Path(args.schemas).name})")
+    print(f"concepts: {len(concepts)} tier-1 (descriptions from {args.schemas})")
 
-    documents = discover_documents(args.ocr_root, parser)
+    documents = discover_documents(store, args.ocr_root, parser)
     if args.doc:
         wanted = set(args.doc)
         documents = [d for d in documents if d["document_id"] in wanted]
         unknown = wanted - {d["document_id"] for d in documents}
         if unknown:
             parser.error(f"unknown document(s): {sorted(unknown)}")
-    total_bytes = sum(d["path"].stat().st_size for d in documents)
-    print(f"documents: {len(documents)} ({total_bytes/1e6:.2f} MB of full.txt)")
+    print(f"documents: {len(documents)}")
 
     if args.doc and not args.out_dir:
-        out_dir = default_out / "_partial"
-        out_dir.mkdir(parents=True, exist_ok=True)
+        out_dir = f"{default_out}/_partial"
         print(f"partial run (--doc): writing to {out_dir} so the full-corpus artifacts stay intact")
 
     params = cache_params(args, args.model)
@@ -472,14 +611,14 @@ def main(argv=None):
         chunker = build_chunker(args.chunk_size, args.tokenizer, args.recipe, parser)
         all_rows, totals = [], {}
         for doc in documents:
-            rows, stats = chunk_document(doc, chunker, args.drop_filler)
+            rows, stats = chunk_document(store, doc, chunker, args.drop_filler)
             all_rows.extend(rows)
             for k, v in stats.items():
                 totals[k] = totals.get(k, 0) + v
             print(f"  {doc['key']:56s} {stats['n_pages']:4d}p {stats['n_chunks']:5d} chunks")
-        write_jsonl(out_dir / "chunks.jsonl", [strip_embed_text(r) for r in all_rows])
+        store.write_jsonl(f"{out_dir}/chunks.jsonl", [strip_embed_text(r) for r in all_rows])
         print(f"chunks: {len(all_rows):,}  (offset mismatches: {totals.get('n_offset_mismatches', 0)})")
-        print(f"wrote {out_dir / 'chunks.jsonl'}")
+        print(f"wrote {out_dir}/chunks.jsonl")
         return 0
 
     transformers_version = check_transformers(parser)
@@ -498,7 +637,7 @@ def main(argv=None):
     all_rows, all_vectors, totals = [], [], {}
     n_cached = 0
     for doc in documents:
-        cached = None if args.force else load_cached(cache_dir, doc["key"], params)
+        cached = None if args.force else load_cached(store, cache_dir, doc["key"], params)
         if cached is not None:
             rows, vectors, stats = cached
             n_cached += 1
@@ -511,9 +650,11 @@ def main(argv=None):
                 )
             if chunker is None:
                 chunker = build_chunker(args.chunk_size, args.tokenizer, args.recipe, parser)
-            rows, stats = chunk_document(doc, chunker, args.drop_filler)
+            rows, stats = chunk_document(store, doc, chunker, args.drop_filler)
             vectors = embed_rows(model, rows, args.batch_size)
-            save_cached(cache_dir, doc["key"], params, [strip_embed_text(r) for r in rows], vectors, stats)
+            save_cached(
+                store, cache_dir, doc["key"], params, [strip_embed_text(r) for r in rows], vectors, stats
+            )
             suffix = ""
 
         for k, v in stats.items():
@@ -571,22 +712,23 @@ def main(argv=None):
         "n_chunks": len(all_rows),
         "n_concepts": len(concepts),
     }
-    write_json(out_dir / "lookup.json", {
+    store.write_json(f"{out_dir}/lookup.json", {
         "schema_version": SCHEMA_VERSION,
         "meta": meta,
         "documents": documents_out,
     }, indent=None)
 
-    write_jsonl(out_dir / "chunks.jsonl", [strip_embed_text(r) for r in all_rows])
-    np.save(out_dir / "chunk_embeddings.npy", chunk_vectors)
-    np.save(out_dir / "concept_embeddings.npy", concept_vectors)
-    write_json(out_dir / "concepts.json", {c["concept_id"]: c for c in concepts})
-    write_json(out_dir / "manifest.json", {
+    store.write_jsonl(f"{out_dir}/chunks.jsonl", [strip_embed_text(r) for r in all_rows])
+    store.write_npy(f"{out_dir}/chunk_embeddings.npy", chunk_vectors)
+    store.write_npy(f"{out_dir}/concept_embeddings.npy", concept_vectors)
+    store.write_json(f"{out_dir}/concepts.json", {c["concept_id"]: c for c in concepts})
+    store.write_json(f"{out_dir}/manifest.json", {
         "schema_version": SCHEMA_VERSION,
         "generated": generated,
         "model": args.model,
         "embedding_dim": int(chunk_vectors.shape[1]) if len(chunk_vectors) else None,
         "device": device,
+        "storage": store.describe(),
         "versions": {
             "transformers": transformers_version,
             "sentence_transformers": st.__version__,
@@ -613,9 +755,9 @@ def main(argv=None):
     mismatches = totals.get("n_offset_mismatches", 0)
     if mismatches:
         print(f"  !! {mismatches} chunk(s) were not verbatim slices -- their page ranges are suspect")
-    for name in ("lookup.json", "chunks.jsonl", "chunk_embeddings.npy", "manifest.json"):
-        path = out_dir / name
-        print(f"wrote {path} ({path.stat().st_size/1000:.0f} KB)")
+    for name in ("lookup.json", "chunks.jsonl", "chunk_embeddings.npy",
+                 "concept_embeddings.npy", "concepts.json", "manifest.json"):
+        print(f"wrote {out_dir}/{name}")
     return 0
 
 

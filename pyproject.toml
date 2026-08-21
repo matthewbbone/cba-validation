@@ -5,7 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "boto3>=1.43.76",
+    "botocore[crt]>=1.43.76",
     "chonkie>=1.7.0",
+    "huggingface-hub>=1.28.0",
     "jsonschema>=4.26.0",
     "numpy>=2.5.2",
     "openai>=2.41.1",

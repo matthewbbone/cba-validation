@@ -8,10 +8,14 @@
  *   ... --dry-run          list what would be uploaded and stop
  *
  * Uploads:
- *   stg_01_ocr/{source}/{engine}/{doc}/full.txt      (one per document)
+ *   stg_01_ocr/{source}/{engine}/{doc}/full.txt        (one per document)
  *   results/concept_similarity/chunks.jsonl
  *   results/concept_similarity/lookup.json
  *   results/concept_similarity/concepts.json
+ *   annotation_ui/data/review-extractions.json         (the review tab, ~7 MB)
+ *
+ * The review tab also needs the source PDFs at cbas/{source}/{filename}; those are
+ * already in the bucket and are served as presigned URLs, not proxied.
  *
  * Only full.txt is uploaded from the OCR tree: the per-page .md/.txt files are what
  * full.txt was built from, and nothing in the app reads them any more.
@@ -94,6 +98,16 @@ function collect(): string[] {
       process.exit(1);
     }
     rels.push(rel);
+  }
+
+  // The review tab's extraction detail. Warned about rather than fatal: the
+  // annotation tab works without it.
+  const reviewRel = "annotation_ui/data/review-extractions.json";
+  if (fs.existsSync(path.join(REPO_ROOT, reviewRel))) {
+    rels.push(reviewRel);
+  } else {
+    console.warn(`! skipping ${reviewRel} — run \`npm run prepare-data\` to build it;`);
+    console.warn("  without it the extraction-review tab has no data.");
   }
 
   return rels;
